@@ -1,7 +1,9 @@
 import dgram from 'node:dgram';
+import { EmotionProcessor } from './emotion-processor.js'
 
 const serverPython = dgram.createSocket('udp4');
 const serverPhone = dgram.createSocket('udp4');
+const emotionProcessor = new EmotionProcessor();
 
 serverPython.on('error', (err) => {
   console.log(`server error:\n${err.stack}`);
@@ -9,23 +11,12 @@ serverPython.on('error', (err) => {
 });
 
 serverPython.on('message', (msg, rinfo) => {
-  //console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-    console.log(msg.toString());
-  
-  /*var sendVal = msg.toString('ascii').split(',')[1].trim();
-  var sendVal2 = "sAnger";
 
-  console.log("len:" + sendVal.length);
+    var emotionalValence = emotionProcessor.keyValueInput(msg.toString());
 
-  console.log("SendVal:" + sendVal);
-  console.log("len:" + sendVal.length);
-  const buf6 = Buffer.from(sendVal);
-  console.log(buf6);
-  console.log("SendVal2:" + sendVal2);
-  console.log("len2:" + sendVal2.length);
-  const buf7 = Buffer.from(sendVal2);
-  console.log(buf7); */
-  serverPhone.send(msg.toString(), 1338);
+    console.log(emotionalValence);
+
+  serverPhone.send(emotionalValence, 1338);
 
 });
 
@@ -49,5 +40,3 @@ serverPhone.on('error', (err) => {
     const address = serverPhone.address();
     console.log(`server listening ${address.address}:${address.port}`);
   });
-  
-  //serverPhone.bind(1338);

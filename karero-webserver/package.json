@@ -1,5 +1,5 @@
 {
-  "type":"module",
+  "type": "module",
   "dependencies": {
     "dgram": "^1.0.1",
     "ws": "^8.8.1"
