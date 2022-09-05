@@ -68,6 +68,9 @@ export class EmotionProcessor {
             case "Disgust":
                 emotion = BEmotion.Disgust[valenceClass];
                 break;
+            case "Contempt":
+                emotion = BEmotion.Contempt[valenceClass];
+                break;
             default:
                 emotion = "Neutral";
         }
@@ -112,4 +115,6 @@ const BEmotion = {
     "Sadness" : ['Pensiveness', 'Sadness', 'Grief']
     ,
     "Disgust" : ['Boredom', 'Disgust','Loathing']
+    ,
+    "Contempt" : ['Contempt', 'Contempt','Contempt']
 }
