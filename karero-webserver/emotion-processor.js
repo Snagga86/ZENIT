@@ -97,7 +97,7 @@ export class EmotionProcessor {
 }
 
 const NUM_VALENCE_CLASSES = 3.333;
-const EMOTION_BUFFER_LEN = 20;
+const EMOTION_BUFFER_LEN = 12;
 const BEmotion = {
 
     "Anger" : ['Annoyance','Anger', 'Rage']

@@ -10,6 +10,8 @@ using System;
 using UnityEngine.UIElements;
 using UnityEditor.PackageManager;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 
 public class UDP_Receive : MonoBehaviour
 {
@@ -20,14 +22,16 @@ public class UDP_Receive : MonoBehaviour
     private object obj = null;
     byte[] receivedBytes;
     public string displayEmotion = "";
+    public string lastEmotion = "";
 
     public SkinnedMeshRenderer eyeLeft;
     public SkinnedMeshRenderer eyeRight;
 
     public FaceEmotion faceEmotion;
+    public Face targetFace;
+    public Face startFace;
 
-
-
+    private static float t = 0.0f;
 
     void Start()
     {
@@ -60,32 +64,72 @@ public class UDP_Receive : MonoBehaviour
 
         Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>());
         GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>().text = displayEmotion;
-        this.setFace(eyeLeft, eyeRight, displayEmotion);
+        
+
+        if(lastEmotion != displayEmotion){
+            this.startFace = this.getStartFace(eyeLeft, eyeRight);
+            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion(displayEmotion);
+            t = 0.0f;
+            
+        }
+        this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
+
+        lastEmotion = displayEmotion;
     }
 
-    void setFace(SkinnedMeshRenderer leftEye, SkinnedMeshRenderer rightEye, string emotion)
+    Face getStartFace(SkinnedMeshRenderer leftEye, SkinnedMeshRenderer rightEye)
     {
-        this.SetEye(leftEye, "left", emotion);
-        this.SetEye(rightEye, "right", emotion);
+        EmotionShapes tmpLeftEye = new EmotionShapes();
+        EmotionShapes tmpRightEye = new EmotionShapes();
+        
+        tmpLeftEye.angry = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry);
+        tmpLeftEye.disgusted = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted);
+        tmpLeftEye.full = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full);
+        tmpLeftEye.kreis = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis);
+        tmpLeftEye.sad = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad);
+        tmpLeftEye.happy = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy);
+
+        tmpRightEye.angry = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry);
+        tmpRightEye.disgusted = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted);
+        tmpRightEye.full = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full);
+        tmpRightEye.kreis = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis);
+        tmpRightEye.sad = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad);
+        tmpRightEye.happy = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy);
+
+        return new Face(tmpLeftEye, tmpRightEye);
     }
-    void SetEye(SkinnedMeshRenderer eye, string eyePosition, string emotion)
+
+    void setFace(SkinnedMeshRenderer leftEye, SkinnedMeshRenderer rightEye, Face startFace, Face targetFace)
     {
-        Face tmpFace = faceEmotion.getEyeShapeValuesByEmotion(emotion);
-        EmotionShapes eyeBlendshapeData = new EmotionShapes();
+        this.SetEye(leftEye, "left", startFace, targetFace);
+        this.SetEye(rightEye, "right", startFace, targetFace);
+    }
+    void SetEye(SkinnedMeshRenderer eye, string eyePosition, Face startFace, Face targetFace)
+    {
+        EmotionShapes eyeBlendshapeDataStart = new EmotionShapes();
+        EmotionShapes eyeBlendshapeDataEnd = new EmotionShapes();
+
+        Debug.Log(startFace);
+        Debug.Log(targetFace);
         if (eyePosition == "left")
         {
-            eyeBlendshapeData = tmpFace.leftEye;
+            eyeBlendshapeDataStart = startFace.leftEye;
+            eyeBlendshapeDataEnd = targetFace.leftEye;
         }
         else if (eyePosition == "right")
         {
-            eyeBlendshapeData = tmpFace.rightEye;
+            eyeBlendshapeDataStart = startFace.rightEye;
+            eyeBlendshapeDataEnd = targetFace.rightEye;
         }
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, eyeBlendshapeData.full * 100);
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad, eyeBlendshapeData.sad * 100);
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis, eyeBlendshapeData.kreis * 100 );
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, eyeBlendshapeData.disgusted * 100);
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy, eyeBlendshapeData.happy * 100);
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry, eyeBlendshapeData.angry * 100);
+
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(eyeBlendshapeDataStart.full, eyeBlendshapeDataEnd.full * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad, Mathf.Lerp(eyeBlendshapeDataStart.sad, eyeBlendshapeDataEnd.sad * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis, Mathf.Lerp(eyeBlendshapeDataStart.kreis, eyeBlendshapeDataEnd.kreis * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(eyeBlendshapeDataStart.disgusted, eyeBlendshapeDataEnd.disgusted * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy, Mathf.Lerp(eyeBlendshapeDataStart.happy, eyeBlendshapeDataEnd.happy * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry, Mathf.Lerp(eyeBlendshapeDataStart.angry, eyeBlendshapeDataEnd.angry * 100, t));
+
+        t += 1.5f * Time.deltaTime;
     }
 
 }
