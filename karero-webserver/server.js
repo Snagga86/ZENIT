@@ -3,6 +3,7 @@ import { EmotionProcessor } from './emotion-processor.js'
 
 const serverPython = dgram.createSocket('udp4');
 const serverPhone = dgram.createSocket('udp4');
+const serverRobot = dgram.createSocket('udp4');
 const emotionProcessor = new EmotionProcessor();
 
 serverPython.on('error', (err) => {
@@ -18,6 +19,7 @@ serverPython.on('message', (msg, rinfo) => {
 
   serverPhone.send(emotionalValence, 1338);
 
+  serverRobot.send(emotionalValence, 5678, "192.168.0.164");
 });
 
 serverPython.on('listening', () => {

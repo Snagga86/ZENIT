@@ -17,8 +17,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 #client.send_message("/data/emtion", 123) # Send float message
 #client.send_message("/some/address", [1, 2., "hello"]) # Send message
 
-stream_url = "srt://192.168.0.102:3333"
-cap = cv.VideoCapture(0)
+stream_url = "srt://192.168.0.101:3333"
+cap = cv.VideoCapture(2)
 if not cap.isOpened():
     print("Cannot open camera")
     #exit()
@@ -41,6 +41,7 @@ while cap.isOpened():
         emotion,scores=fer.predict_emotions(face_img,logits=True)
         #print(scores);
         print(emotion);
+        print(scores);
         b = bytearray()
         b.extend(map(ord, emotion))
         print(b[0])
