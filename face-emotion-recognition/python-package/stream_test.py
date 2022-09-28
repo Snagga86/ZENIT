@@ -18,7 +18,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 #client.send_message("/some/address", [1, 2., "hello"]) # Send message
 
 stream_url = "srt://192.168.0.101:3333"
-cap = cv.VideoCapture(2)
+cap = cv.VideoCapture(1)
 if not cap.isOpened():
     print("Cannot open camera")
     #exit()
@@ -48,7 +48,7 @@ while cap.isOpened():
         #client.send_message("/data/emtion", emotion)
         sock.sendto(bytes(emotion, "utf-8"), (UDP_IP, UDP_PORT))
         
-    cv.imshow('Video', cv.resize(frame,(1600,960),interpolation = cv.INTER_CUBIC))
+    #cv.imshow('Video', cv.resize(frame,(1600,960),interpolation = cv.INTER_CUBIC))
     # Display the resulting frame
     #cv.imshow('frame', gray)
     

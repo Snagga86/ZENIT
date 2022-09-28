@@ -322,6 +322,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!137 &216612233 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -720298726770719842, guid: b4d77cadc6917e9478b1d312e1a1f67b, type: 3}
+  m_PrefabInstance: {fileID: 1082224559}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &388066302
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,8 +439,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PORT: 1338
   displayEmotion: 
-  eyeLeft: {fileID: 0}
-  eyeRight: {fileID: 0}
+  lastEmotion: 
+  eyeLeft: {fileID: 216612233}
+  eyeRight: {fileID: 1417744666}
 --- !u!1 &522885367
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,6 +982,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b4d77cadc6917e9478b1d312e1a1f67b, type: 3}
+--- !u!137 &1417744666 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -720298726770719842, guid: b4d77cadc6917e9478b1d312e1a1f67b, type: 3}
+  m_PrefabInstance: {fileID: 600018345}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1512551678
 GameObject:
   m_ObjectHideFlags: 0

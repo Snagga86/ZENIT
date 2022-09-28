@@ -30,7 +30,7 @@ export class EmotionProcessor {
         });
 
         var currentEmotion = this.maxKeyValue(this.emotionCounter);
-        console.log("currentEmotion: " + currentEmotion[0]);
+        //console.log("currentEmotion: " + currentEmotion[0]);
         var emotionAndValenceClass = this.getEmotionAndValence(currentEmotion[0],currentEmotion[1]);
         this.emotionCounter = new Array();
 
@@ -41,8 +41,8 @@ export class EmotionProcessor {
         var valence = ((count + 1) / EMOTION_BUFFER_LEN) * 10 / NUM_VALENCE_CLASSES;
         var valenceClass = Math.floor(valence) - 1;
         if(valenceClass < 0)valenceClass = 0;
-        console.log(emotion + ": " + valence);
-        console.log(emotion + ": " + valenceClass);
+        //console.log(emotion + ": " + valence);
+        //console.log(emotion + ": " + valenceClass);
         switch(emotion){
             case "Anger":
                 emotion = BEmotion.Anger[valenceClass];
@@ -74,7 +74,7 @@ export class EmotionProcessor {
             default:
                 emotion = "Neutral";
         }
-        console.log("Emotion:" + emotion);
+        //console.log("Emotion:" + emotion);
         return emotion;
     }
 

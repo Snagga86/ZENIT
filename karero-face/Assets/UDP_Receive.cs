@@ -1,21 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using UnityEngine;
-using System.Threading.Tasks;
 using System.Text;
 using TMPro;
 using System;
-using UnityEngine.UIElements;
-using UnityEditor.PackageManager;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
+using NativeWebSocket;
+using UnityEngine.XR;
 
 public class UDP_Receive : MonoBehaviour
 {
-
+    public WebSocket webSocket;
     public int PORT = 1338;
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
@@ -30,16 +24,37 @@ public class UDP_Receive : MonoBehaviour
     public FaceEmotion faceEmotion;
     public Face targetFace;
     public Face startFace;
-
     private static float t = 0.0f;
 
     void Start()
     {
-        udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, PORT));
-        udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
+        webSocket = new WebSocket("ws://192.168.0.101:3344");
+        
 
-        eyeLeft = GameObject.Find("EyeLeft").GetComponentsInChildren<SkinnedMeshRenderer>()[0];
-        eyeRight = GameObject.Find("EyeRight").GetComponentsInChildren<SkinnedMeshRenderer>()[0];
+        webSocket.OnMessage += (data) =>
+        {
+            Debug.Log("onMEssage");
+            var message = System.Text.Encoding.UTF8.GetString(data);
+
+            displayEmotion = message;
+        };
+
+        webSocket.OnOpen += () =>
+        {
+            Debug.Log("ws connect");
+        };
+
+        webSocket.OnError += (error) =>
+        {
+            Debug.Log("ws error " + error);
+        };
+        webSocket.Connect();
+
+        //udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, PORT));
+        //udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
+
+        //eyeLeft = GameObject.Find("EyeLeft").GetComponentsInChildren<SkinnedMeshRenderer>()[0];
+        //eyeRight = GameObject.Find("EyeRight").GetComponentsInChildren<SkinnedMeshRenderer>()[0];
 
         faceEmotion = new FaceEmotion();
     }
@@ -47,9 +62,9 @@ public class UDP_Receive : MonoBehaviour
 
     void ReceivedUDPPacket(IAsyncResult result)
     {
-        var recvBuffer = udpClient.EndReceive(result, ref from);
+        //var recvBuffer = udpClient.EndReceive(result, ref from);
     
-        displayEmotion = Encoding.UTF8.GetString(recvBuffer);
+        //displayEmotion = Encoding.UTF8.GetString(recvBuffer);
         Debug.Log(displayEmotion);
         Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshPro>());
         GameObject.Find("Emotion").GetComponent<TextMeshPro>().text = displayEmotion;
@@ -58,9 +73,17 @@ public class UDP_Receive : MonoBehaviour
         this.gameObject.transform.Rotate(new Vector3(0, 1, 0), 1.8f);
     }
 
+    private void FixedUpdate()
+    {
+
+    }
     void Update()
     {
-        udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
+        //udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
+
+        #if !UNITY_WEBGL || UNITY_EDITOR
+                webSocket.DispatchMessageQueue();
+        #endif
 
         Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>());
         GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>().text = displayEmotion;
@@ -70,7 +93,6 @@ public class UDP_Receive : MonoBehaviour
             this.startFace = this.getStartFace(eyeLeft, eyeRight);
             this.targetFace = faceEmotion.getEyeShapeValuesByEmotion(displayEmotion);
             t = 0.0f;
-            
         }
         this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
 
