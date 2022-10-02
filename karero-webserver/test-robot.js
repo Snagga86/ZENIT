@@ -21,7 +21,28 @@ mecharm.sync_send_angles(ANIMATIONS.DANCE_STD[1], 25);
 mecharm.sync_send_angles(ANIMATIONS.DANCE_STD[2], 25);
 */
 
-mecharm.send_angles(neutralPose, 0);
+//mecharm.send_angles(neutralPose, 60);
+
+//follow2();
+
+function follow3(){
+    setTimeout(() => {
+        //mecharm.send_angles_single([[1,90, 88],[2, 40, 88]]);
+        //sss();
+        mecharm.send_angle(1, 90, 0);
+        follow2();
+    }, 3000);
+}
+
+function follow2(){
+    setTimeout(() => {
+        //mecharm.send_angles_single([[1,90, 88],[2, 40, 88]]);
+        //sss();
+        mecharm.send_angles(neutralPose, 0);
+        follow3();
+     }, 3000);
+}
+
 /*
 //sss();
 function sss(){
@@ -42,7 +63,7 @@ function sss(){
 
 const osc = new pkg() // defaults to WebsocketClientPlugin
 osc.open({ host: '127.0.0.1', port: 9123 })
-console.log(osc.status);
+//console.log(osc.status);
 
 var rota = 0;
 
@@ -52,15 +73,24 @@ osc.on('/data', message => {
     rota = mecharm.rotateBaseToTarget(Number(data.translatedBodies[0].x) * 100, Number(data.translatedBodies[0].z) * 100)
 });
 
-follow();
 
+follow();
+var zielWinkelAlt = 0;
+var erreichterWinkel = 0;
+var alteGeschwindigkeit = 1;
 function follow(){
     setTimeout(() => {
         //mecharm.send_angles_single([[1,90, 88],[2, 40, 88]]);
         //sss();
-        mecharm.send_angle(1,  Math.floor(rota), 44);
+        zielWinkelAlt = Math.floor(rota);
+        //erreichteWinkel = ?;
+        //mecharm.get_radians();
+        //var verfehlteZielvorgabe = 1- (erreichterWinkelAlt / zielWinkelAlt);
+        //var neueGeschwidigkeit = verfehlteZielvorgabe * alteGeschwindigkeit;
+        
+        mecharm.send_angle(1,  Math.floor(rota), 1);
         follow();
-     }, 1500);
+     }, 500);
 };
 
 

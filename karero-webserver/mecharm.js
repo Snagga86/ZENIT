@@ -11,6 +11,10 @@ export class Mecharm{
         this.baseRotationDeg = baseRotationDeg;
         this.x = 0;
         this.z = 0;
+        this.serverRobot.on('message', (msg, _) => {
+            //console.log("here");
+            console.log(msg.toString());
+        });
     }
 
     send_angle(id, degree, speed){
@@ -29,6 +33,10 @@ export class Mecharm{
         }
     }
 
+    get_radians(){
+        this.serverRobot.send("get_radians", this.rPort, this.rIp);
+    }
+
     sync_send_angles(degrees, speed, timeout=7){
         this.serverRobot.send("sync_send_angles," + degrees +  "," + speed + "," + timeout, this.rPort, this.rIp);
     }
@@ -45,8 +53,8 @@ export class Mecharm{
         var z1 = this.z * 100;
         var z2 = z;
 
-        console.log("Robot Pos: [" + x1 + "|" + z1 + "]");
-        console.log("My Pos: [" + x2 + "|" + z2 + "]");
+        //console.log("Robot Pos: [" + x1 + "|" + z1 + "]");
+        //console.log("My Pos: [" + x2 + "|" + z2 + "]");
 
         /*var x1 = 100;
         var z1 = 100;
@@ -55,7 +63,7 @@ export class Mecharm{
 
         var angle = Math.atan2(z2 - z1, x2 - x1) * 180 / Math.PI - 90;
         if (angle < 0) angle = angle + 360;
-        console.log("angle: " + angle );
+        //console.log("angle: " + angle );
         angle = angle + this.baseRotationDeg;
         return -1 * angle;
     }
