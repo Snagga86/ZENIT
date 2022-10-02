@@ -1,11 +1,22 @@
 import dgram from 'node:dgram';
 import { EmotionProcessor } from './emotion-processor.js'
+import pkg from  "osc-js";
+import { WebSocketServer } from 'ws';
+
+import { Mecharm } from "./mecharm.js";
+
+var mecharm = new Mecharm();
+mecharm.setCoordinates(1.15,0.35);
 
 const emotionDetectionSocket = dgram.createSocket('udp4');
-//const serverRobot = dgram.createSocket('udp4');
 const emotionProcessor = new EmotionProcessor();
+const osc = new pkg()
+osc.open({ host: '192.168.0.101', port: 9123 })
+//console.log(osc.status);
 
-import { WebSocketServer } from 'ws';
+var rota = 0;
+
+
 
 const displayControlWSS = new WebSocketServer({host: "192.168.0.101", port: 3344}, ()=>{
   console.log("display control server start");
@@ -28,6 +39,7 @@ robotControlWSS.on('connection', (webSocket) =>{
   console.log("robot control connection established");
   robotControlWS = webSocket;
   console.log(webSocket.readyState);
+  
 
   robotControlWS.on('message', (data) =>{
     console.log("robot control data:" + data);
@@ -35,7 +47,29 @@ robotControlWSS.on('connection', (webSocket) =>{
   });
 });
 
+osc.on('/data', message => {
+  //console.log(message.args); // prints the message arguments
+  var data = JSON.parse(message.args)
+  if(robotControlWS != null){
+    if(robotControlWS.readyState == 1){
 
+      var payload = {
+        "function" : "followHead",
+        "data" : {
+          "baseX" : 1.15,
+          "baseY" : 0.9,
+          "baseZ" : 0.35,
+          "baseRotation" : -90,
+          "personX" : Number(data.translatedBodies[0].x),
+          "personY" : Number(data.translatedBodies[0].y),
+          "personZ" : Number(data.translatedBodies[0].z)
+        } 
+      }
+
+      robotControlWS.send(JSON.stringify(payload));
+    }
+  }
+});
 
 displayControlWSS.on('close', (webSocket) =>{
   console.log("connection disconnected");
