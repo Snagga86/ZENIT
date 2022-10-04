@@ -7,23 +7,13 @@ import logging
 from transitions import Machine, State
 import numpy as np
 
-logging.basicConfig(filename="/home/ubuntu/KARERO/karero-body/robolog.log", level=logging.INFO,filemode='w')
+#logging.basicConfig(filename="/home/ubuntu/KARERO/karero-body/robolog.log", level=logging.INFO,filemode='w')
 
 karero_api = MyCobot('/dev/ttyAMA0', "1000000", timeout = 0.1, debug = False)
-karero_bot_control = KAREROBot(karero_api)
-karero_network = RobotNetwork(karero_bot_control, "192.168.0.101", 3345)
+karero_network = RobotNetwork("192.168.0.101", 3345)
+karero_bot_control = KAREROBot(karero_api, karero_network)
 
 
-karero_api.power_on();
-time.sleep(2);
-karero_api.set_fresh_mode(1)
-time.sleep(0.5);
-print("get_robot_version: ", karero_api.get_robot_version())
-time.sleep(0.5);
-print("Power on: ", karero_api.is_power_on())
-time.sleep(0.5);
-
-karero_network.start()
 
 
 
