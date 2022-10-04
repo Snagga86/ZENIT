@@ -1,0 +1,37 @@
+{
+    "type" : "config",
+    "distributedSystem": {
+        "reqiredSystems" : [
+            "Azure Kinetic Space",
+            "Karero Body",
+            "Karero Face",
+            "Karero Webserver",
+            "Face Emotion Recognition"
+        ],
+        "systemPath" : {
+            "AzureKineticSpace_P" : "G:/work/hska/workspace/AzureKineticSpace",
+            "KareroFace_P" : "G:/work/hska/workspace/DIS/KARERO/karero-face",
+            "KareroBody_P" : "home/ubuntu/KARERO/karero-body",
+            "KareroWebserver_P" : "G:/work/hska/workspace/DIS/KARERO/karero-webserver",
+            "FaceEmotionRecognition_P" : "G:/work/hska/workspace/DIS/KARERO/face-emotion-recognition"
+        }
+    },
+    "networkConfig": {
+        "RobotNetwork" : {
+            "IpAddress" : "192.168.0.1",
+            "Port" : 3345
+        },
+        "DisplayNetwork" : {
+            "IpAddress" : "192.168.0.1",
+            "Port" : 3344
+        },
+        "KinectNetwork" : {
+            "IpAddress" : "192.168.0.1",
+            "Port" : 9123
+        },
+        "EmotionNetwork" : {
+            "IpAddress" : "192.168.0.1",
+            "Port" : 1337
+        }
+    }
+}
