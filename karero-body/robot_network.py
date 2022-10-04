@@ -7,8 +7,8 @@ import json
 from io import StringIO
 
 class RobotNetwork:
-    def __init__(self, karero_bot, ip, port):
-        self.karero_bot = karero_bot
+    def __init__(self, ip, port):
+        self.karero_bot = ""
         self.webservice_ip = 'ws://' + ip + ':' + str(port)
         websocket.enableTrace(False)
         self.ws = websocket.WebSocketApp(self.webservice_ip,
@@ -29,9 +29,11 @@ class RobotNetwork:
                 greeting = await websocket.recv()
                 print("< {}".format(greeting))'''
 
-    def start(self):
-        #asyncio.get_event_loop().run_until_complete(self.recvSendProcedure())
         
+
+    def start(self, karero_bot):
+        #asyncio.get_event_loop().run_until_complete(self.recvSendProcedure())
+        self.karero_bot = karero_bot
         self.ws.run_forever(dispatcher=rel)  # Set dispatcher to automatic reconnection
         rel.signal(2, rel.abort)  # Keyboard Interrupt
         rel.dispatch()
@@ -40,8 +42,11 @@ class RobotNetwork:
         #print(message)
         io = StringIO(message)
         json_obj = json.load(io)
-        executed = self.karero_bot.action(json_obj)
-        #print("Action executed: ", executed)
+        if(json_obj['mode'] == "setMode"):
+            executed = self.karero_bot.set_activity(json_obj)
+
+        if(json_obj['mode'] == "dataSupply"):
+            executed = self.karero_bot.digest_activity_data(json_obj)
         
 
     def on_error(self, ws, error):
@@ -52,3 +57,6 @@ class RobotNetwork:
 
     def on_open(self, ws):
         print("Opened connection")
+
+    def backsend(self, data):
+        self.ws.send(data)
