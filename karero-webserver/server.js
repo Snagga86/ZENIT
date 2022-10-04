@@ -45,7 +45,7 @@ robotControlWSS.on('connection', (webSocket) =>{
     "activity" : "followHead"
   }
   
-  robotControlWS.send(JSON.stringify(payload));
+  //robotControlWS.send(JSON.stringify(payload));
   
 
   robotControlWS.on('message', (data) =>{
@@ -103,15 +103,28 @@ emotionDetectionSocket.on('message', (msg, rinfo) => {
     if(displayControlWS != null){
       
       displayControlWS.send(emotionalValence);
-      //console.log(displayControlWS.readyState);
-      //console.log("send");
+      
     }
     else{
       console.log("phone not connected");
     }
 
     if(robotControlWS != null){
-      robotControlWS.send(emotionalValence);
+      
+      if(emotionalValence == "Ecstasy"){
+        var payload = {
+          "mode" : "setMode",
+          "activity" : "dance"
+        }
+        robotControlWS.send(JSON.stringify(payload));
+      }
+      if(emotionalValence == "Neutral"){
+        var payload = {
+          "mode" : "setMode",
+          "activity" : "followHead"
+        }
+        robotControlWS.send(JSON.stringify(payload));
+      }
     }
     else{
       console.log("robot not connected");
