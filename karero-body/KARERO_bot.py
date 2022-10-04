@@ -63,13 +63,34 @@ class KAREROBot:
         self.karero_api.send_angles([angle_v, -15, angle_h - 5 , 0, 30, 0], 15)
         self.last_action_timestamp = time.time()
         
-        
+    async def dance(self, karero_api):
+        movement_description = [
+            [0, -25, -30, -10, 15, -5],
+            [20, -45, 10, 0, 35, 0],
+            [40, -25, -30, 10, 15, 5]
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 55)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[1], 55)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[2], 55)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[1], 55)
+        time.sleep(1.5)
+
+
     def set_activity(self, payload):
 
-        self.activity = payload['activity']
+        if(self.activity != payload['activity']):
+            self.activity = payload['activity']
+            print("set activity ", self.activity)
+            if(payload['activity'] == 'followHead'):
+                self.karero_network.backsend("getPersonCoordinates")
 
-        if(payload['activity'] == 'followHead'):
-            self.karero_network.backsend("getPersonCoordinates")
+            if(payload['activity'] == 'dance'):
+                asyncio.run(self.dance(self.karero_api))
+                print("after async")
 
         return True
 
