@@ -1,11 +1,23 @@
 import dgram from 'node:dgram';
 import { EmotionProcessor } from './emotion-processor.js'
+import pkg from  "osc-js";
+import { WebSocketServer } from 'ws';
+
+import { Mecharm } from "./mecharm.js";
+
+var mecharm = new Mecharm();
+mecharm.setCoordinates(1.15,0.35);
 
 const emotionDetectionSocket = dgram.createSocket('udp4');
-//const serverRobot = dgram.createSocket('udp4');
 const emotionProcessor = new EmotionProcessor();
+const osc = new pkg()
+osc.open({ host: '192.168.0.101', port: 9123 })
+//console.log(osc.status);
 
-import { WebSocketServer } from 'ws';
+var rota = 0;
+
+var tmpOSCPayload = "";
+
 
 const displayControlWSS = new WebSocketServer({host: "192.168.0.101", port: 3344}, ()=>{
   console.log("display control server start");
@@ -28,14 +40,45 @@ robotControlWSS.on('connection', (webSocket) =>{
   console.log("robot control connection established");
   robotControlWS = webSocket;
   console.log(webSocket.readyState);
+  var payload = {
+    "mode" : "setMode",
+    "activity" : "followHead"
+  }
+  
+  robotControlWS.send(JSON.stringify(payload));
+  
 
   robotControlWS.on('message', (data) =>{
     console.log("robot control data:" + data);
-    robotControlWS.send("nice data");
+
+    if(data == "getPersonCoordinates"){
+      var payload = {
+        "mode" : "dataSupply",
+        "activity" : "personCoordinates",
+        "data" : {
+          "baseX" : 1.15,
+          "baseY" : 0.9,
+          "baseZ" : 0.35,
+          "baseRotation" : -90,
+          "personX" : Number(tmpOSCPayload.translatedBodies[0].x),
+          "personY" : Number(tmpOSCPayload.translatedBodies[0].y),
+          "personZ" : Number(tmpOSCPayload.translatedBodies[0].z)
+        } 
+      }
+
+      robotControlWS.send(JSON.stringify(payload));
+
+      
+    }
+    
   });
 });
 
-
+osc.on('/data', message => {
+  //console.log(message.args); // prints the message arguments
+  var data = JSON.parse(message.args)
+  tmpOSCPayload = data
+});
 
 displayControlWSS.on('close', (webSocket) =>{
   console.log("connection disconnected");
@@ -84,3 +127,4 @@ emotionDetectionSocket.on('listening', () => {
 });
 
 emotionDetectionSocket.bind(1337);
+

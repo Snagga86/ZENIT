@@ -2,23 +2,30 @@ import numpy as np
 import cv2 as cv
 from pythonosc.udp_client import SimpleUDPClient
 import socket
+import sys
 from hsemotions.facial_emotions import HSEmotionRecognizer
 model_name='enet_b0_8_best_afew'
 fer=HSEmotionRecognizer(model_name=model_name,device='cpu')
 
-
-UDP_IP = "127.0.0.1"
+CAMERA_NO = 0
+UDP_IP = "192.168.0.101"
 UDP_PORT = 1337
+
+print(sys.argv)
+if(len(sys.argv) >= 3):
+    if(sys.argv[1]):
+        if(sys.argv[1] == "--camera"):
+            if(sys.argv[2]):
+                CAMERA_NO = sys.argv[2]
+                print("Using camera ", CAMERA_NO)
+                
+
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 
+#stream_url = "srt://192.168.0.101:3333"
 
-#client = SimpleUDPClient(ip, port) # Create client
-#client.send_message("/data/emtion", 123) # Send float message
-#client.send_message("/some/address", [1, 2., "hello"]) # Send message
-
-stream_url = "srt://192.168.0.101:3333"
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture(int(CAMERA_NO))
 if not cap.isOpened():
     print("Cannot open camera")
     #exit()
@@ -48,7 +55,8 @@ while cap.isOpened():
         #client.send_message("/data/emtion", emotion)
         sock.sendto(bytes(emotion, "utf-8"), (UDP_IP, UDP_PORT))
         
-    #cv.imshow('Video', cv.resize(frame,(1600,960),interpolation = cv.INTER_CUBIC))
+    #
+    cv.imshow('Video', cv.resize(frame,(1600,960),interpolation = cv.INTER_CUBIC))
     # Display the resulting frame
     #cv.imshow('frame', gray)
     
