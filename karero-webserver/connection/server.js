@@ -1,18 +1,17 @@
 import dgram from 'node:dgram';
-import { EmotionProcessor } from '../behavior/emotion-processor.js'
-import { GesturePostureProcessor } from '../behavior/gesture-posture-processor.js'
 import pkg from  "osc-js";
 import { WebSocketServer } from 'ws';
 import { Brain } from '../behavior/brain.js';
 
 export class KAREROServer {
 
-    constructor(networkConfig) {
+    constructor(networkConfig, robotPosition) {
 
-        this.KAREROBrain = new Brain();
         this.networkConfig = networkConfig;
+        this.robotPosition = robotPosition;
+        this.KAREROBrain = new Brain();
+        
         this.osc = new pkg()
-
         this.emotionDetectionSocket = dgram.createSocket('udp4');
 
         this.tmpOSCPayload = {
@@ -26,13 +25,20 @@ export class KAREROServer {
         };
         this.recognition = "";
 
-        this.displayControlWS = null;
-        this.robotControlWS = null;
-
+        /* Websocket Server declarations. */
         this.displayControlWSS = null;
         this.robotControlWSS = null;
+
+        /* Websocket. */
+        this.displayControlWS = null;
+        this.robotControlWS = null;
     }
 
+    /* Starts all network services for KARERO interaction. 
+    Azure Kinetic Space: The data is received via OSC protocol. Receive data only.
+    Emotion Recognition: The data is received by UDP stream. Receive data only.
+    Robot Arm: The data is sent and received via Websocket.
+    Robot Display: The data is sent via Websocket. Send data only. */
     startAllNetworkServices(){
 
         this.osc.open({ host: this.networkConfig.KinectNetwork.IpAddress, port: this.networkConfig.KinectNetwork.Port })
@@ -65,10 +71,10 @@ export class KAREROServer {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
                         "data" : {
-                        "baseX" : 1.15,
-                        "baseY" : 0.9,
-                        "baseZ" : 0.35,
-                        "baseRotation" : -90,
+                        "baseX" : robotPosition.baseX,
+                        "baseY" : robotPosition.baseY,
+                        "baseZ" : robotPosition.baseZ,
+                        "baseRotation" : robotPosition.baseRotation,
                         "personX" : Number(this.tmpOSCPayload.translatedBodies[0].x),
                         "personY" : Number(this.tmpOSCPayload.translatedBodies[0].y),
                         "personZ" : Number(this.tmpOSCPayload.translatedBodies[0].z)
@@ -104,72 +110,12 @@ export class KAREROServer {
         });
 
         this.emotionDetectionSocket.on('message', (msg, rinfo) => {
-
             this.KAREROBrain.processEmotionRecognition(msg.toString());
-
-            
-            /*if(this.robotControlWS != null){
-            
-            if(this.recognition == "a3" || this.recognition == "arnold2" || this.recognition == "arnold"){
-                var payload = {
-                "mode" : "setMode",
-                "activity" : "attack"
-                }
-                this.robotControlWS.send(JSON.stringify(payload));
-                if(this.displayControlWS != null){
-                    this.displayControlWS.send("Rage");
-                }
-            }
-            else if(this.emotionalValence == "Ecstasy"){
-                var payload = {
-                "mode" : "setMode",
-                "activity" : "dance"
-                }
-                this.robotControlWS.send(JSON.stringify(payload));
-                if(this.displayControlWS != null){
-                    this.displayControlWS.send("Ecstasy");
-                
-                }
-                else{
-                console.log("phone not connected");
-                }
-            }
-            else if(this.emotionalValence == "Neutral"){
-                var payload = {
-                "mode" : "setMode",
-                "activity" : "followHead"
-                }
-                if(this.displayControlWS != null){
-            
-                    this.displayControlWS.send(emotionalValence);
-                
-                }
-                else{
-                console.log("phone not connected");
-                }
-                this.robotControlWS.send(JSON.stringify(payload));
-            }
-            else{
-                if(this.displayControlWS != null){
-                    this.displayControlWS.send(emotionalValence);
-                
-                }
-                else{
-                console.log("phone not connected");
-                }
-            }
-            }
-            else{
-            console.log("robot not connected");
-            }*/
-            
-
-        //serverRobot.send(emotionalValence, 5678, "192.168.0.164");
         });
 
         this.emotionDetectionSocket.on('listening', () => {
-        const address = this.emotionDetectionSocket.address();
-        console.log(`python server listening ${address.address}:${address.port}`);
+            const address = this.emotionDetectionSocket.address();
+            console.log(`python server listening ${address.address}:${address.port}`);
         });
 
         this.emotionDetectionSocket.bind(this.networkConfig.EmotionNetwork.Port);

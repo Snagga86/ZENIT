@@ -19,6 +19,13 @@ const networkConfig = {
   }
 }
 
-const server = new KAREROServer(networkConfig);
+const robotPosition = {
+    "baseX" : 1.15,
+    "baseY" : 0.9,
+    "baseZ" : 0.35,
+    "baseRotation" : -90
+}
+
+const server = new KAREROServer(networkConfig, robotPosition);
 
 server.startAllNetworkServices();
