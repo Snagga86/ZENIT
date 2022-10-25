@@ -71,10 +71,10 @@ export class KAREROServer {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
                         "data" : {
-                        "baseX" : robotPosition.baseX,
-                        "baseY" : robotPosition.baseY,
-                        "baseZ" : robotPosition.baseZ,
-                        "baseRotation" : robotPosition.baseRotation,
+                        "baseX" : this.robotPosition.baseX,
+                        "baseY" : this.robotPosition.baseY,
+                        "baseZ" : this.robotPosition.baseZ,
+                        "baseRotation" : this.robotPosition.baseRotation,
                         "personX" : Number(this.tmpOSCPayload.translatedBodies[0].x),
                         "personY" : Number(this.tmpOSCPayload.translatedBodies[0].y),
                         "personZ" : Number(this.tmpOSCPayload.translatedBodies[0].z)
