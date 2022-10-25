@@ -1,3 +1,5 @@
+import EventEmitter from 'events';
+
 export class EmotionProcessor {
 
     constructor(facialExpressionsInterpretation=true, bodyLanguageInterpretation=false) {
@@ -7,17 +9,37 @@ export class EmotionProcessor {
 
         this.facialEmotionInputBuffer = new Array();
         this.emotionCounter = new Array();
+
+        this.emotionEvent = new EventEmitter();
+
+        this.currentEmotion = "";
     }
 
-    keyValueInput(value){
+    getCurrentRecognition(){
+        return this.currentEmotion;
+    }
+
+
+    /*keyValueInput(value){
         if(this.facialExpressionsInterpretation == true){
             var emotion = this.processValueAsFacialExpression(value);
         }
         if(this.bodyLanguageInterpretation == true){
             this.processValueAsBodyLanguage(value);
         }
-
+        this.currentEmotion = emotion;
         return emotion;
+    }*/
+
+    digest(currentEmotionInput) {
+        if(this.facialExpressionsInterpretation == true){
+            var emotion = this.processValueAsFacialExpression(currentEmotionInput);
+        }
+        if(this.bodyLanguageInterpretation == true){
+            this.processValueAsBodyLanguage(currentEmotionInput);
+        }
+        this.emotionEvent.emit('EmotionDetection', emotion);
+        this.currentEmotion = emotion;
     }
 
     processValueAsFacialExpression(value){
