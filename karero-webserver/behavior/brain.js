@@ -40,11 +40,13 @@ export class Brain{
         const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
         const dance = new Dance(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
         const attack = new Attack(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+
+        this.stateMachineDefinition = {
+            initialState: "off", off, follow, dance, attack
+        };
         
         /* Create the state machine with states required. */
-        this.machine = this.createMachine({
-            initialState: "off", off, follow, dance, attack
-        });
+        this.machine = this.createMachine(this.stateMachineDefinition);
 
         /* If a state is changed within the state machine the event is catched here and sets the next state. */
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, (transition) => {
@@ -61,10 +63,16 @@ export class Brain{
 
         /* Whenever a state triggers a new face action on the robot display it is transmitted from here. */
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, (emotion) => {
+            console.log(this.robotFaceWS);
             if(this.robotFaceWS != null){
+                console.log("send " + emotion);
                 this.robotFaceWS.send(emotion);
             }
         });
+
+        this.state = this.machine.value;
+
+        this.stateMachineDefinition[this.state].actions.onEnter();
     }
 
     /* Set the transmission websocket for robot arm action connection. */
@@ -73,13 +81,17 @@ export class Brain{
          
         /* Fire enter on off state when robot arm is connected. */
         /* ToDo: Find a better implementation for this. */
-        this.state = this.machine.value
-        this.start.enterFunction();
+        
+        /*this.state = this.machine.value
+        this.stateMachineDefinition[this.state].actions.onEnter();*/
     }
 
     /* Set the transmission websocket for robot face action connection. */
     setBrainRobotFaceTransmissionWS(ws){
         this.robotFaceWS = ws;
+        /*console.log(this.stateMachineDefinition[this.state]);
+        this.state = this.machine.value
+        this.stateMachineDefinition[this.state].actions.onEnter();*/
     }
 
     /* Process raw data of gestures/postures detection. */
@@ -91,6 +103,10 @@ export class Brain{
     processEmotionRecognition(data){
         this.emotionProcessor.digest(data);
     }
+
+    getStateDefinition(state, stateMachineDefinition){
+        return stateMachineDefinition[state];
+    };
 
     /* Create the base state machine. */
     createMachine(stateMachineDefinition) {

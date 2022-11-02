@@ -38,6 +38,7 @@ export class EmotionProcessor {
         if(this.bodyLanguageInterpretation == true){
             this.processValueAsBodyLanguage(currentEmotionInput);
         }
+        console.log(emotion);
         this.emotionEvent.emit('EmotionDetection', emotion);
         this.currentEmotion = emotion;
     }

@@ -1,8 +1,8 @@
-SET AzureKineticSpace_P=G:\work\hska\workspace\AzureKineticSpace
-SET KareroFace_P=G:\work\hska\workspace\DIS\KARERO\karero-face
-SET KareroBody_P=G:\work\hska\workspace\DIS\KARERO\karero-body
-SET KareroWebserver_P=G:\work\hska\workspace\DIS\KARERO\karero-webserver
-SET FaceEmotionRecognition_P=G:\work\hska\workspace\DIS\KARERO\face-emotion-recognition
+SET AzureKineticSpace_P=C:\Workspace\AzureKineticSpace
+SET KareroFace_P=C:\Workspace\KARERO\karero-face
+SET KareroBody_P=C:\Workspace\workspace\DIS\KARERO\karero-body
+SET KareroWebserver_P=C:\Workspace\\KARERO\karero-webserver
+SET FaceEmotionRecognition_P=C:\Workspace\KARERO\face-emotion-recognition
 
 
 ::Activate Azure Kinetic Space GUI

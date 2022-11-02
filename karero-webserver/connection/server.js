@@ -91,6 +91,7 @@ export class KAREROServer {
             var data = JSON.parse(message.args)
             this.tmpOSCPayload = data
             //this.gesturePostureProcessor.digest(data);
+            console.log(this.tmpOSCPayload.translatedBodies[0]);
             this.KAREROBrain.processKinectRecognition(data);
         });
 

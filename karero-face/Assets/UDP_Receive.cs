@@ -28,7 +28,7 @@ public class UDP_Receive : MonoBehaviour
 
     void Start()
     {
-        webSocket = new WebSocket("ws://192.168.0.101:3344");
+        webSocket = new WebSocket("ws://192.168.123.101:3344");
         
 
         webSocket.OnMessage += (data) =>

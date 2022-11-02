@@ -63,7 +63,8 @@ export class Follow extends StateWrap{
 
     /* Interpretion function of received data coming from Emotion Detection Algorithm. */
     emotionRecognition(receivedEmotion){
-
+        console.log("detect emotion");
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, receivedEmotion);
         /* If the ecstasy emotion was detected the robot changes it's state to dance. */
         if(receivedEmotion == "Ecstasy"){
 
