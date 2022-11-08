@@ -1,31 +1,9 @@
 import { KAREROServer } from './connection/server.js';
+import * as fs from 'fs';
 
-const networkConfig = {
-  "RobotNetwork" : {
-      "IpAddress" : "192.168.123.182",
-      "Port" : 3345
-  },
-  "DisplayNetwork" : {
-      "IpAddress" : "192.168.123.182",
-      "Port" : 3344
-  },
-  "KinectNetwork" : {
-      "IpAddress" : "192.168.123.182",
-      "Port" : 9123
-  },
-  "EmotionNetwork" : {
-      "IpAddress" : "192.168.123.182",
-      "Port" : 1337
-  }
-}
+let rawdata = fs.readFileSync('server-conf.json');
+let serverConf = JSON.parse(rawdata);
 
-const robotPosition = {
-    "baseX" : 1.15,
-    "baseY" : 0.9,
-    "baseZ" : 0.01,
-    "baseRotation" : 0
-}
-
-const server = new KAREROServer(networkConfig, robotPosition);
+const server = new KAREROServer(serverConf.config.networkConfig, serverConf.config.robotPosition);
 
 server.startAllNetworkServices();
