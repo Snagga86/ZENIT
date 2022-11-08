@@ -7,16 +7,16 @@ using System;
 using NativeWebSocket;
 using UnityEngine.XR;
 
-public class UDP_Receive : MonoBehaviour
+public class FaceControl : MonoBehaviour
 {
     public WebSocket webSocket;
-    public int PORT = 1338;
+    public string WS = "ws://192.168.123.101:3344";
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
     private object obj = null;
     byte[] receivedBytes;
     public string displayEmotion = "";
-    public string lastEmotion = "";
+    private string lastEmotion = "init";
 
     public SkinnedMeshRenderer eyeLeft;
     public SkinnedMeshRenderer eyeRight;
@@ -28,12 +28,17 @@ public class UDP_Receive : MonoBehaviour
 
     void Start()
     {
-        webSocket = new WebSocket("ws://192.168.123.101:3344");
-        
+        faceEmotion = new FaceEmotion();
+    }
+
+    public void connectToWebsocket(string websocketDescription) { 
+
+        this.WS = websocketDescription;
+        webSocket = new WebSocket(this.WS.Substring(0, this.WS.Length - 1));
 
         webSocket.OnMessage += (data) =>
         {
-            Debug.Log("onMEssage");
+            Debug.Log("onMessage");
             var message = System.Text.Encoding.UTF8.GetString(data);
 
             displayEmotion = message;
@@ -49,24 +54,16 @@ public class UDP_Receive : MonoBehaviour
             Debug.Log("ws error " + error);
         };
         webSocket.Connect();
-
-        //udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, PORT));
-        //udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
-
-        //eyeLeft = GameObject.Find("EyeLeft").GetComponentsInChildren<SkinnedMeshRenderer>()[0];
-        //eyeRight = GameObject.Find("EyeRight").GetComponentsInChildren<SkinnedMeshRenderer>()[0];
-
-        faceEmotion = new FaceEmotion();
     }
 
 
     void ReceivedUDPPacket(IAsyncResult result)
     {
         //var recvBuffer = udpClient.EndReceive(result, ref from);
-    
+
         //displayEmotion = Encoding.UTF8.GetString(recvBuffer);
-        Debug.Log(displayEmotion);
-        Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshPro>());
+        //Debug.Log(displayEmotion);
+        //Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshPro>());
         GameObject.Find("Emotion").GetComponent<TextMeshPro>().text = displayEmotion;
 
         this.gameObject.transform.Rotate(new Vector3(1, 0, 0), 1.2f);
@@ -81,16 +78,22 @@ public class UDP_Receive : MonoBehaviour
     {
         //udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
 
-        #if !UNITY_WEBGL || UNITY_EDITOR
-                webSocket.DispatchMessageQueue();
-        #endif
-
-        Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>());
-        GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>().text = displayEmotion;
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if (this.webSocket != null)
+        {
+            webSocket.DispatchMessageQueue();
+        }
         
+#endif
 
-        if(lastEmotion != displayEmotion){
+        //Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>());
+        //GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>().text = displayEmotion;
+
+
+        if (lastEmotion != displayEmotion)
+        {
             this.startFace = this.getStartFace(eyeLeft, eyeRight);
+            //Debug.Log("startFace: " + startFace);
             this.targetFace = faceEmotion.getEyeShapeValuesByEmotion(displayEmotion);
             t = 0.0f;
         }
@@ -103,7 +106,7 @@ public class UDP_Receive : MonoBehaviour
     {
         EmotionShapes tmpLeftEye = new EmotionShapes();
         EmotionShapes tmpRightEye = new EmotionShapes();
-        
+
         tmpLeftEye.angry = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry);
         tmpLeftEye.disgusted = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted);
         tmpLeftEye.full = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full);
@@ -131,8 +134,8 @@ public class UDP_Receive : MonoBehaviour
         EmotionShapes eyeBlendshapeDataStart = new EmotionShapes();
         EmotionShapes eyeBlendshapeDataEnd = new EmotionShapes();
 
-        Debug.Log(startFace);
-        Debug.Log(targetFace);
+        //Debug.Log(startFace);
+        //Debug.Log(targetFace);
         if (eyePosition == "left")
         {
             eyeBlendshapeDataStart = startFace.leftEye;
