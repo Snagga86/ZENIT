@@ -23,9 +23,12 @@ if(len(sys.argv) >= 3):
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 
-#stream_url = "srt://192.168.0.101:3333"
+cap = cv.VideoCapture("http://192.168.0.103:8910/video")
+#cap = cv.imgread("http://192.168.0.103:8910/video/shot.jpg")
 
-cap = cv.VideoCapture(int(CAMERA_NO))
+facecasc = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+#cap = cv.VideoCapture(int(CAMERA_NO))
+
 if not cap.isOpened():
     print("Cannot open camera")
     #exit()
@@ -37,24 +40,21 @@ while cap.isOpened():
         print("Can't receive frame (stream end?). Exiting ...")
         break
     # Our operations on the frame come here
-    facecasc = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
+    
     frame = cv.cvtColor(frame_raw, cv.COLOR_BGR2RGB)
-    faces = facecasc.detectMultiScale(frame,scaleFactor=1.3, minNeighbors=5)
-
+    '''faces = facecasc.detectMultiScale(frame,scaleFactor=1.3, minNeighbors=5)
+    
     for (x, y, w, h) in faces:
         cv.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
         face_img = frame[y:y + h, x:x + w]
         #cropped_img = np.expand_dims(np.expand_dims(cv.resize(roi_gray, (224, 224)), -1), 0)
         emotion,scores=fer.predict_emotions(face_img,logits=True)
         #print(scores);
-        print(emotion);
-        print(scores);
         b = bytearray()
         b.extend(map(ord, emotion))
-        print(b[0])
         #client.send_message("/data/emtion", emotion)
         sock.sendto(bytes(emotion, "utf-8"), (UDP_IP, UDP_PORT))
-        
+     '''
     #
     cv.imshow('Video', cv.resize(frame,(1600,960),interpolation = cv.INTER_CUBIC))
     # Display the resulting frame
