@@ -7,13 +7,15 @@ export class KAREROServer {
 
     constructor(networkConfig, robotPosition) {
 
+        /* Store network configuration and stationary robot position. */
         this.networkConfig = networkConfig;
         this.robotPosition = robotPosition;
-        this.KAREROBrain = new Brain();
-        
-        this.osc = new pkg()
-        this.emotionDetectionSocket = dgram.createSocket('udp4');
 
+        /* Initialize KARERO brain/business logic. */
+        this.KAREROBrain = new Brain();
+ 
+        /* Initial definition of the tracked person position to avoid NULL errors 
+        if no data is received. */
         this.tmpOSCPayload = {
             "translatedBodies" : [
                 {
@@ -23,7 +25,6 @@ export class KAREROServer {
                 }
             ]
         };
-        this.recognition = "";
 
         /* Websocket Server declarations. */
         this.displayControlWSS = null;
@@ -32,6 +33,10 @@ export class KAREROServer {
         /* Websocket. */
         this.displayControlWS = null;
         this.robotControlWS = null;
+
+        /* UDP sockets */
+        this.osc = new pkg()
+        this.emotionDetectionSocket = dgram.createSocket('udp4');
     }
 
     /* Starts all network services for KARERO interaction. 
@@ -41,16 +46,48 @@ export class KAREROServer {
     Robot Display: The data is sent via Websocket. Send data only. */
     startAllNetworkServices(){
 
+        /* -------- Azure Kinetic Space -------- */
+        /* Open the OSC/UDP data receive connection to Azure Kinetic Space. */
         this.osc.open({ host: this.networkConfig.KinectNetwork.IpAddress, port: this.networkConfig.KinectNetwork.Port })
 
+        /* On incoming OSC data from Azure Kinetic Space this data is processed for possible usage
+        in the KARERO Brain/business logic. */
+        this.osc.on('/data', message => {
+            var data = JSON.parse(message.args)
+            this.tmpOSCPayload = data
+            this.KAREROBrain.processKinectRecognition(data);
+        });
+
+        /* -------- Emotion Recognition -------- */
+        /* Bind the UDP socket to receive recognized basic emotions from the emotion detection
+        network. */
+        this.emotionDetectionSocket.bind(this.networkConfig.EmotionNetwork.Port);
+
+        /* Incoming data from the emotion detection network is processed in the KARERO brain. */
+        this.emotionDetectionSocket.on('message', (msg, rinfo) => {
+            this.KAREROBrain.processEmotionRecognition(msg.toString());
+        });
+
+        /* Emotion detection error handling. */
+        this.emotionDetectionSocket.on('error', (err) => {
+            console.log(`server error:\n${err.stack}`);
+            this.emotionDetectionSocket.close();
+        });
+
+        /* ToDo: Handling */
+        this.emotionDetectionSocket.on('listening', () => {
+            const address = this.emotionDetectionSocket.address();
+            console.log(`python server listening ${address.address}:${address.port}`);
+        });
+
+        /* -------- Display/Face Communication -------- */
+        /* Start the server to communicate with KARERO Face application. */
         this.displayControlWSS = new WebSocketServer({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
             console.log("display control server start");
         });
 
-        this.robotControlWSS = new WebSocketServer({host: this.networkConfig.RobotNetwork.IpAddress, port: this.networkConfig.RobotNetwork.Port}, ()=>{
-            console.log("robot control server start");
-        });
-
+        /* On incoming connection of the KARERO Face/Display, e.g. table or cell phone set
+        the connection web socket in KARERO Brain. */
         this.displayControlWSS.on('connection', (webSocket) =>{
             console.log("display control connection established");
             this.displayControlWS = webSocket;
@@ -58,14 +95,35 @@ export class KAREROServer {
             console.log(webSocket.readyState);
         });
 
+        /* Handling for display control connection close. */
+        this.displayControlWSS.on('close', (webSocket) =>{
+            console.log("connection disconnected");
+            this.displayControlWS = null;
+        });
+
+        /* Handling for display control connection error. */
+        this.displayControlWSS.on('error', (webSocket) =>{
+            console.log("connection disonnected");
+            this.displayControlWS = null;
+        });
+
+        /* -------- MechArm Robot Communication -------- */
+        /* Start the server to communicate with KARERO Body application. */
+        this.robotControlWSS = new WebSocketServer({host: this.networkConfig.RobotNetwork.IpAddress, port: this.networkConfig.RobotNetwork.Port}, ()=>{
+            console.log("robot control server start");
+        });
+
+        /* On incoming connection of the KARERO body/MechArm set the connection web socket
+        in KARERO Body. */
         this.robotControlWSS.on('connection', (webSocket) =>{
             console.log("robot control connection established");
             this.robotControlWS = webSocket;
             this.KAREROBrain.setBrainRobotBodyTransmissionWS(webSocket);
             console.log(webSocket.readyState);
 
-            this.robotControlWS.on('message', (data) =>{
-                
+            /* When KARERO Body is in head follow mode it requests the position data of the first
+            person tracked by the azure kinect array. Kinect data is the replied to the robot body. */
+            this.robotControlWS.on('message', (data) =>{              
                 if(data == "getPersonCoordinates"){
                     var payload = {
                         "mode" : "dataSupply",
@@ -86,40 +144,6 @@ export class KAREROServer {
             });
         });
 
-        this.osc.on('/data', message => {
-            //console.log(message.args); // prints the message arguments
-            var data = JSON.parse(message.args)
-            this.tmpOSCPayload = data
-            //this.gesturePostureProcessor.digest(data);
-            console.log(this.tmpOSCPayload.translatedBodies[0]);
-            this.KAREROBrain.processKinectRecognition(data);
-        });
-
-        this.displayControlWSS.on('close', (webSocket) =>{
-            console.log("connection disconnected");
-            this.displayControlWS = null;
-        });
-
-        this.displayControlWSS.on('error', (webSocket) =>{
-            console.log("connection disonnected");
-            this.displayControlWS = null;
-        });
-
-        this.emotionDetectionSocket.on('error', (err) => {
-            console.log(`server error:\n${err.stack}`);
-            this.emotionDetectionSocket.close();
-        });
-
-        this.emotionDetectionSocket.on('message', (msg, rinfo) => {
-            this.KAREROBrain.processEmotionRecognition(msg.toString());
-        });
-
-        this.emotionDetectionSocket.on('listening', () => {
-            const address = this.emotionDetectionSocket.address();
-            console.log(`python server listening ${address.address}:${address.port}`);
-        });
-
-        this.emotionDetectionSocket.bind(this.networkConfig.EmotionNetwork.Port);
     }
 }
 

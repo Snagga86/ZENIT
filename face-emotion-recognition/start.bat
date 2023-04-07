@@ -1,5 +1,5 @@
-set CONDA_LOKAL=C:\Users\Felix\anaconda3\Scripts\activate.bat
-set CONDA_ENV=test-conda-env
+set CONDA_LOKAL=C:\Users\Christian Purps\anaconda3\Scripts\activate.bat
+set CONDA_ENV=face-emotion-recognition-2
 
 call %CONDA_LOKAL% %CONDA_ENV%
 cd python-package

@@ -7,8 +7,8 @@ from hsemotions.facial_emotions import HSEmotionRecognizer
 model_name='enet_b0_8_best_afew'
 fer=HSEmotionRecognizer(model_name=model_name,device='cpu')
 
-CAMERA_NO = 0
-UDP_IP = "192.168.123.182"
+CAMERA_NO = 1
+UDP_IP = "192.168.123.101"
 UDP_PORT = 1337
 
 print(sys.argv)
