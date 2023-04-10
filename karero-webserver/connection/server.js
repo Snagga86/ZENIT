@@ -119,23 +119,47 @@ export class KAREROServer {
             console.log("robot control connection established");
             this.robotControlWS = webSocket;
             this.KAREROBrain.setBrainRobotBodyTransmissionWS(webSocket);
-            console.log(webSocket.readyState);
 
             /* When KARERO Body is in head follow mode it requests the position data of the first
             person tracked by the azure kinect array. Kinect data is the replied to the robot body. */
             this.robotControlWS.on('message', (data) =>{              
                 if(data == "getPersonCoordinates"){
+                    /* Only target closest body */
+                    var closestBody = null;
+                    var closestDistance = 100000;
+                    var distance = 0;
+                    this.tmpOSCPayload.translatedBodies.forEach(body => {
+                        var xDistance = this.robotPosition.baseX - body.x;
+                        var yDistance = this.robotPosition.baseY - body.y;
+                        var zDistance = this.robotPosition.baseZ - body.z;
+
+                        distance = Math.sqrt(
+                            Math.pow(xDistance, 2) +
+                            Math.pow(yDistance, 2) +
+                            Math.pow(zDistance, 2)
+                        );
+
+                        console.log("Distance:", distance);
+                        
+                        if(distance < closestDistance){
+                            closestBody = body;
+                            closestDistance = distance;
+                        }
+                    });
+
+                    console.log("Closest Distance:", distance);
+
                     var payload = {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
                         "data" : {
-                        "baseX" : this.robotPosition.baseX,
-                        "baseY" : this.robotPosition.baseY,
-                        "baseZ" : this.robotPosition.baseZ,
-                        "baseRotation" : this.robotPosition.baseRotation,
-                        "personX" : Number(this.tmpOSCPayload.translatedBodies[0].x),
-                        "personY" : Number(this.tmpOSCPayload.translatedBodies[0].y),
-                        "personZ" : Number(this.tmpOSCPayload.translatedBodies[0].z)
+                            "baseX" : this.robotPosition.baseX,
+                            "baseY" : this.robotPosition.baseY,
+                            "baseZ" : this.robotPosition.baseZ,
+                            "baseRotation" : this.robotPosition.baseRotation,
+                            "personX" : Number(closestBody.x),
+                            "personY" : Number(closestBody.y),
+                            "personZ" : Number(closestBody.z)
                         } 
                     }
 

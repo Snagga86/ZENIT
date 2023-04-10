@@ -9,8 +9,10 @@ from hsemotions.facial_emotions import HSEmotionRecognizer
 model_name='enet_b0_8_best_afew'
 fer=HSEmotionRecognizer(model_name=model_name,device='cpu')
 
+ONLY_LARGEST_FACE = True
 CAMERA_NO = 0
 UDP_IP = "192.168.123.101"
+SHOT_URL = "http://192.168.123.103:8910/shot.jpg"
 UDP_PORT = 1337
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
@@ -21,7 +23,7 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 facecasc = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 def process():
-    req = urllib.request.urlopen("http://192.168.0.103:8910/shot.jpg")
+    req = urllib.request.urlopen(SHOT_URL)
     arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
     shot = cv.imdecode(arr, -1)
 
@@ -32,9 +34,24 @@ def process():
     frame = cv.cvtColor(shot, cv.COLOR_BGR2RGB)
     faces = facecasc.detectMultiScale(frame,scaleFactor=1.3, minNeighbors=5)
     
+    lastFaceSize = 0
+    lastX = 0
+    lastY = 0
+    lastW = 0
+    lastH = 0
+
     for (x, y, w, h) in faces:
-        cv.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
-        face_img = frame[y:y + h, x:x + w]
+        faceSize = np.sqrt(w^2 + h^2)
+        if faceSize > lastFaceSize:
+            lastX = x
+            lastY = y
+            lastW = w
+            lastH = h
+            lastFaceSize = faceSize
+
+    if lastFaceSize > 0:
+        cv.rectangle(frame, (lastX, lastY-50), (lastX+lastW, lastY+lastH+10), (255, 0, 0), 2)
+        face_img = frame[lastY:lastY + lastH, lastX:lastX + lastW]
         #cropped_img = np.expand_dims(np.expand_dims(cv.resize(roi_gray, (224, 224)), -1), 0)
         emotion,scores=fer.predict_emotions(face_img,logits=True)
         #print(scores);
@@ -45,8 +62,8 @@ def process():
         print(b[0])
         #client.send_message("/data/emtion", emotion)
         sock.sendto(bytes(emotion, "utf-8"), (UDP_IP, UDP_PORT))
-     
-    #
+        
+        #
     cv.imshow('Video', cv.resize(frame,(1600,960),interpolation = cv.INTER_CUBIC))
     # Display the resulting frame
     #cv.imshow('frame', gray)
