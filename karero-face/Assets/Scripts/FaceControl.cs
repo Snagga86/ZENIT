@@ -6,11 +6,20 @@ using TMPro;
 using System;
 using NativeWebSocket;
 using UnityEngine.XR;
+using Newtonsoft.Json;
+using UnityEngine.Video;
 
 public class FaceControl : MonoBehaviour
 {
+    public GameObject videoPlayer;
+    public GameObject soundPlayer;
+
     public WebSocket webSocket;
     public string WS = "ws://192.168.123.182:3344";
+
+    private string TEXT_FOLDER = "Assets/Text";
+    private string VIDEO_FOLDER = "Assets/Videos";
+
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
     private object obj = null;
@@ -40,8 +49,82 @@ public class FaceControl : MonoBehaviour
         {
             Debug.Log("onMessage");
             var message = System.Text.Encoding.UTF8.GetString(data);
+            FaceControlDescription jsonControlObject = JsonConvert.DeserializeObject<FaceControlDescription>(message);
 
-            displayEmotion = message;
+            if(jsonControlObject.mode == "setEmotion")
+            {
+                displayEmotion = jsonControlObject.data;
+            }
+
+            if (jsonControlObject.mode == "setVideo")
+            {
+                VideoClip newVideoClip;
+                switch (jsonControlObject.data)
+                {
+                    case "show":
+                        Debug.Log("show video");
+                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
+                        break;
+                    case "hide":
+                        Debug.Log("hide video");
+                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+                        break;
+                    case "start":
+                        Debug.Log("start video");
+                        this.videoPlayer.GetComponent<VideoPlayer>().Play();
+                        break;
+                    case "stop":
+                        Debug.Log("stop video");
+                        this.videoPlayer.GetComponent<VideoPlayer>().Stop();
+                        break;
+                    case "name":
+                        Debug.Log("name video");
+                        //implement video src change
+                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra + ".mp4");
+                        break;
+                    case "showAndPlay":
+                        Debug.Log("show and play video");
+                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
+                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra + ".mp4");
+                        this.videoPlayer.GetComponent<VideoPlayer>().clip = newVideoClip;
+                        this.videoPlayer.GetComponent<VideoPlayer>().Play();
+                        break;
+                    case "stopAndHide":
+                        Debug.Log("stop and hide video");
+                        this.videoPlayer.GetComponent<VideoPlayer>().Stop();
+                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+                        break;
+                }
+            }
+
+            if (jsonControlObject.mode == "setSound")
+            {
+                AudioClip newAudioClip;
+                switch (jsonControlObject.data)
+                {
+                    case "play":
+                        Debug.Log("play sound");
+                        this.soundPlayer.GetComponent<AudioSource>().Play();
+                        break;
+                    case "stop":
+                        Debug.Log("stop sound");
+                        this.soundPlayer.GetComponent<AudioSource>().Stop();
+                        this.soundPlayer.GetComponent<AudioSource>().time = 0;
+                        break;
+                    case "name":
+                        Debug.Log("name sound");
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + ".mp3");
+                        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+                        break;
+                    case "nameAndPlay":
+                        Debug.Log("name sound");
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + ".mp3");
+                        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+                        this.soundPlayer.GetComponent<AudioSource>().Play();
+                        break;
+                }
+            }
+
         };
 
         webSocket.OnOpen += () =>

@@ -2,11 +2,11 @@ import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Follow extends StateWrap{
+export class Appreciation extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("follow", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("appreciation", emotionProcessor, gesturePostureProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -14,12 +14,10 @@ export class Follow extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("dance", "dance", () => {
-            console.log('transition action for "follow" in "dance" state')
+        this.state.transitions.push(new Transition("farewell", "farewell", () => {
         }));
-        this.state.transitions.push(new Transition("attack", "attack", () => {
-            console.log('transition action for "follow" in "attack" state')
-        }));
+
+        this.timeout;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -36,44 +34,41 @@ export class Follow extends StateWrap{
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
 
+        var facePayload = {
+            "mode" : "setSound",
+            "data" : "nameAndPlay",
+            "extra" : "appreciation"
+        }
+
+        /* Send the activity change to the KARERO brain. */
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.GesturePostureDetection.bind(this));
-        this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
+        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
+
+        this.timeout = setTimeout(function() {
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
+        }, 4000);
     }
 
     /* Exit function is executed whenever the state is left. */
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.GesturePostureDetection);
-        this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
+        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
+        clearTimeout(this.timeout);
     }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
-    GesturePostureDetection(receivedGesture){
+    closestBodyRecognition(distance){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(receivedGesture == "a3" || receivedGesture == "arnold2" || receivedGesture == "arnold"){
+        if(distance > 1500){
 
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "attack");
-        }
-    }
-
-    /* Interpretion function of received data coming from Emotion Detection Algorithm. */
-    emotionRecognition(receivedEmotion){
-        console.log("detect emotion");
-        var payload = {
-            "mode" : "setEmotion",
-            "data" : receivedEmotion
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
-        /* If the ecstasy emotion was detected the robot changes it's state to dance. */
-        if(receivedEmotion == "Ecstasy"){
-
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "dance");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
         }
     }
 }

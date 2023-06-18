@@ -23,6 +23,10 @@
             "baseY" : 0.9,
             "baseZ" : 0.01,
             "baseRotation" : 0
+        },
+        "interactionSweetSpot": {
+            "x" : 1.6,
+            "z" : 3
         }
     }
 }

@@ -7,8 +7,8 @@ export class Off extends StateWrap{
         
         this.state.actions.onEnter = this.enterFunction.bind(this);
 
-        this.state.transitions.push(new Transition("follow", "follow", () => {
-            console.log('transition action for "off" in "follow" state')
+        this.state.transitions.push(new Transition("callToAction", "callToAction", () => {
+            console.log('transition action for "off" in "callToAction" state')
         }));
         
         this.state.transitions.push(new Transition("off", "off", () => {
@@ -19,7 +19,7 @@ export class Off extends StateWrap{
     enterFunction(){
         this.stateChangeInitiated = false;
         console.log('off: onEnter')
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "follow");
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
     }
 
 }

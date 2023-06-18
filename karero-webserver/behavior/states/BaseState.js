@@ -34,5 +34,5 @@ export class StateWrap{
         return this.state;
     }
 
-    gesturePostureRecognition(rec){}
+    GesturePostureDetection(rec){}
 }

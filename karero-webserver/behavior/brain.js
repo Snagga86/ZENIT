@@ -5,6 +5,14 @@ import { Off } from './states/Off.js'
 import { Follow } from './states/Follow.js'
 import { Dance } from './states/Dance.js'
 import { Attack } from './states/Attack.js'
+import { Appreciation } from './states/Appreciation.js'
+import { BriefingForExercise } from './states/BriefingForExercise.js'
+import { CallToAction } from './states/CallToAction.js'
+import { Farewell } from './states/Farewell.js'
+import { GeneralBriefing } from './states/GeneralBriefing.js'
+import { IntermediateAward } from './states/IntermediateAward.js'
+import { PerformanceAnchor } from './states/PerformanceAnchor.js'
+import { Welcoming } from './states/Welcoming.js'
 
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
@@ -41,8 +49,18 @@ export class Brain{
         const dance = new Dance(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
         const attack = new Attack(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
 
+        const appreciation = new Appreciation(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const callToAction = new CallToAction(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const farewell = new Farewell(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const generalBriefing = new GeneralBriefing(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+
+
         this.stateMachineDefinition = {
-            initialState: "off", off, follow, dance, attack
+            initialState: "off", off, follow, dance, attack, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming
         };
         
         /* Create the state machine with states required. */
@@ -62,11 +80,11 @@ export class Brain{
         });
 
         /* Whenever a state triggers a new face action on the robot display it is transmitted from here. */
-        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, (emotion) => {
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, (payload) => {
             console.log(this.robotFaceWS);
             if(this.robotFaceWS != null){
-                console.log("send " + emotion);
-                this.robotFaceWS.send(emotion);
+                console.log("send " + JSON.stringify(payload));
+                this.robotFaceWS.send(JSON.stringify(payload));
             }
         });
 

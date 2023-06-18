@@ -2,11 +2,11 @@ import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Attack extends StateWrap{
+export class IntermediateAward extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("attack", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("intermediateAward", emotionProcessor, gesturePostureProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -14,7 +14,7 @@ export class Attack extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 6500; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 6000; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
@@ -23,8 +23,7 @@ export class Attack extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("follow", "follow", () => {
-            console.log('transition action for "attack" in "follow" state');
+        this.state.transitions.push(new Transition("performanceAnchor", "performanceAnchor", () => {
         }));
     }
 
@@ -36,22 +35,16 @@ export class Attack extends StateWrap{
         activity: The strategy interpreted and executed by the connected robot device */
         var payload = {
             "mode" : "setMode",
-            "activity" : "attack"
-        }
-
-        var payloadEmotion= {
-            "mode" : "setEmotion",
-            "data" : "Rage"
+            "activity" : "dance"
         }
 
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion)
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "follow");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "performanceAnchor");
             clearTimeout(this.timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
     }
