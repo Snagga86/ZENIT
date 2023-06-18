@@ -1839,9 +1839,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05d281ec4faaa484a8476a52238abf2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frequency: 1
-  amplitude: 2
-  resolution: 1000
+  frequency: 0.5
+  amplitude: 2.5
+  resolution: 10000
 --- !u!82 &1111824177
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2005,7 +2005,7 @@ LineRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0.4448895
-        value: 0.004348755
+        value: 0.00869751
         inSlope: 0
         outSlope: 0
         tangentMode: 0

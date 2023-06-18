@@ -40,12 +40,28 @@ export class BriefingForExercise extends StateWrap{
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
 
+        var facePayload = {
+            "mode" : "setVideo",
+            "data" : "showAndPlay",
+            "extra" : "squads"
+        }
+
+        /* Send the activity change to the KARERO brain. */
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
         this.timeout = setTimeout(function() {
+            var facePayload = {
+                "mode" : "setVideo",
+                "data" : "stopAndHide"
+            }
+    
+            /* Send the activity change to the KARERO brain. */
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "performanceAnchor");
         }, 7000);
     }
@@ -63,7 +79,13 @@ export class BriefingForExercise extends StateWrap{
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(distance > 1500){
-
+            var facePayload = {
+                "mode" : "setVideo",
+                "data" : "stopAndHide"
+            }
+    
+            /* Send the activity change to the KARERO brain. */
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
         }
