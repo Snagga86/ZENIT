@@ -10,7 +10,7 @@ using UnityEngine.XR;
 public class FaceControl : MonoBehaviour
 {
     public WebSocket webSocket;
-    public string WS = "ws://192.168.123.101:3344";
+    public string WS = "ws://192.168.123.182:3344";
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
     private object obj = null;

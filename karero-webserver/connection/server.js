@@ -65,6 +65,7 @@ export class KAREROServer {
 
         /* Incoming data from the emotion detection network is processed in the KARERO brain. */
         this.emotionDetectionSocket.on('message', (msg, rinfo) => {
+			console.log(msg);
             this.KAREROBrain.processEmotionRecognition(msg.toString());
         });
 
