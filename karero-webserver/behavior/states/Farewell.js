@@ -48,7 +48,7 @@ export class Farewell extends StateWrap{
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
-        this.timeout = setTimeout(function() {
+        this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
         }, 4000);
     }
@@ -63,9 +63,9 @@ export class Farewell extends StateWrap{
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
-
+        console.log(distance);
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1500){
+        if(distance > 1.5){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");

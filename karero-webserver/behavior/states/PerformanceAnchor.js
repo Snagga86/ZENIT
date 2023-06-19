@@ -34,11 +34,11 @@ export class PerformanceAnchor extends StateWrap{
         this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureDetection.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
-        this.timeout = setTimeout(function() {
+        this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
         }, 15000);
 
-        this.timeoutIntermediateMotivation = setTimeout(function() {
+        this.timeoutIntermediateMotivation = setTimeout(() => {
             var facePayload = {
                 "mode" : "setSound",
                 "data" : "nameAndPlay",
@@ -65,7 +65,7 @@ export class PerformanceAnchor extends StateWrap{
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(receivedGesture == "squad"){
             this.timeout.clear();
-            this.timeout = setTimeout(function() {
+            this.timeout = setTimeout(() => {
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
             }, 15000);
             /* Emit the attack state change event. */
@@ -94,7 +94,7 @@ export class PerformanceAnchor extends StateWrap{
     closestBodyRecognition(distance){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1500){
+        if(distance > 1.5){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");

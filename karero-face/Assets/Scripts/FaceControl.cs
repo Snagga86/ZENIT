@@ -17,8 +17,8 @@ public class FaceControl : MonoBehaviour
     public WebSocket webSocket;
     public string WS = "ws://192.168.123.182:3344";
 
-    private string TEXT_FOLDER = "Assets/Text";
-    private string VIDEO_FOLDER = "Assets/Videos";
+    private string TEXT_FOLDER = "Text/";
+    private string VIDEO_FOLDER = "Videos/";
 
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
@@ -80,12 +80,12 @@ public class FaceControl : MonoBehaviour
                     case "name":
                         Debug.Log("name video");
                         //implement video src change
-                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra + ".mp4");
+                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra);
                         break;
                     case "showAndPlay":
                         Debug.Log("show and play video");
                         this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
-                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra + ".mp4");
+                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra);
                         this.videoPlayer.GetComponent<VideoPlayer>().clip = newVideoClip;
                         this.videoPlayer.GetComponent<VideoPlayer>().Play();
                         break;
@@ -100,6 +100,7 @@ public class FaceControl : MonoBehaviour
             if (jsonControlObject.mode == "setSound")
             {
                 AudioClip newAudioClip;
+                Debug.Log(jsonControlObject);
                 switch (jsonControlObject.data)
                 {
                     case "play":
@@ -113,12 +114,14 @@ public class FaceControl : MonoBehaviour
                         break;
                     case "name":
                         Debug.Log("name sound");
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + ".mp3");
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra);
                         this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
                         break;
                     case "nameAndPlay":
-                        Debug.Log("name sound");
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + ".mp3");
+                        Debug.Log("nameAndPlay");
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra);
+                        Debug.Log(newAudioClip);
+                        Debug.Log(TEXT_FOLDER + jsonControlObject.extra + ".mp3");
                         this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
                         this.soundPlayer.GetComponent<AudioSource>().Play();
                         break;

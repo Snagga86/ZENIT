@@ -17,6 +17,8 @@ export class CallToAction extends StateWrap{
         this.state.transitions.push(new Transition("welcoming", "welcoming", () => {
             console.log('transition action for "callToAction" in "welcoming" state')
         }));
+
+        this.timeout;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -25,6 +27,35 @@ export class CallToAction extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
+
+        /* Add the event listener to listen on GesturePostureDetection events.
+        Execute gesturePostureRecognition function on received detections. */
+        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
+
+        this.followHead();
+    }
+
+    /* Exit function is executed whenever the state is left. */
+    exitFunction(){
+
+        /* Turn off event listener if state is exited. */
+        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
+        clearTimeout(this.timeout);
+        //this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
+    }
+
+    /* Interpretion function of received data coming from Azure Kinectic Space. */
+    closestBodyRecognition(distance){
+        /* If the arnold gesture was detected the robot changes its state to attack. */
+        if(distance <= 1.5){
+
+            /* Emit the attack state change event. */
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "welcoming");
+        }
+    }
+
+    seekAttention(){
         var payload = {
             "mode" : "setMode",
             "activity" : "seekAttention"
@@ -33,28 +64,22 @@ export class CallToAction extends StateWrap{
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
 
-        /* Add the event listener to listen on GesturePostureDetection events.
-        Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
-        //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
+        this.timeout = setTimeout(() => {
+            this.followHead();
+        }, 7500);
     }
 
-    /* Exit function is executed whenever the state is left. */
-    exitFunction(){
-
-        /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        //this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
-    }
-
-    /* Interpretion function of received data coming from Azure Kinectic Space. */
-    closestBodyRecognition(distance){
-
-        /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance <= 1500){
-
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "welcoming");
+    followHead(){
+        var payload = {
+            "mode" : "setMode",
+            "activity" : "followHead"
         }
+
+        /* Send the activity change to the KARERO brain. */
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+
+        this.timeout = setTimeout(() => {
+            this.seekAttention();
+        }, 3000);
     }
 }

@@ -53,6 +53,7 @@ export class KAREROServer {
         /* On incoming OSC data from Azure Kinetic Space this data is processed for possible usage
         in the KARERO Brain/business logic. */
         this.osc.on('/data', message => {
+
             var data = JSON.parse(message.args)
             this.tmpOSCPayload = data
             this.KAREROBrain.processKinectRecognition(data);

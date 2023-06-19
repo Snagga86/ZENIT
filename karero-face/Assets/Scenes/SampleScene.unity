@@ -645,7 +645,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   videoPlayer: {fileID: 927164512}
-  soundPlayer: {fileID: 0}
+  soundPlayer: {fileID: 1111824175}
   WS: ws://192.168.123.182:3344
   displayEmotion: 
   eyeLeft: {fileID: 216612233}
@@ -1853,7 +1853,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: b9be8a5ea63e65940a14c295c1e9de3e, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0

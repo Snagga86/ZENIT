@@ -15,10 +15,10 @@ export class Welcoming extends StateWrap{
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("generalBriefing", "generalBriefing", () => {
-            console.log('transition action for "follow" in "dance" state')
+            console.log('transition action for "Welcoming" in "generalBriefing" state')
         }));
         this.state.transitions.push(new Transition("farewell", "farewell", () => {
-            console.log('transition action for "follow" in "attack" state')
+            console.log('transition action for "Welcoming" in "farewell" state')
         }));
 
         this.timeout;
@@ -52,7 +52,7 @@ export class Welcoming extends StateWrap{
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
-        this.timeout = setTimeout(function() {
+        this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "generalBriefing");
         }, 4000);
     }
@@ -67,9 +67,8 @@ export class Welcoming extends StateWrap{
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
-
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1500){
+        if(distance > 1.5){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");

@@ -6,7 +6,7 @@ export class BriefingForExercise extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("briefingForExcercise", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("briefingForExercise", emotionProcessor, gesturePostureProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -15,10 +15,10 @@ export class BriefingForExercise extends StateWrap{
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("performanceAnchor", "performanceAnchor", () => {
-            console.log('transition action for "follow" in "dance" state')
+            console.log('transition action for "briefingForExercise" in "performanceAnchor" state')
         }));
         this.state.transitions.push(new Transition("farewell", "farewell", () => {
-            console.log('transition action for "follow" in "attack" state')
+            console.log('transition action for "BriefingForExercise" in "farewell" state')
         }));
 
         this.timeout;
@@ -54,7 +54,7 @@ export class BriefingForExercise extends StateWrap{
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
-        this.timeout = setTimeout(function() {
+        this.timeout = setTimeout(() => {
             var facePayload = {
                 "mode" : "setVideo",
                 "data" : "stopAndHide"
@@ -78,7 +78,7 @@ export class BriefingForExercise extends StateWrap{
     closestBodyRecognition(distance){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1500){
+        if(distance > 1.5){
             var facePayload = {
                 "mode" : "setVideo",
                 "data" : "stopAndHide"

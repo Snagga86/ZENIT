@@ -1,4 +1,6 @@
 import EventEmitter from 'events';
+import * as fs from 'fs';
+
 
 export class GesturePostureProcessor {
 
@@ -8,14 +10,17 @@ export class GesturePostureProcessor {
         this.currentGesture = "";
         this.closestBody;
         this.closestBodyDistance = 100000000;
+
+        this.rawdata = fs.readFileSync('./server-conf.json');
+        this.serverConf = JSON.parse(this.rawdata);
     }
 
     digest(kinectData) {
         if(this.ONLY_SWEETSPOT_BODY == true){
-            var closestBody = this.getClosestBody(kinectData.translatedBodies)
-            this.gesturePostureEvent.emit('GesturePostureDetection', closestBody.trackedGesture);
+            this.getClosestBody(kinectData.translatedBodies);
+            this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);
             this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
-            this.currentGesture = closestBody.trackedGesture;
+            this.currentGesture = this.closestBody.trackedGesture;
         }
     }
 
@@ -31,24 +36,25 @@ export class GesturePostureProcessor {
     }
 
     getClosestBody(bodies){
-        closestDistance = 1000000;
-        var closestBody = null;
-        bodies.forEach(element => {
-            var distance = calcDistance(element.positionTracked.x, element.positionTracked.y, element.positionTracked.z);
-            if(distance < closestDistance){
-                closestDistance = distance;
-                closestBody = element;
+        /* Only target closest body */
+        this.closestBodyDistance = 1000000;
+        var distance = 0;
+        bodies.forEach(body => {
+            var xDistance = this.serverConf.config.robotPosition.baseX - body.x;
+            var yDistance = this.serverConf.config.robotPosition.baseY - body.y;
+            var zDistance = this.serverConf.config.robotPosition.baseZ - body.z;
+
+            distance = Math.sqrt(
+                Math.pow(xDistance, 2) +
+                Math.pow(yDistance, 2) +
+                Math.pow(zDistance, 2)
+            );
+            
+            if(distance < this.closestBodyDistance){
+                this.closestBody = body;
+                this.closestBodyDistance = distance;
+                //
             }
         });
-        this.closestBody = closestBody;
-        this.closestBodyDistance = closestDistance;
-    }
-
-    calcDistance(x,y,z){
-        const dx = x - sweetSpotX;
-        const dy = y - sweetSpotY;
-        const dz = z - sweetSpotZ;
-        // return Math.sqrt(dx*dx + dy*dy + dz*dz);
-        return Math.sqrt(dx*dx + dz*dz);
     }
 }
