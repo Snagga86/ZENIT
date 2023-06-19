@@ -41,7 +41,13 @@ export class Farewell extends StateWrap{
         }
 
         /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
+        var facePayload = {
+            "mode" : "setEmotion",
+            "data" : "Idle1"
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
@@ -63,7 +69,6 @@ export class Farewell extends StateWrap{
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
-        console.log(distance);
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(distance > 1.5){
 

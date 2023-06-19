@@ -8,6 +8,7 @@ using NativeWebSocket;
 using UnityEngine.XR;
 using Newtonsoft.Json;
 using UnityEngine.Video;
+using System.Collections;
 
 public class FaceControl : MonoBehaviour
 {
@@ -34,6 +35,9 @@ public class FaceControl : MonoBehaviour
     public Face targetFace;
     public Face startFace;
     private static float t = 0.0f;
+    private static float tMulti = 1.5f;
+
+    private Coroutine blinkCoroutine;
 
     void Start()
     {
@@ -176,16 +180,51 @@ public class FaceControl : MonoBehaviour
         //GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>().text = displayEmotion;
 
 
-        if (lastEmotion != displayEmotion)
+        if (lastEmotion != displayEmotion && displayEmotion != "Idle1" && displayEmotion != "Idle1")
         {
+            if(this.blinkCoroutine != null)StopCoroutine(this.blinkCoroutine);
             this.startFace = this.getStartFace(eyeLeft, eyeRight);
             //Debug.Log("startFace: " + startFace);
             this.targetFace = faceEmotion.getEyeShapeValuesByEmotion(displayEmotion);
             t = 0.0f;
+            tMulti = 1.0f;
         }
         this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
+        
 
+        if (lastEmotion != displayEmotion && displayEmotion == "Idle1" || displayEmotion == "Idle2")
+        {
+            Debug.Log("start Coroutine");
+            this.blinkCoroutine = StartCoroutine(this.BlinkCoroutine());
+        }
         lastEmotion = displayEmotion;
+    }
+
+    private IEnumerator BlinkCoroutine()
+    {
+        Debug.Log("Coroutine go");
+        tMulti = 0.17f;
+        while (1 < 2)
+        {
+            Debug.Log("go while");
+            this.startFace = this.getStartFace(eyeLeft, eyeRight);
+            //Debug.Log("startFace: " + startFace);
+            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Idle1");
+            t = 0.0f;
+            
+            this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
+            // Wait for 2 seconds
+            yield return new WaitForSeconds(3.2f);
+            Debug.Log("Coroutine resumed after 0.5 seconds");
+            this.startFace = this.getStartFace(eyeLeft, eyeRight);
+            //Debug.Log("startFace: " + startFace);
+            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Neutral");
+            t = 0.0f;
+            int randomValue = UnityEngine.Random.Range(6, 12);
+
+            this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
+            yield return new WaitForSeconds(2.7f);
+        }
     }
 
     Face getStartFace(SkinnedMeshRenderer leftEye, SkinnedMeshRenderer rightEye)
@@ -240,7 +279,7 @@ public class FaceControl : MonoBehaviour
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy, Mathf.Lerp(eyeBlendshapeDataStart.happy, eyeBlendshapeDataEnd.happy * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry, Mathf.Lerp(eyeBlendshapeDataStart.angry, eyeBlendshapeDataEnd.angry * 100, t));
 
-        t += 1.5f * Time.deltaTime;
+        t += tMulti * Time.deltaTime;
     }
 
 }
@@ -354,6 +393,12 @@ public class FaceEmotion
                 break;
             case "Neutral":
                 return this.neutral.neutral;
+                break;
+            case "Idle1":
+                return this.neutral.idle1;
+                break;
+            case "Idle2":
+                return this.neutral.idle2;
                 break;
             default:
                 return this.neutral.neutral;
@@ -616,6 +661,8 @@ public class Contempt
 public class Neutral
 {
     public Face neutral;
+    public Face idle1;
+    public Face idle2;
 
     public Neutral()
     {
@@ -623,6 +670,18 @@ public class Neutral
         EmotionShapes rShape = new EmotionShapes();
 
         neutral = new Face(lShape, rShape);
+
+        lShape = new EmotionShapes();
+        rShape = new EmotionShapes();
+        lShape.full = 0.23f;
+        rShape.full = 0.23f;
+        idle1 = new Face(lShape, rShape);
+
+        lShape = new EmotionShapes();
+        rShape = new EmotionShapes();
+        lShape.happy = 0.42f;
+        rShape.happy = 0.42f;
+        idle2 = new Face(lShape, rShape);
     }
 }
 

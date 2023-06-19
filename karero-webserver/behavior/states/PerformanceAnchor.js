@@ -46,7 +46,14 @@ export class PerformanceAnchor extends StateWrap{
             }
     
             /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
+            var facePayload = {
+                "mode" : "setEmotion",
+                "data" : "Sadness"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
         }, 5000);
     }
 
@@ -83,7 +90,13 @@ export class PerformanceAnchor extends StateWrap{
             }
     
             /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
+            var facePayload = {
+                "mode" : "setEmotion",
+                "data" : "Idle1"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
         }
         if(this.squadCounter >= 5){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "intermediateAward");
