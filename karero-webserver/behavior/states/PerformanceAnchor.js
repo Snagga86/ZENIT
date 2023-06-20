@@ -1,5 +1,6 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
+import keypress from 'keypress';
 
 /* Robot state class defining the robot behavior within this state */
 export class PerformanceAnchor extends StateWrap{
@@ -19,9 +20,12 @@ export class PerformanceAnchor extends StateWrap{
         this.state.transitions.push(new Transition("appreciation", "appreciation", () => {
         }));
 
-        this.timeout;
+        this.timeoutSquad;
         this.timeoutIntermediateMotivation;
+        this.timeoutAppreciation;
         this.squadCounter = 0;
+
+        keypress(process.stdin);
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -34,10 +38,58 @@ export class PerformanceAnchor extends StateWrap{
         this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureDetection.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
-        this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
-        }, 15000);
+        this.intermediateMotivationTimeout();
+        this.appreciationTimeout();
 
+        var payload = {
+            "mode" : "setMode",
+            "activity" : "followHead"
+        }
+
+        /* Send the activity change to the KARERO brain. */
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+    
+        var facePayload = {
+            "mode" : "setEmotion",
+            "data" : "Idle1"
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
+        process.stdin.on('keypress', this.keyPressHandler);
+        process.stdin.resume();
+    }  
+
+
+    keyPressHandler = (ch, key) =>{
+        if (key && key.name === 'a') {
+            // 'Enter' key was pressed, react accordingly
+            console.log('a key pressed');
+            this.gesturePostureDetection("squad");
+            // You can perform other actions here
+        } else if (key && key.ctrl && key.name === 'c') {
+            // Ctrl + C was pressed, exit the program
+            process.exit();
+        } else {
+            // Other key presses
+            console.log(`Key pressed: ${ch}`);
+        }
+        console.log('Press Enter or any other key (Ctrl + C to exit):');
+    }
+
+    /* Exit function is executed whenever the state is left. */
+    exitFunction(){
+
+        process.stdin.removeListener('keypress', this.keyPressHandler);
+        process.stdin.pause();
+        /* Turn off event listener if state is exited. */
+        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
+        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
+        clearTimeout(this.timeoutAppreciation);
+        clearTimeout(this.timeoutIntermediateMotivation);
+        clearTimeout(this.timeoutSquad);
+    }
+
+    intermediateMotivationTimeout(){
         this.timeoutIntermediateMotivation = setTimeout(() => {
             var facePayload = {
                 "mode" : "setSound",
@@ -53,28 +105,34 @@ export class PerformanceAnchor extends StateWrap{
                 "data" : "Sadness"
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
-
-        }, 5000);
+            this.intermediateMotivationTimeout();
+        }, 7000);
     }
 
-    /* Exit function is executed whenever the state is left. */
-    exitFunction(){
+    appreciationTimeout(){
+        this.timeoutAppreciation = setTimeout(() => {
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
+        }, 18000);
+    }
 
-        /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
-        clearTimeout(this.timeout);
-        clearTimeout(this.timeoutIntermediateMotivation);
+    squadTimeout(){
+        this.timeoutSquad = setTimeout(() => {
+            var payload = {
+                "mode" : "setMode",
+                "activity" : "followHead"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+        }, 2500);
     }
 
     gesturePostureDetection(receivedGesture){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(receivedGesture == "squad"){
-            this.timeout.clear();
-            this.timeout = setTimeout(() => {
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
-            }, 15000);
+            clearTimeout(this.timeoutAppreciation);
+            clearTimeout(this.timeoutIntermediateMotivation);
+            clearTimeout(this.timeoutSquad);
+            
             /* Emit the attack state change event. */
             this.squadCounter++;
             var payload = {
@@ -97,10 +155,18 @@ export class PerformanceAnchor extends StateWrap{
                 "data" : "Idle1"
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+            this.intermediateMotivationTimeout();
+            this.appreciationTimeout();
+
+            this.squadTimeout();
         }
+
         if(this.squadCounter >= 5){
+            this.squadCounter = 0;
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "intermediateAward");
         }
+
+
     }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
@@ -110,7 +176,7 @@ export class PerformanceAnchor extends StateWrap{
         if(distance > 1.5){
 
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
         }
     }
 }

@@ -70,7 +70,7 @@ export class CallToAction extends StateWrap{
 
         this.timeout = setTimeout(() => {
             this.followHead();
-        }, 7500);
+        }, 4500);
     }
 
     followHead(){
@@ -84,6 +84,6 @@ export class CallToAction extends StateWrap{
 
         this.timeout = setTimeout(() => {
             this.seekAttention();
-        }, 3000);
+        }, 7000);
     }
 }

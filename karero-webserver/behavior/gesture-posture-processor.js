@@ -13,12 +13,21 @@ export class GesturePostureProcessor {
 
         this.rawdata = fs.readFileSync('./server-conf.json');
         this.serverConf = JSON.parse(this.rawdata);
+
+        this.TIME_THRESHHOLD = 1500;
+        this.timeDetected = 0;
+        this.recentlyDetected = false;
     }
 
     digest(kinectData) {
         if(this.ONLY_SWEETSPOT_BODY == true){
             this.getClosestBody(kinectData.translatedBodies);
-            this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);
+            if(this.recentlyDetected == false){
+                this.recentlyDetected = true;
+                this.timeDetected = Date.now();
+                this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);  
+            }
+            this.debounceGesture();
             this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
             this.currentGesture = this.closestBody.trackedGesture;
         }
@@ -29,9 +38,8 @@ export class GesturePostureProcessor {
     }
 
     debounceGesture(){
-        var data = JSON.parse(message.args)
-        if(Date.now() - TIME_THRESHHOLD > timeDetected){
-            recentlyDetected = false;
+        if(Date.now() - this.TIME_THRESHHOLD > this.timeDetected){
+            this.recentlyDetected = false;
         }
     }
 

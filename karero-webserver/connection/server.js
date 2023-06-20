@@ -140,17 +140,12 @@ export class KAREROServer {
                             Math.pow(yDistance, 2) +
                             Math.pow(zDistance, 2)
                         );
-
-                        console.log("Distance:", distance);
                         
                         if(distance < closestDistance){
                             closestBody = body;
                             closestDistance = distance;
                         }
                     });
-
-                    console.log("Closest Distance:", distance);
-
                     var payload = {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
