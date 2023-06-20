@@ -60,7 +60,7 @@ export class Appreciation extends StateWrap{
 
         this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
-        }, 7000);
+        }, 8500);
     }
 
     /* Exit function is executed whenever the state is left. */

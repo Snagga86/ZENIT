@@ -118,14 +118,14 @@ public class FaceControl : MonoBehaviour
                         break;
                     case "name":
                         Debug.Log("name sound");
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra);
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4));
                         this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
                         break;
                     case "nameAndPlay":
                         Debug.Log("nameAndPlay");
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra);
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4));
                         Debug.Log(newAudioClip);
-                        Debug.Log(TEXT_FOLDER + jsonControlObject.extra + ".mp3");
+                        Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
                         this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
                         this.soundPlayer.GetComponent<AudioSource>().Play();
                         break;

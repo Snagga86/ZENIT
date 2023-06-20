@@ -52,16 +52,16 @@ export class GeneralBriefing extends StateWrap{
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
 
         this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
-        }, 22000);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
+        }, 11000);
 
         
-        process.stdin.on('keypress', this.keyPressHandler);
-        process.stdin.resume();
+        /*process.stdin.on('keypress', this.keyPressHandler);
+        process.stdin.resume();*/
         
     }
 
-    keyPressHandler = (ch, key) =>{
+    /*keyPressHandler = (ch, key) =>{
         if (key && key.name === 'a') {
             // 'Enter' key was pressed, react accordingly
             console.log('a key pressed');
@@ -76,7 +76,7 @@ export class GeneralBriefing extends StateWrap{
             console.log(`Key pressed: ${ch}`);
         }
         console.log('Press Enter or any other key (Ctrl + C to exit):');
-    }
+    }*/
 
     /* Exit function is executed whenever the state is left. */
     exitFunction(){

@@ -16,7 +16,7 @@ export class IntermediateAward extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 6000; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 8500; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
@@ -36,6 +36,15 @@ export class IntermediateAward extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
+        var v_face_payload = {
+            "mode" : "setSound",
+            "data" : "nameAndPlay",
+            "extra" : "intermediate-award"
+        }
+        if(globalStore.communicationLevel != "only_nonverbal"){
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, v_face_payload);
+        }
+
         var nv_body_payload = {
             "mode" : "setMode",
             "activity" : "dance"

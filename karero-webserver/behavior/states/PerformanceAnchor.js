@@ -93,7 +93,7 @@ export class PerformanceAnchor extends StateWrap{
 
     intermediateMotivationTimeout(){
         this.timeoutIntermediateMotivation = setTimeout(() => {
-            var facePayload = {
+            var v_face_payload = {
                 "mode" : "setSound",
                 "data" : "nameAndPlay",
                 "extra" : "intermediate-motivation"
@@ -101,17 +101,17 @@ export class PerformanceAnchor extends StateWrap{
     
             /* Send the activity change to the KARERO brain. */
             if(globalStore.communicationLevel != "only_nonverbal"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
             }
             
 
-            var facePayload = {
+            var nv_face_payload = {
                 "mode" : "setEmotion",
                 "data" : "Sadness"
             }
 
             if(globalStore.communicationLevel != "only_verbal"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
             }
             this.intermediateMotivationTimeout();
             logger(globalStore.filename, "IntermediateMotivation", "none");

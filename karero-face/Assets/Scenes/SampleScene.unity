@@ -646,7 +646,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   videoPlayer: {fileID: 927164512}
   soundPlayer: {fileID: 1111824175}
-  WS: ws://192.168.123.182:3344
+  WS: ws://192.168.123.101:3344
   displayEmotion: 
   eyeLeft: {fileID: 216612233}
   eyeRight: {fileID: 1417744666}

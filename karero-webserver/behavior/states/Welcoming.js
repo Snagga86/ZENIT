@@ -76,7 +76,7 @@ export class Welcoming extends StateWrap{
 
         this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "generalBriefing");
-        }, 8000);
+        }, 13000);
     }
 
     /* Exit function is executed whenever the state is left. */
