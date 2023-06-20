@@ -1,5 +1,7 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Farewell extends StateWrap{
@@ -23,6 +25,7 @@ export class Farewell extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
+        logger(globalStore.filename, "StateChange", "Farewell");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
@@ -70,7 +73,7 @@ export class Farewell extends StateWrap{
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1.5){
+        if(distance > globalStore.welcomeDistance){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");

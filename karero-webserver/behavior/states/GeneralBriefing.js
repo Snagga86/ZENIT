@@ -1,6 +1,8 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
 import keypress from 'keypress';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class GeneralBriefing extends StateWrap{
@@ -26,6 +28,8 @@ export class GeneralBriefing extends StateWrap{
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
+
+        logger(globalStore.filename, "StateChange", "GeneralBriefing");
 
         var facePayload = {
             "mode" : "setSound",
@@ -101,7 +105,7 @@ export class GeneralBriefing extends StateWrap{
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1.5){
+        if(distance > globalStore.welcomeDistance){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");

@@ -1,5 +1,7 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class IntermediateAward extends StateWrap{
@@ -30,28 +32,40 @@ export class IntermediateAward extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
+        logger(globalStore.filename, "StateChange", "IntermediateAward");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var payload = {
+        var nv_body_payload = {
             "mode" : "setMode",
             "activity" : "dance"
         }
 
         /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+        if(globalStore.communicationLevel != "only_verbal"){
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
+        }
 
-        var facePayload = {
+        var nv_face_payload = {
             "mode" : "setEmotion",
             "data" : "Ecstasy"
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 
+        if(globalStore.communicationLevel != "only_verbal"){
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+        }
+        
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "performanceAnchor");
             clearTimeout(this.timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
+    }
+
+    exitFunction(){
+
+        /* Turn off event listener if state is exited. */
+        clearTimeout(this.timeout);
     }
 }

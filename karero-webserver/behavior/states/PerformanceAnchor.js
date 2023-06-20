@@ -1,6 +1,8 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
 import keypress from 'keypress';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class PerformanceAnchor extends StateWrap{
@@ -31,7 +33,7 @@ export class PerformanceAnchor extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-
+        logger(globalStore.filename, "StateChange", "PerformanceAnchor");
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
@@ -41,19 +43,19 @@ export class PerformanceAnchor extends StateWrap{
         this.intermediateMotivationTimeout();
         this.appreciationTimeout();
 
-        var payload = {
+        var nv_body_payload = {
             "mode" : "setMode",
             "activity" : "followHead"
         }
 
         /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
     
-        var facePayload = {
+        var nv_face_payload = {
             "mode" : "setEmotion",
             "data" : "Idle1"
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
 
         process.stdin.on('keypress', this.keyPressHandler);
         process.stdin.resume();
@@ -98,14 +100,21 @@ export class PerformanceAnchor extends StateWrap{
             }
     
             /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+            if(globalStore.communicationLevel != "only_nonverbal"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+            }
+            
 
             var facePayload = {
                 "mode" : "setEmotion",
                 "data" : "Sadness"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
+            if(globalStore.communicationLevel != "only_verbal"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+            }
             this.intermediateMotivationTimeout();
+            logger(globalStore.filename, "IntermediateMotivation", "none");
         }, 7000);
     }
 
@@ -135,26 +144,35 @@ export class PerformanceAnchor extends StateWrap{
             
             /* Emit the attack state change event. */
             this.squadCounter++;
-            var payload = {
+            logger(globalStore.filename, "Squad", this.squadCounter);
+            var nv_body_payload = {
                 "mode" : "setMode",
                 "activity" : "squad"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
 
-            var facePayload = {
+            if(globalStore.communicationLevel != "only_verbal"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
+            }
+
+            var v_face_payload = {
                 "mode" : "setSound",
                 "data" : "nameAndPlay",
                 "extra" : this.squadCounter
             }
     
-            /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+            if(globalStore.communicationLevel != "only_nonverbal"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
+            }
 
-            var facePayload = {
+            var nv_face_payload = {
                 "mode" : "setEmotion",
                 "data" : "Idle1"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+
+            if(globalStore.communicationLevel != "only_verbal"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+            }
+
             this.intermediateMotivationTimeout();
             this.appreciationTimeout();
 
@@ -173,7 +191,7 @@ export class PerformanceAnchor extends StateWrap{
     closestBodyRecognition(distance){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > 1.5){
+        if(distance > globalStore.welcomeDistance){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");

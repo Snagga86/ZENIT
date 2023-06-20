@@ -1,5 +1,7 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class CallToAction extends StateWrap{
@@ -24,6 +26,7 @@ export class CallToAction extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
+        logger(globalStore.filename, "StateChange", "CallToAction");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */

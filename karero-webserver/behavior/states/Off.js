@@ -1,5 +1,7 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 export class Off extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, stateChangeEvent){ 
