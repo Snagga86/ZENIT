@@ -33,8 +33,11 @@ export class Welcoming extends StateWrap{
         var newParticipantID = uuidv4();
         globalStore.filename = newParticipantID;
 
-        if(globalStore.communicationMode == "Random"){
+        if(globalStore.communicationMode == "random"){
             globalStore.currentCommunicationLevel = globalStore.communicationLevel[Math.floor(Math.random() * 3)];
+        }
+        else{
+            globalStore.currentCommunicationLevel = globalStore.communicationMode;
         }
 
         logger(globalStore.filename, "BehaviorMode", globalStore.currentCommunicationLevel);
