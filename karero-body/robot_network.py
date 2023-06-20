@@ -39,7 +39,7 @@ class RobotNetwork:
         rel.dispatch()
 
     def on_message(self, ws, message):
-        print(message)
+        print("on message:", message)
         io = StringIO(message)
         json_obj = json.load(io)
         if(json_obj['mode'] == "setMode"):

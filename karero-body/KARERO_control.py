@@ -10,7 +10,7 @@ import numpy as np
 #logging.basicConfig(filename="/home/ubuntu/KARERO/karero-body/robolog.log", level=logging.INFO,filemode='w')
 
 karero_api = MyCobot('/dev/ttyAMA0', "1000000", timeout = 0.1, debug = False)
-karero_network = RobotNetwork("192.168.0.101", 3345)
+karero_network = RobotNetwork("192.168.123.182", 3345)
 karero_bot_control = KAREROBot(karero_api, karero_network)
 
 
