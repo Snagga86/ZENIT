@@ -82,7 +82,7 @@ export class GeneralBriefing extends StateWrap{
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        process.stdin.removeListener('keypress', this.keyPressHandler);
+        //process.stdin.removeListener('keypress', this.keyPressHandler);
 
         // Stop listening for input
         process.stdin.pause();

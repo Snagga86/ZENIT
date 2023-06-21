@@ -56,10 +56,6 @@ export class Farewell extends StateWrap{
         Execute gesturePostureRecognition function on received detections. */
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
-
-        this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
-        }, 4000);
     }
 
     /* Exit function is executed whenever the state is left. */

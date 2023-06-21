@@ -137,7 +137,7 @@ export class PerformanceAnchor extends StateWrap{
     gesturePostureDetection(receivedGesture){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(receivedGesture == "squad"){
+        if(receivedGesture.includes("squad")){
             clearTimeout(this.timeoutAppreciation);
             clearTimeout(this.timeoutIntermediateMotivation);
             clearTimeout(this.timeoutSquad);
@@ -157,7 +157,7 @@ export class PerformanceAnchor extends StateWrap{
             var v_face_payload = {
                 "mode" : "setSound",
                 "data" : "nameAndPlay",
-                "extra" : this.squadCounter
+                "extra" : "perform-performance*" + this.squadCounter
             }
     
             if(globalStore.communicationLevel != "only_nonverbal"){

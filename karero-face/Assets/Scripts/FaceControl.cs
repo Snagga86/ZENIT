@@ -16,7 +16,7 @@ public class FaceControl : MonoBehaviour
     public GameObject soundPlayer;
 
     public WebSocket webSocket;
-    public string WS = "ws://192.168.123.182:3344";
+    public string WS = "ws://192.168.123.101:3344";
 
     private string TEXT_FOLDER = "Text/";
     private string VIDEO_FOLDER = "Videos/";
@@ -123,9 +123,16 @@ public class FaceControl : MonoBehaviour
                         break;
                     case "nameAndPlay":
                         Debug.Log("nameAndPlay");
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4));
+                        if(jsonControlObject.extra.Contains("perform-performance*")){
+                            newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra.Split('*')[0] + "/" + jsonControlObject.extra.Split('*')[1]);
+                        }
+                        else
+                        {
+                            newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4));
+                        }
+                        
                         Debug.Log(newAudioClip);
-                        Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
+                        //Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
                         this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
                         this.soundPlayer.GetComponent<AudioSource>().Play();
                         break;

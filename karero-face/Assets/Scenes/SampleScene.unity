@@ -725,7 +725,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "ws://192.168.123.182:3344\u200B"
+  m_text: "ws://192.168.123.101:3344\u200B"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1315,7 +1315,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: ws://192.168.123.182:3344
+  m_Text: ws://192.168.123.101:3344
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -1840,8 +1840,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frequency: 0.5
-  amplitude: 2.5
-  resolution: 10000
+  amplitude: 0.3
+  resolution: 1200
 --- !u!82 &1111824177
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2004,8 +2004,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.4448895
-        value: 0.00869751
+        time: 0.45793575
+        value: 0.005
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -2440,7 +2440,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 507, y: 242}
+  m_AnchoredPosition: {x: 602, y: 341}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5000003}
 --- !u!114 &2129492621
@@ -2512,7 +2512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.1981132, g: 0.1981132, b: 0.1981132, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

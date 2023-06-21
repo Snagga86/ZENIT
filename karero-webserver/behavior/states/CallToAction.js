@@ -55,7 +55,7 @@ export class CallToAction extends StateWrap{
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance <= 1.5){
+        if(distance <= globalStore.welcomeDistance){
 
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "welcoming");

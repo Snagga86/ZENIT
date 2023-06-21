@@ -42,7 +42,7 @@ export class IntermediateAward extends StateWrap{
             "extra" : "intermediate-award"
         }
         if(globalStore.communicationLevel != "only_nonverbal"){
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, v_face_payload);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
         }
 
         var nv_body_payload = {
@@ -63,7 +63,7 @@ export class IntermediateAward extends StateWrap{
         if(globalStore.communicationLevel != "only_verbal"){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
         }
-        
+
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
