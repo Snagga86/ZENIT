@@ -114,7 +114,7 @@ export class PerformanceAnchor extends StateWrap{
             }
             this.intermediateMotivationTimeout();
             logger(globalStore.filename, "IntermediateMotivation", "none");
-        }, 7000);
+        }, 5000);
     }
 
     appreciationTimeout(){
@@ -130,7 +130,7 @@ export class PerformanceAnchor extends StateWrap{
                 "activity" : "followHead"
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
-        }, 2500);
+        }, 4000);
     }
 
     gesturePostureDetection(receivedGesture){

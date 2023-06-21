@@ -66,7 +66,7 @@ export class BriefingForExercise extends StateWrap{
             /* Send the activity change to the KARERO brain. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "performanceAnchor");
-        }, 18000);
+        }, 15000);
     }
 
     /* Exit function is executed whenever the state is left. */

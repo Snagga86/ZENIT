@@ -53,7 +53,7 @@ export class GeneralBriefing extends StateWrap{
 
         this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
-        }, 11000);
+        }, 9000);
 
         
         /*process.stdin.on('keypress', this.keyPressHandler);
