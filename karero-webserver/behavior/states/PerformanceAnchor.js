@@ -102,8 +102,7 @@ export class PerformanceAnchor extends StateWrap{
             /* Send the activity change to the KARERO brain. */
             if(globalStore.communicationLevel != "only_nonverbal"){
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
-            }
-            
+            }           
 
             var nv_face_payload = {
                 "mode" : "setEmotion",
@@ -136,6 +135,7 @@ export class PerformanceAnchor extends StateWrap{
 
     gesturePostureDetection(receivedGesture){
 
+        console.log("receivedGesture:" + receivedGesture);
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(receivedGesture.includes("squad")){
             clearTimeout(this.timeoutAppreciation);
@@ -144,33 +144,36 @@ export class PerformanceAnchor extends StateWrap{
             
             /* Emit the attack state change event. */
             this.squadCounter++;
-            logger(globalStore.filename, "Squad", this.squadCounter);
-            var nv_body_payload = {
-                "mode" : "setMode",
-                "activity" : "squad"
-            }
+            logger(globalStore.filename, "Squad", this.squadCounter);    
 
-            if(globalStore.communicationLevel != "only_verbal"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
-            }
+            if(this.squadCounter < 5){
+                var nv_body_payload = {
+                    "mode" : "setMode",
+                    "activity" : "squad"
+                }
 
-            var v_face_payload = {
-                "mode" : "setSound",
-                "data" : "nameAndPlay",
-                "extra" : "perform-performance*" + this.squadCounter
-            }
+                if(globalStore.communicationLevel != "only_verbal"){
+                
+                    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
+                }
+                var v_face_payload = {
+                    "mode" : "setSound",
+                    "data" : "nameAndPlay",
+                    "extra" : "perform-performance*" + this.squadCounter
+                }
+        
+                if(globalStore.communicationLevel != "only_nonverbal"){
+                    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
+                }
     
-            if(globalStore.communicationLevel != "only_nonverbal"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
-            }
-
-            var nv_face_payload = {
-                "mode" : "setEmotion",
-                "data" : "Idle1"
-            }
-
-            if(globalStore.communicationLevel != "only_verbal"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+                var nv_face_payload = {
+                    "mode" : "setEmotion",
+                    "data" : "Idle1"
+                }
+    
+                if(globalStore.communicationLevel != "only_verbal"){
+                    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+                }  
             }
 
             this.intermediateMotivationTimeout();

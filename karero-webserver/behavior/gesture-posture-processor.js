@@ -14,7 +14,7 @@ export class GesturePostureProcessor {
         this.rawdata = fs.readFileSync('./server-conf.json');
         this.serverConf = JSON.parse(this.rawdata);
 
-        this.TIME_THRESHHOLD = 1500;
+        this.TIME_THRESHHOLD = 1800;
         this.timeDetected = 0;
         this.recentlyDetected = false;
     }
@@ -22,19 +22,15 @@ export class GesturePostureProcessor {
     digest(kinectData) {
         if(this.ONLY_SWEETSPOT_BODY == true){
             this.getClosestBody(kinectData.translatedBodies);
-            if(this.recentlyDetected == false){
+            if(this.recentlyDetected == false && this.closestBody.trackedGesture != ""){
                 this.recentlyDetected = true;
                 this.timeDetected = Date.now();
                 this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);  
             }
             this.debounceGesture();
             this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
-            this.currentGesture = this.closestBody.trackedGesture;
+            //this.currentGesture = this.closestBody.trackedGesture;
         }
-    }
-
-    getCurrentRecognition(){
-        return this.currentGesture;
     }
 
     debounceGesture(){

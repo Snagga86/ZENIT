@@ -66,7 +66,6 @@ export class KAREROServer {
 
         /* Incoming data from the emotion detection network is processed in the KARERO brain. */
         this.emotionDetectionSocket.on('message', (msg, rinfo) => {
-			console.log(msg);
             this.KAREROBrain.processEmotionRecognition(msg.toString());
         });
 
@@ -94,7 +93,6 @@ export class KAREROServer {
             console.log("display control connection established");
             this.displayControlWS = webSocket;
             this.KAREROBrain.setBrainRobotFaceTransmissionWS(webSocket);
-            console.log(webSocket.readyState);
         });
 
         /* Handling for display control connection close. */

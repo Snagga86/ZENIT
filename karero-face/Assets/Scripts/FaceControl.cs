@@ -14,6 +14,7 @@ public class FaceControl : MonoBehaviour
 {
     public GameObject videoPlayer;
     public GameObject soundPlayer;
+    public GameObject DebugTrace;
 
     public WebSocket webSocket;
     public string WS = "ws://192.168.123.101:3344";
@@ -39,6 +40,9 @@ public class FaceControl : MonoBehaviour
 
     private Coroutine blinkCoroutine;
 
+    private string nv_action = "";
+    private string v_action = "";
+
     void Start()
     {
         faceEmotion = new FaceEmotion();
@@ -55,7 +59,18 @@ public class FaceControl : MonoBehaviour
             var message = System.Text.Encoding.UTF8.GetString(data);
             FaceControlDescription jsonControlObject = JsonConvert.DeserializeObject<FaceControlDescription>(message);
 
-            if(jsonControlObject.mode == "setEmotion")
+            if (jsonControlObject.mode == "setEmotion")
+            {
+                this.nv_action = "\nMode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
+            }
+            if (jsonControlObject.mode == "setSound")
+            {
+                Debug.Log("VERBAL ACTION TRACE");
+                this.v_action = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
+            }
+            this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.v_action + this.nv_action;
+
+            if (jsonControlObject.mode == "setEmotion")
             {
                 displayEmotion = jsonControlObject.data;
             }

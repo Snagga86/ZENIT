@@ -69,7 +69,7 @@ export class Brain{
         /* If a state is changed within the state machine the event is catched here and sets the next state. */
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, (transition) => {
             this.state = this.machine.transition(this.state, transition)
-            console.log(`current state: ${this.state}`)
+            //console.log(`current state: ${this.state}`)
         });
 
         /* Whenever a state triggers a new body action on the robot arm it is transmitted from here. */
@@ -81,7 +81,6 @@ export class Brain{
 
         /* Whenever a state triggers a new face action on the robot display it is transmitted from here. */
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, (payload) => {
-            console.log(this.robotFaceWS);
             if(this.robotFaceWS != null){
                 console.log("send " + JSON.stringify(payload));
                 this.robotFaceWS.send(JSON.stringify(payload));
