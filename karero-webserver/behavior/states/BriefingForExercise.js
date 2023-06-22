@@ -24,6 +24,7 @@ export class BriefingForExercise extends StateWrap{
         }));
 
         this.timeout;
+        this.videoTimeout;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -64,9 +65,19 @@ export class BriefingForExercise extends StateWrap{
             }
     
             /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "performanceAnchor");
         }, 15000);
+
+        this.videoTimeout = setTimeout(() => {
+            var facePayload = {
+                "mode" : "setVideo",
+                "data" : "stopAndHide"
+            }
+    
+            /* Send the activity change to the KARERO brain. */
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        }, 10000);
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -75,6 +86,7 @@ export class BriefingForExercise extends StateWrap{
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         clearTimeout(this.timeout);
+        clearTimeout(this.videoTimeout);
     }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */

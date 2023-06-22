@@ -14,7 +14,7 @@ export class GesturePostureProcessor {
         this.rawdata = fs.readFileSync('./server-conf.json');
         this.serverConf = JSON.parse(this.rawdata);
 
-        this.TIME_THRESHHOLD = 2300;
+        this.TIME_THRESHHOLD = 2600;
         this.timeDetected = 0;
         this.recentlyDetected = false;
     }

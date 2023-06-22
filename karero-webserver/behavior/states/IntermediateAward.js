@@ -41,7 +41,7 @@ export class IntermediateAward extends StateWrap{
             "data" : "nameAndPlay",
             "extra" : "intermediate-award"
         }
-        if(globalStore.communicationLevel != "only_nonverbal"){
+        if(globalStore.currentCommunicationLevel != "only_nonverbal"){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
         }
 
@@ -51,7 +51,7 @@ export class IntermediateAward extends StateWrap{
         }
 
         /* Send the activity change to the KARERO brain. */
-        if(globalStore.communicationLevel != "only_verbal"){
+        if(globalStore.currentCommunicationLevel != "only_verbal"){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
         }
 
@@ -60,7 +60,7 @@ export class IntermediateAward extends StateWrap{
             "data" : "Ecstasy"
         }
 
-        if(globalStore.communicationLevel != "only_verbal"){
+        if(globalStore.currentCommunicationLevel != "only_verbal"){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
         }
 

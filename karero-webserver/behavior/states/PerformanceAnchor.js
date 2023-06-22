@@ -81,6 +81,7 @@ export class PerformanceAnchor extends StateWrap{
     /* Exit function is executed whenever the state is left. */
     exitFunction(){
 
+        this.squadCounter = 0;
         process.stdin.removeListener('keypress', this.keyPressHandler);
         process.stdin.pause();
         /* Turn off event listener if state is exited. */
@@ -100,7 +101,7 @@ export class PerformanceAnchor extends StateWrap{
             }
     
             /* Send the activity change to the KARERO brain. */
-            if(globalStore.communicationLevel != "only_nonverbal"){
+            if(globalStore.currentCommunicationLevel != "only_nonverbal"){
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
             }           
 
@@ -109,18 +110,18 @@ export class PerformanceAnchor extends StateWrap{
                 "data" : "Sadness"
             }
 
-            if(globalStore.communicationLevel != "only_verbal"){
+            if(globalStore.currentCommunicationLevel != "only_verbal"){
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
             }
             this.intermediateMotivationTimeout();
             logger(globalStore.filename, "IntermediateMotivation", "none");
-        }, 5000);
+        }, 8000);
     }
 
     appreciationTimeout(){
         this.timeoutAppreciation = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "appreciation");
-        }, 18000);
+        }, 24000);
     }
 
     squadTimeout(){
@@ -130,7 +131,7 @@ export class PerformanceAnchor extends StateWrap{
                 "activity" : "followHead"
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
-        }, 4000);
+        }, 2000);
     }
 
     gesturePostureDetection(receivedGesture){
@@ -152,7 +153,7 @@ export class PerformanceAnchor extends StateWrap{
                     "activity" : "squad"
                 }
 
-                if(globalStore.communicationLevel != "only_verbal"){
+                if(globalStore.currentCommunicationLevel != "only_verbal"){
                 
                     this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
                 }
@@ -162,7 +163,7 @@ export class PerformanceAnchor extends StateWrap{
                     "extra" : "perform-performance*" + this.squadCounter
                 }
         
-                if(globalStore.communicationLevel != "only_nonverbal"){
+                if(globalStore.currentCommunicationLevel != "only_nonverbal"){
                     this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
                 }
     
@@ -171,7 +172,7 @@ export class PerformanceAnchor extends StateWrap{
                     "data" : "Idle1"
                 }
     
-                if(globalStore.communicationLevel != "only_verbal"){
+                if(globalStore.currentCommunicationLevel != "only_verbal"){
                     this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
                 }  
             }

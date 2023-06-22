@@ -2,7 +2,7 @@ import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
 import logger from '../../tools/logger.js';
 import globalStore from '../../tools/globals.js';
-import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
+import shortid from 'shortid';
 
 /* Robot state class defining the robot behavior within this state */
 export class Welcoming extends StateWrap{
@@ -30,11 +30,18 @@ export class Welcoming extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        var newParticipantID = uuidv4();
+        var newParticipantID = shortid.generate();
+        globalStore.countVisits++;
+        console.log(globalStore.countVisits);
         globalStore.filename = newParticipantID;
-
+        console.log(globalStore.communicationMode);
         if(globalStore.communicationMode == "random"){
             globalStore.currentCommunicationLevel = globalStore.communicationLevel[Math.floor(Math.random() * 3)];
+            console.log(globalStore.currentCommunicationLevel);
+        }
+        else if(globalStore.communicationMode == "order"){
+            globalStore.currentCommunicationLevel = globalStore.communicationLevel[globalStore.countVisits%3];
+            console.log(globalStore.currentCommunicationLevel);
         }
         else{
             globalStore.currentCommunicationLevel = globalStore.communicationMode;
