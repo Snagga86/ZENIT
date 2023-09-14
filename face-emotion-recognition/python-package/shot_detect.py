@@ -11,7 +11,7 @@ fer=HSEmotionRecognizer(model_name=model_name,device='cpu')
 
 ONLY_LARGEST_FACE = True
 CAMERA_NO = 0
-UDP_IP = "192.168.123.182"
+UDP_IP = "192.168.123.101"
 SHOT_URL = "http://192.168.123.103:8910/shot.jpg"
 UDP_PORT = 1337
 

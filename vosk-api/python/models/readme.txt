@@ -1,1 +1,1 @@
-place models in src here.
+place models in /src folder here.

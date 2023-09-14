@@ -1,17 +1,20 @@
-#!/usr/bin/env python3
-
-# prerequisites: as described in https://alphacephei.com/vosk/install and also python module `sounddevice` (simply run command `pip install sounddevice`)
-# Example usage using Dutch (nl) recognition model: `python test_microphone.py -m nl`
-# For more help run: `python test_microphone.py -h`
-
-import argparse
+import socket
 import queue
 import sys
 import sounddevice as sd
 
 from vosk import Model, KaldiRecognizer
 
+UDP_IP = "192.168.123.101"
+UDP_PORT = 1338
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+
 q = queue.Queue()
+samplerate = 44100
+model = Model(model_path="C:\\Workspace\\KARERO\\vosk-api\\python\\models\\src\\de-de")
+device_info = sd.query_devices(0, "input")
+dump_fn = open("logs.txt", "wb")
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -26,61 +29,31 @@ def callback(indata, frames, time, status):
         print(status, file=sys.stderr)
     q.put(bytes(indata))
 
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument(
-    "-l", "--list-devices", action="store_true",
-    help="show list of audio devices and exit")
-args, remaining = parser.parse_known_args()
-if args.list_devices:
-    print(sd.query_devices())
-    parser.exit(0)
-parser = argparse.ArgumentParser(
-    description=__doc__,
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    parents=[parser])
-parser.add_argument(
-    "-f", "--filename", type=str, metavar="FILENAME",
-    help="audio file to store recording to")
-parser.add_argument(
-    "-d", "--device", type=int_or_str,
-    help="input device (numeric ID or substring)")
-parser.add_argument(
-    "-r", "--samplerate", type=int, help="sampling rate")
-parser.add_argument(
-    "-m", "--model", type=str, help="language model; e.g. en-us, fr, nl; default is en-us")
-args = parser.parse_args(remaining)
-
 try:
-    if args.samplerate is None:
-        device_info = sd.query_devices(args.device, "input")
-        # soundfile expects an int, sounddevice provides a float:
-        args.samplerate = int(device_info["default_samplerate"])
-        
-    if args.model is None:
-        model = Model(model_path="C:\\Workspace\\KARERO\\vosk-api\\python\\models\\de-de")
-    else:
-        model = Model(lang=args.model)
 
-    if args.filename:
-        dump_fn = open(args.filename, "wb")
-    else:
-        dump_fn = None
-
-    with sd.RawInputStream(samplerate=args.samplerate, blocksize = 8000, device=args.device,
+    with sd.RawInputStream(samplerate=samplerate, blocksize = 8000, 
             dtype="int16", channels=1, callback=callback):
         print("#" * 80)
         print("Press Ctrl+C to stop the recording")
         print("#" * 80)
 
-        rec = KaldiRecognizer(model, args.samplerate, '[ "keyphrase", "[karero]" ]')
+        rec = KaldiRecognizer(model, samplerate, '[ "keyphrase", "[karero]" ]')
         while True:
             data = q.get()
             if rec.AcceptWaveform(data):
-                print(rec.Result())
+                print("final result:\n")
+                finalRes = rec.FinalResult()
+                finalResult = finalRes
+                print(finalResult)
+                sock.sendto(bytes(finalResult, "utf-8"), (UDP_IP, UDP_PORT))
             else:
+                print("partial result:\n")
                 print(rec.PartialResult())
+                partialResult = rec.PartialResult()
+                sock.sendto(bytes(partialResult, "utf-8"), (UDP_IP, UDP_PORT))
             if dump_fn is not None:
                 dump_fn.write(data)
+            
 
 except KeyboardInterrupt:
     print("\nDone")

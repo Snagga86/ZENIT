@@ -46,6 +46,14 @@ public class FaceControl : MonoBehaviour
     void Start()
     {
         faceEmotion = new FaceEmotion();
+        AudioClip newAudioClip;
+        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + "greeting/1");
+
+
+        Debug.Log(newAudioClip);
+        //Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
+        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+        this.soundPlayer.GetComponent<AudioSource>().Play();
     }
 
     public void connectToWebsocket(string websocketDescription) { 
