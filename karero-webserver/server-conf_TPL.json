@@ -16,6 +16,10 @@
             "EmotionNetwork" : {
                 "IpAddress" : "192.168.123.182",
                 "Port" : 1337
+            },
+            "SpeechNetwork" : {
+                "IpAddress" : "192.168.123.182",
+                "Port" : 1338
             }
         },
         "robotPosition" : {

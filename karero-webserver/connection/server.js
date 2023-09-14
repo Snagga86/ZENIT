@@ -37,6 +37,7 @@ export class KAREROServer {
         /* UDP sockets */
         this.osc = new pkg()
         this.emotionDetectionSocket = dgram.createSocket('udp4');
+        this.speechDetectionSocket = dgram.createSocket('udp4');
     }
 
     /* Starts all network services for KARERO interaction. 
@@ -78,6 +79,28 @@ export class KAREROServer {
         /* ToDo: Handling */
         this.emotionDetectionSocket.on('listening', () => {
             const address = this.emotionDetectionSocket.address();
+            console.log(`python server listening ${address.address}:${address.port}`);
+        });
+
+        /* -------- Speech Recognition -------- */
+        /* Bind the UDP socket to receive recognized basic emotions from the emotion detection
+        network. */
+        this.speechDetectionSocket.bind(this.networkConfig.SpeechNetwork.Port);
+
+        /* Incoming data from the emotion detection network is processed in the KARERO brain. */
+        this.speechDetectionSocket.on('message', (msg, rinfo) => {
+            this.KAREROBrain.processSpeechRecognition(msg.toString());
+        });
+
+        /* Emotion detection error handling. */
+        this.speechDetectionSocket.on('error', (err) => {
+            console.log(`server error:\n${err.stack}`);
+            this.speechDetectionSocket.close();
+        });
+
+        /* ToDo: Handling */
+        this.speechDetectionSocket.on('listening', () => {
+            const address = this.speechDetectionSocket.address();
             console.log(`python server listening ${address.address}:${address.port}`);
         });
 
