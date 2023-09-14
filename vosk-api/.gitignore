@@ -32,6 +32,7 @@ __pycache__
 python/dist
 python/build
 python/models/src
+python/example/logs.txt
 python/vosk/*.so
 python/test/db
 python/test/hyp
