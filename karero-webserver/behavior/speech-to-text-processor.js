@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 
-export class SpeechProcessor {
+export class SpeechToTextProcessor {
 
     constructor() {
 

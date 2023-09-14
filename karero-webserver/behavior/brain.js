@@ -1,5 +1,5 @@
 import { EmotionProcessor } from './emotion-processor.js'
-import { SpeechProcessor } from './speech-processor.js'
+import { SpeechToTextProcessor } from './speech-to-text-processor.js'
 import { GesturePostureProcessor } from './gesture-posture-processor.js'
 import EventEmitter from 'events';
 import { Off } from './states/Off.js'
@@ -35,8 +35,8 @@ export class Brain{
         this.emotionProcessor = new EmotionProcessor();
         /* Create posture/gesture processor. */
         this.gesturePostureProcessor = new GesturePostureProcessor();
-        /* Create speech processor. */
-        this.speechProcessor = new SpeechProcessor();
+        /* Create speech to text processor. */
+        this.speechToTextProcessor = new SpeechToTextProcessor();
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
 
@@ -125,8 +125,8 @@ export class Brain{
     }
 
     /* Process raw data of speech detection. */
-    processSpeechRecognition(data){
-        this.speechProcessor.digest(data);
+    processSpeechToText(data){
+        this.speechToTextProcessor.digest(data);
     }
 
     getStateDefinition(state, stateMachineDefinition){

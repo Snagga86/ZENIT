@@ -15,7 +15,9 @@ file_name = "./output_I.wav"
 # init TTS with the target model name
 tts = TTS(model_name=model_name, progress_bar=False, gpu=is_cuda_available)
 
-text = "Sabrina ist nett"
-file_name = "test.wav"
-# (text: str, speaker: str | None = None, language: str | None = None, speaker_wav: str | None = None, emotion: str = "Neutral", speed: float = 1, file_path: str = "output.wav")
-tts.tts_to_file(text=text, file_path="./" + file_name)
+while True:
+    text_to_generate = input('What text to generate\n')
+
+    file_name = text_to_generate.strip() + ".wav"
+    # (text: str, speaker: str | None = None, language: str | None = None, speaker_wav: str | None = None, emotion: str = "Neutral", speed: float = 1, file_path: str = "output.wav")
+    tts.tts_to_file(text=text_to_generate, file_path="./generatedSoundFiles/"+ file_name)
