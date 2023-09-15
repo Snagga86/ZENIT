@@ -26,7 +26,8 @@ export class Brain{
     static ROBOT_BRAIN_EVENTS = {
         ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
         ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
-        ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION'
+        ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
+        TTS_ACTION: 'TTS_Action'
     }
   
     constructor(){
@@ -43,6 +44,7 @@ export class Brain{
         /* Websocket connections to send signals to KARERO display and body. */
         this.robotBodyWS = null;
         this.robotFaceWS = null;
+        this.ttsService = null;
 
         /* Creating all state machine states for every behavior. The start state has to be declated
         seperately. */
@@ -90,6 +92,13 @@ export class Brain{
             }
         });
 
+        /* Whenever a state triggers a new tts action it is transmitted from here. */
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, (text) => {
+            if(this.ttsService != null){
+                this.ttsService.send(JSON.stringify(text));
+            }
+        });
+
         this.state = this.machine.value;
 
         this.stateMachineDefinition[this.state].actions.onEnter();
@@ -109,9 +118,11 @@ export class Brain{
     /* Set the transmission websocket for robot face action connection. */
     setBrainRobotFaceTransmissionWS(ws){
         this.robotFaceWS = ws;
-        /*console.log(this.stateMachineDefinition[this.state]);
-        this.state = this.machine.value
-        this.stateMachineDefinition[this.state].actions.onEnter();*/
+    }
+
+    /* Set the transmission websocket for TTS action connection. */
+    setTTSTransmissionWS(ws){
+        this.ttsService = ws;
     }
 
     /* Process raw data of gestures/postures detection. */

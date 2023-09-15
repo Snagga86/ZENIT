@@ -21,7 +21,10 @@ export class Off extends StateWrap{
     enterFunction(){
         this.stateChangeInitiated = false;
         console.log('off: onEnter')
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
+        this.timeout = setTimeout(() => {
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
+        }, 5000);
+        
     }
 
 }

@@ -20,6 +20,10 @@
             "SpeechNetwork" : {
                 "IpAddress" : "192.168.123.182",
                 "Port" : 1338
+            },
+            "TTSNetwork" : {
+                "IpAddress" : "192.168.123.182",
+                "Port" : 1339
             }
         },
         "robotPosition" : {

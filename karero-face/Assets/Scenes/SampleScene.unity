@@ -1863,7 +1863,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -2114,8 +2114,8 @@ AudioEchoFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
   m_Enabled: 1
-  m_Delay: 10
-  m_DecayRatio: 0.1
+  m_Delay: 15
+  m_DecayRatio: 0.2
   m_WetMix: 0.7
   m_DryMix: 0.6
 --- !u!165 &1111824184

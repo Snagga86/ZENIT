@@ -2,6 +2,9 @@ import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
 import logger from '../../tools/logger.js';
 import globalStore from '../../tools/globals.js';
+import readline from 'readline';
+
+
 
 /* Robot state class defining the robot behavior within this state */
 export class CallToAction extends StateWrap{
@@ -21,7 +24,27 @@ export class CallToAction extends StateWrap{
         }));
 
         this.timeout;
+
+        this.rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+          });
     }
+
+    getTextInput() {
+        this.rl.question('Enter some text (or type "exit" to quit): ', (text) => {
+          if (text.toLowerCase() === 'exit') {
+            this.rl.close();
+          } else {
+            var payload = {
+                "mode":"tts",
+                "text": text
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payload);
+            this.getTextInput(); // Repeat the prompt
+          }
+        });
+      }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
@@ -40,7 +63,57 @@ export class CallToAction extends StateWrap{
             "data" : "Idle1"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
+
+        
+
         this.followHead();
+        
+
+
+
+        this.getTextInput();
+        //process.stdin.on('keypress', this.keyPressHandler);
+        //process.stdin.resume();
+
+    }
+
+    keyPressHandler = (ch, key) =>{
+        if (key && key.name === 'a') {
+            // 'Enter' key was pressed, react accordingly
+            console.log('a key pressed');
+            var payload = [{
+                "mode" : "tts",
+                "text" : "Hallo, ich bin Fred das Kuscheltier."
+            },
+            {
+                "mode" : "tts",
+                "text" : "Ich mag mit dir tanzen."
+            },
+            {
+                "mode" : "tts",
+                "text" : "Ich bin Zenieth, wie geht es dir?"
+            },
+            {
+                "mode" : "tts",
+                "text" : "Wer ein glückliches Leben führen will, muss sich selbst kennen. Die Frage „Wer bin ich?“ ist deshalb zentral für beruflichen Erfolg ebenso wie für persönlichen. Zu wissen, wer man ist, was man wirklich will und wohin – das sind die wichtigsten Erkenntnisse im Leben überhaupt. Die Antworten darauf zu finden, ist allerdings nicht leicht. Oft gleicht es einem lebenslangen Prozess."
+            }];
+
+            // Generate a random number between 1 and 5 (inclusive)
+            const randomNumber = Math.floor(Math.random() * 4);
+
+            console.log(randomNumber);
+
+
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payload[randomNumber]);
+            // You can perform other actions here
+        } else if (key && key.ctrl && key.name === 'c') {
+            // Ctrl + C was pressed, exit the program
+            process.exit();
+        } else {
+            // Other key presses
+            console.log(`Key pressed: ${ch}`);
+        }
+        console.log('Press Enter or any other key (Ctrl + C to exit):');
     }
 
     /* Exit function is executed whenever the state is left. */

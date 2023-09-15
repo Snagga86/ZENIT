@@ -29,12 +29,14 @@ export class KAREROServer {
         /* Websocket Server declarations. */
         this.displayControlWSS = null;
         this.robotControlWSS = null;
+        this.textToSpeechWSS = null;
 
-        /* Websocket. */
+        /* Websockets. */
         this.displayControlWS = null;
         this.robotControlWS = null;
+        this.textToSpeechWS = null;
 
-        /* UDP sockets */
+        /* UDP sockets. */
         this.osc = new pkg()
         this.emotionDetectionSocket = dgram.createSocket('udp4');
         this.speechDetectionSocket = dgram.createSocket('udp4');
@@ -83,16 +85,16 @@ export class KAREROServer {
         });
 
         /* -------- Speech Recognition -------- */
-        /* Bind the UDP socket to receive recognized basic emotions from the emotion detection
+        /* Bind the UDP socket to receive recognized basic emotions from the TTS detection
         network. */
         this.speechDetectionSocket.bind(this.networkConfig.SpeechNetwork.Port);
 
-        /* Incoming data from the emotion detection network is processed in the KARERO brain. */
+        /* Incoming data from the TTS detection network is processed in the KARERO brain. */
         this.speechDetectionSocket.on('message', (msg, rinfo) => {
             this.KAREROBrain.processSpeechRecognition(msg.toString());
         });
 
-        /* Emotion detection error handling. */
+        /* TTS detection error handling. */
         this.speechDetectionSocket.on('error', (err) => {
             console.log(`server error:\n${err.stack}`);
             this.speechDetectionSocket.close();
@@ -128,6 +130,49 @@ export class KAREROServer {
         this.displayControlWSS.on('error', (webSocket) =>{
             console.log("connection disonnected");
             this.displayControlWS = null;
+        });
+
+        /* -------- TTS Communication -------- */
+        /* Start the server to communicate with KARERO TTS application. */
+        this.textToSpeechWSS = new WebSocketServer({host: this.networkConfig.TTSNetwork.IpAddress, port: this.networkConfig.TTSNetwork.Port}, ()=>{
+            console.log("tts control server start");
+        });
+
+        /* On incoming connection of the KARERO TTS in KARERO Brain. */
+        this.textToSpeechWSS.on('connection', (webSocket) =>{
+            console.log("Text-To-Speech control connection established");
+            this.textToSpeechWS = webSocket;
+            this.KAREROBrain.setTTSTransmissionWS(webSocket);
+
+            this.textToSpeechWS.on('message', (data) =>{
+                console.log(data.toString('utf8'))
+                var text = data.toString('utf8');
+                var facePayload = {
+                    "mode" : "setSound",
+                    "data" : "speak",
+                    "extra" : text
+                }
+
+                try{
+                    console.log("Sending Text to speak to display device...")
+                    this.displayControlWS.send(JSON.stringify(facePayload));
+                }
+                catch{
+                    console.log("Display device not connected...")
+                }
+            });
+        });
+
+        /* Handling for display control connection close. */
+        this.textToSpeechWSS.on('close', (webSocket) =>{
+            console.log("connection disconnected");
+            this.textToSpeechWS = null;
+        });
+
+        /* Handling for display control connection error. */
+        this.textToSpeechWSS.on('error', (webSocket) =>{
+            console.log("connection disonnected");
+            this.textToSpeechWS = null;
         });
 
         /* -------- MechArm Robot Communication -------- */

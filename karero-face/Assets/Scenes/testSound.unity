@@ -156,7 +156,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23863acad945b424b9c51d601a1d31b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  filename: your_audio_file.mp3
 --- !u!65 &1352450201
 BoxCollider:
   m_ObjectHideFlags: 0

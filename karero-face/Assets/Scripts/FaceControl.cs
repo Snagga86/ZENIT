@@ -9,6 +9,7 @@ using UnityEngine.XR;
 using Newtonsoft.Json;
 using UnityEngine.Video;
 using System.Collections;
+using UnityEngine.Networking;
 
 public class FaceControl : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class FaceControl : MonoBehaviour
 
     private string TEXT_FOLDER = "Text/";
     private string VIDEO_FOLDER = "Videos/";
+    private const string serverUrl = "http://localhost:1340/getAudio";
 
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
@@ -40,20 +42,22 @@ public class FaceControl : MonoBehaviour
 
     private Coroutine blinkCoroutine;
 
+    
+
     private string nv_action = "";
     private string v_action = "";
 
     void Start()
     {
         faceEmotion = new FaceEmotion();
-        AudioClip newAudioClip;
-        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + "greeting/1");
+        //AudioClip newAudioClip;
+        //newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + "greeting/1");
 
 
-        Debug.Log(newAudioClip);
+        //Debug.Log(newAudioClip);
         //Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
-        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
-        this.soundPlayer.GetComponent<AudioSource>().Play();
+        //this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+        //this.soundPlayer.GetComponent<AudioSource>().Play();
     }
 
     public void connectToWebsocket(string websocketDescription) { 
@@ -159,6 +163,9 @@ public class FaceControl : MonoBehaviour
                         this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
                         this.soundPlayer.GetComponent<AudioSource>().Play();
                         break;
+                    case "speak":
+                        StartCoroutine(RequestAudio(jsonControlObject.extra));
+                        break;
                 }
             }
 
@@ -254,6 +261,28 @@ public class FaceControl : MonoBehaviour
 
             this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
             yield return new WaitForSeconds(2.7f);
+        }
+    }
+
+    private IEnumerator RequestAudio(string filename)
+    {
+        string audioUrl = $"{serverUrl}?filename={filename}";
+        Debug.Log(audioUrl);
+        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip newAudioClip = DownloadHandlerAudioClip.GetContent(www);
+
+                this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+                this.soundPlayer.GetComponent<AudioSource>().Play();
+            }
+            else
+            {
+                Debug.LogError($"Failed to load audio: {www.error}");
+            }
         }
     }
 
