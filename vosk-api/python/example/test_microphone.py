@@ -32,6 +32,7 @@ websocket.enableTrace(False)
 agentIsTalking = False
 agentStartTalkTime = 0
 agentEndTalkTime = 0
+safetyDelay = 0.5
 
 # Initialize a flag to track connection status
 IS_CONNECTED = False
@@ -115,11 +116,11 @@ try:
                 
                 if(message["mode"] == "listen" and message["status"] == "stop"):
                     agentStartTalkTime = int(time.time())
-                    delay = float(message["duration"])
+                    delay = float(message["duration"])  + safetyDelay
                     # Convert the Unix timestamp to a datetime object
                     current_datetime = datetime.fromtimestamp(agentStartTalkTime)
                     
-                    # Add 2.3 seconds to the datetime
+                    # Add delay seconds to the datetime
                     new_datetime = current_datetime + timedelta(seconds=delay)
 
                     # Convert the updated datetime back to a Unix timestamp

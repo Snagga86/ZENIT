@@ -22,7 +22,7 @@ public class FaceControl : MonoBehaviour
 
     private string TEXT_FOLDER = "Text/";
     private string VIDEO_FOLDER = "Videos/";
-    private const string serverUrl = "http://localhost:1340/getAudio";
+    private const string serverUrl = "http://192.168.0.101:1340/getAudio";
 
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
