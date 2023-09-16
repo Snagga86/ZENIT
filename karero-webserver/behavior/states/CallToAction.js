@@ -8,10 +8,10 @@ import readline from 'readline';
 
 /* Robot state class defining the robot behavior within this state */
 export class CallToAction extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("callToAction", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("callToAction", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -40,6 +40,7 @@ export class CallToAction extends StateWrap{
                 "mode":"tts",
                 "text": text
             }
+            console.log("before emit");
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payload);
             this.getTextInput(); // Repeat the prompt
           }
@@ -64,17 +65,28 @@ export class CallToAction extends StateWrap{
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
 
-        
+        this.speechProcessor.speechEvent.on('WakeUp', this.wakeUpAgent.bind(this));
+        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultProcessing.bind(this));
 
         this.followHead();
-        
 
-
-
-        this.getTextInput();
+        //this.getTextInput();
         //process.stdin.on('keypress', this.keyPressHandler);
         //process.stdin.resume();
 
+    }
+
+    wakeUpAgent(){
+        console.log("Wake up agent!");
+    }
+
+    finalResultProcessing(resultText){
+        console.log("final result: " + resultText );
+        var payload = {
+            "mode" : "tts",
+            "text" : resultText
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payload);
     }
 
     keyPressHandler = (ch, key) =>{

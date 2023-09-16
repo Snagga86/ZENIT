@@ -146,7 +146,9 @@ export class KAREROServer {
 
             this.textToSpeechWS.on('message', (data) =>{
                 console.log(data.toString('utf8'))
-                var text = data.toString('utf8');
+                var text = data.toString('utf8').split(';')[0];
+                var textDuration = data.toString('utf8').split(';')[1];
+                this.KAREROBrain.agentTalking(textDuration);
                 var facePayload = {
                     "mode" : "setSound",
                     "data" : "speak",

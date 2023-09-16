@@ -22,11 +22,12 @@ export class Transition{
 }
 
 export class StateWrap{
-    constructor(stateName, emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(stateName, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
         this.state = new State(stateName);
         this.stateChangeInitiated = false;
         this.emotionProcessor = emotionProcessor;
         this.gesturePostureProcessor = gesturePostureProcessor;
+        this.speechProcessor = speechProcessor;
         this.brainEvents = brainEvents;
     }
     

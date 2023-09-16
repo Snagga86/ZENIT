@@ -1,5 +1,5 @@
 import { EmotionProcessor } from './emotion-processor.js'
-import { SpeechToTextProcessor } from './speech-to-text-processor.js'
+import { SpeechProcessor } from './speech-processor.js'
 import { GesturePostureProcessor } from './gesture-posture-processor.js'
 import EventEmitter from 'events';
 import { Off } from './states/Off.js'
@@ -27,7 +27,7 @@ export class Brain{
         ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
         ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
         ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
-        TTS_ACTION: 'TTS_Action'
+        TTS_ACTION: 'TTS_ACTION'
     }
   
     constructor(){
@@ -37,7 +37,7 @@ export class Brain{
         /* Create posture/gesture processor. */
         this.gesturePostureProcessor = new GesturePostureProcessor();
         /* Create speech to text processor. */
-        this.speechToTextProcessor = new SpeechToTextProcessor();
+        this.speechProcessor = new SpeechProcessor();
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
 
@@ -48,20 +48,20 @@ export class Brain{
 
         /* Creating all state machine states for every behavior. The start state has to be declated
         seperately. */
-        this.start = new Off(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents)
+        this.start = new Off(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents)
         const off = this.start.getState();
-        const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const dance = new Dance(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const attack = new Attack(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const dance = new Dance(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const attack = new Attack(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
-        const appreciation = new Appreciation(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const callToAction = new CallToAction(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const farewell = new Farewell(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const generalBriefing = new GeneralBriefing(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
-        const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.brainEvents).getState();
+        const appreciation = new Appreciation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const callToAction = new CallToAction(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const farewell = new Farewell(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const generalBriefing = new GeneralBriefing(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
 
         this.stateMachineDefinition = {
@@ -136,8 +136,12 @@ export class Brain{
     }
 
     /* Process raw data of speech detection. */
-    processSpeechToText(data){
-        this.speechToTextProcessor.digest(data);
+    processSpeechRecognition(data){
+            this.speechProcessor.digest(data);
+    }
+
+    agentTalking(textDuration){
+        this.speechProcessor.agentStartTalking(textDuration);
     }
 
     getStateDefinition(state, stateMachineDefinition){

@@ -5,14 +5,14 @@ import sounddevice as sd
 
 from vosk import Model, KaldiRecognizer
 
-UDP_IP = "192.168.123.101"
+UDP_IP = "192.168.0.101"
 UDP_PORT = 1338
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 
 q = queue.Queue()
 samplerate = 44100
-model = Model(model_path="C:\\Workspace\\KARERO\\vosk-api\\python\\models\\src\\de-de")
+model = Model(model_path="../models/src/de-de")
 device_info = sd.query_devices(0, "input")
 dump_fn = open("logs.txt", "wb")
 
@@ -40,6 +40,7 @@ try:
         rec = KaldiRecognizer(model, samplerate, '[ "keyphrase", "[karero]" ]')
         while True:
             data = q.get()
+            
             if rec.AcceptWaveform(data):
                 print("final result:\n")
                 finalRes = rec.FinalResult()

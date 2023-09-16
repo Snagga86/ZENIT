@@ -8,9 +8,10 @@ import rel
 import time
 from io import StringIO
 import re
+import librosa
 
 
-IP_ADDRESS = "192.168.123.101"
+IP_ADDRESS = "192.168.0.101"
 PORT = 1339
 IS_CONNECTED = False
 
@@ -49,8 +50,10 @@ def on_message(ws, message):
         file = file + ".wav"
         file_path = "./generatedSoundFiles/" + file
         tts.tts_to_file(text=text_to_generate, file_path=file_path)
-        print("File successfully created")
-        backsend(file)
+        duration = librosa.get_duration(filename=file_path)
+        print("File successfully created, duration: " + str(duration))
+        payload = file + ";" + str(duration)
+        backsend(payload)
 
 def on_error(ws, error):
     print(error)

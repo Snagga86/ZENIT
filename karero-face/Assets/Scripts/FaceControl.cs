@@ -18,7 +18,7 @@ public class FaceControl : MonoBehaviour
     public GameObject DebugTrace;
 
     public WebSocket webSocket;
-    public string WS = "ws://192.168.123.101:3344";
+    public string WS = "ws://192.168.0.101:3344";
 
     private string TEXT_FOLDER = "Text/";
     private string VIDEO_FOLDER = "Videos/";

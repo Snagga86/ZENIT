@@ -4,8 +4,8 @@ import logger from '../../tools/logger.js';
 import globalStore from '../../tools/globals.js';
 
 export class Off extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, stateChangeEvent){ 
-        super("off", emotionProcessor, gesturePostureProcessor, stateChangeEvent);
+    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, stateChangeEvent){ 
+        super("off", emotionProcessor, gesturePostureProcessor, speechProcessor, stateChangeEvent);
         
         this.state.actions.onEnter = this.enterFunction.bind(this);
 
