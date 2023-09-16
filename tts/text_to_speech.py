@@ -10,7 +10,6 @@ from io import StringIO
 import re
 import librosa
 
-
 IP_ADDRESS = "192.168.0.101"
 PORT = 1339
 IS_CONNECTED = False
@@ -73,7 +72,7 @@ def backsend(data):
 
 while True:
     try:
-        print("tryblock")
+        print("try to connect to websocket...")
         ws = websocket.WebSocketApp(webservice_ip,
                                     on_open=on_open,
                                     on_message=on_message,

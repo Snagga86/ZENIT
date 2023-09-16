@@ -112,55 +112,31 @@ export class KAREROServer {
             console.log(`python server listening ${address.address}:${address.port}`);
         });
 
+        /* Bind the websocket to stop STT translation while the agent is
+        talking to prevent sound feedback loops. */
         this.speechToTextWSS = new WebSocketServer({host: this.networkConfig.STTNetwork.IpAddress, port: this.networkConfig.STTNetwork.Port}, ()=>{
             console.log("stt control server start");
         });
 
-        /* On incoming connection of the KARERO TTS in KARERO Brain. */
+        /* On incoming connection of the KARERO STT in KARERO Brain. */
         this.speechToTextWSS.on('connection', (webSocket) =>{
             console.log("Text-To-Speech control connection established");
             this.speechToTextWS = webSocket;
         });
 
-        /* Handling for display control connection close. */
+        /* Handling for STT connection close. */
         this.speechToTextWSS.on('close', (webSocket) =>{
             console.log("connection disconnected");
             this.textToSpeechWS = null;
         });
 
-        /* Handling for display control connection error. */
+        /* Handling for STT connection error. */
         this.speechToTextWSS.on('error', (webSocket) =>{
             console.log("connection disonnected");
             this.textToSpeechWS = null;
         });
-
-        /* -------- Display/Face Communication -------- */
-        /* Start the server to communicate with KARERO Face application. */
-        this.displayControlWSS = new WebSocketServer({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
-            console.log("display control server start");
-        });
-
-        /* On incoming connection of the KARERO Face/Display, e.g. table or cell phone set
-        the connection web socket in KARERO Brain. */
-        this.displayControlWSS.on('connection', (webSocket) =>{
-            console.log("display control connection established");
-            this.displayControlWS = webSocket;
-            this.KAREROBrain.setBrainRobotFaceTransmissionWS(webSocket);
-        });
-
-        /* Handling for display control connection close. */
-        this.displayControlWSS.on('close', (webSocket) =>{
-            console.log("connection disconnected");
-            this.displayControlWS = null;
-        });
-
-        /* Handling for display control connection error. */
-        this.displayControlWSS.on('error', (webSocket) =>{
-            console.log("connection disonnected");
-            this.displayControlWS = null;
-        });
-
-        /* -------- TTS Communication -------- */
+        
+        /* -------- Speech Synthesis -------- */
         /* Start the server to communicate with KARERO TTS application. */
         this.textToSpeechWSS = new WebSocketServer({host: this.networkConfig.TTSNetwork.IpAddress, port: this.networkConfig.TTSNetwork.Port}, ()=>{
             console.log("tts control server start");
@@ -201,16 +177,42 @@ export class KAREROServer {
             });
         });
 
-        /* Handling for display control connection close. */
+        /* Handling for TTS connection close. */
         this.textToSpeechWSS.on('close', (webSocket) =>{
             console.log("connection disconnected");
             this.textToSpeechWS = null;
         });
 
-        /* Handling for display control connection error. */
+        /* Handling for TTS connection error. */
         this.textToSpeechWSS.on('error', (webSocket) =>{
             console.log("connection disonnected");
             this.textToSpeechWS = null;
+        });
+
+        /* -------- Display/Face Communication -------- */
+        /* Start the server to communicate with KARERO Face application. */
+        this.displayControlWSS = new WebSocketServer({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
+            console.log("display control server start");
+        });
+
+        /* On incoming connection of the KARERO Face/Display, e.g. table or cell phone set
+        the connection web socket in KARERO Brain. */
+        this.displayControlWSS.on('connection', (webSocket) =>{
+            console.log("display control connection established");
+            this.displayControlWS = webSocket;
+            this.KAREROBrain.setBrainRobotFaceTransmissionWS(webSocket);
+        });
+
+        /* Handling for display control connection close. */
+        this.displayControlWSS.on('close', (webSocket) =>{
+            console.log("connection disconnected");
+            this.displayControlWS = null;
+        });
+
+        /* Handling for display control connection error. */
+        this.displayControlWSS.on('error', (webSocket) =>{
+            console.log("connection disonnected");
+            this.displayControlWS = null;
         });
 
         /* -------- MechArm Robot Communication -------- */
@@ -268,9 +270,5 @@ export class KAREROServer {
                 }
             });
         });
-
     }
 }
-
-
-

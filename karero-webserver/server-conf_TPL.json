@@ -25,7 +25,7 @@
                 "IpAddress" : "192.168.123.182",
                 "Port" : 1339
             },
-            "SSTNetwork" : {
+            "STTNetwork" : {
                 "IpAddress" : "192.168.123.182",
                 "Port" : 1341
             }
