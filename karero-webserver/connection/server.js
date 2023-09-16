@@ -26,15 +26,21 @@ export class KAREROServer {
             ]
         };
 
+        /* Make sure Agent is not talking and listening at the same time. */
+        this.talkingStart = 0;
+        this.talkingEnd = 0;
+
         /* Websocket Server declarations. */
         this.displayControlWSS = null;
         this.robotControlWSS = null;
         this.textToSpeechWSS = null;
+        this.speechToTextWSS = null;
 
         /* Websockets. */
         this.displayControlWS = null;
         this.robotControlWS = null;
         this.textToSpeechWS = null;
+        this.speechToTextWSS = null;
 
         /* UDP sockets. */
         this.osc = new pkg()
@@ -106,6 +112,28 @@ export class KAREROServer {
             console.log(`python server listening ${address.address}:${address.port}`);
         });
 
+        this.speechToTextWSS = new WebSocketServer({host: this.networkConfig.STTNetwork.IpAddress, port: this.networkConfig.STTNetwork.Port}, ()=>{
+            console.log("stt control server start");
+        });
+
+        /* On incoming connection of the KARERO TTS in KARERO Brain. */
+        this.speechToTextWSS.on('connection', (webSocket) =>{
+            console.log("Text-To-Speech control connection established");
+            this.speechToTextWS = webSocket;
+        });
+
+        /* Handling for display control connection close. */
+        this.speechToTextWSS.on('close', (webSocket) =>{
+            console.log("connection disconnected");
+            this.textToSpeechWS = null;
+        });
+
+        /* Handling for display control connection error. */
+        this.speechToTextWSS.on('error', (webSocket) =>{
+            console.log("connection disonnected");
+            this.textToSpeechWS = null;
+        });
+
         /* -------- Display/Face Communication -------- */
         /* Start the server to communicate with KARERO Face application. */
         this.displayControlWSS = new WebSocketServer({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
@@ -148,7 +176,15 @@ export class KAREROServer {
                 console.log(data.toString('utf8'))
                 var text = data.toString('utf8').split(';')[0];
                 var textDuration = data.toString('utf8').split(';')[1];
-                this.KAREROBrain.agentTalking(textDuration);
+
+                var payload = {
+                    "mode" : "listen",
+                    "status" : "stop",
+                    "duration" : textDuration
+                }
+
+                this.speechToTextWS.send(JSON.stringify(payload));
+
                 var facePayload = {
                     "mode" : "setSound",
                     "data" : "speak",
