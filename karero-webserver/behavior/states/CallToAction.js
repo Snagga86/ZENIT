@@ -77,7 +77,14 @@ export class CallToAction extends StateWrap{
     }
 
     wakeUpAgent(){
-        console.log("Wake up agent!");
+        var facePayload = {
+            "mode" : "setSound",
+            "data" : "nameAndPlay",
+            "extra" : "wakeUpSound"
+        }
+
+        console.log("Sending Wake Up Text to speak to display device...")
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
     }
 
     finalResultProcessing(resultText){

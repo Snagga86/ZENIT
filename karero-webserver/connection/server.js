@@ -40,7 +40,7 @@ export class KAREROServer {
         this.displayControlWS = null;
         this.robotControlWS = null;
         this.textToSpeechWS = null;
-        this.speechToTextWSS = null;
+        this.speechToTextWS = null;
 
         /* UDP sockets. */
         this.osc = new pkg()
@@ -120,20 +120,20 @@ export class KAREROServer {
 
         /* On incoming connection of the KARERO STT in KARERO Brain. */
         this.speechToTextWSS.on('connection', (webSocket) =>{
-            console.log("Text-To-Speech control connection established");
+            console.log("Speech-To-Text control connection established");
             this.speechToTextWS = webSocket;
         });
 
         /* Handling for STT connection close. */
         this.speechToTextWSS.on('close', (webSocket) =>{
             console.log("connection disconnected");
-            this.textToSpeechWS = null;
+            //this.textToSpeechWS = null;
         });
 
         /* Handling for STT connection error. */
         this.speechToTextWSS.on('error', (webSocket) =>{
             console.log("connection disonnected");
-            this.textToSpeechWS = null;
+            //this.textToSpeechWS = null;
         });
         
         /* -------- Speech Synthesis -------- */

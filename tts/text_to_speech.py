@@ -10,7 +10,7 @@ from io import StringIO
 import re
 import librosa
 
-IP_ADDRESS = "192.168.0.101"
+IP_ADDRESS = "192.168.123.101"
 PORT = 1339
 IS_CONNECTED = False
 

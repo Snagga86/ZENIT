@@ -18,11 +18,12 @@ public class FaceControl : MonoBehaviour
     public GameObject DebugTrace;
 
     public WebSocket webSocket;
-    public string WS = "ws://192.168.0.101:3344";
 
-    private string TEXT_FOLDER = "Text/";
+    public string WS = "ws://192.168.123.101:3344";
+
+    private string TEXT_FOLDER = "Sounds/";
     private string VIDEO_FOLDER = "Videos/";
-    private const string serverUrl = "http://192.168.0.101:1340/getAudio";
+    private const string serverUrl = "http://192.168.123.101:1340/getAudio";
 
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
@@ -150,13 +151,8 @@ public class FaceControl : MonoBehaviour
                         break;
                     case "nameAndPlay":
                         Debug.Log("nameAndPlay");
-                        if(jsonControlObject.extra.Contains("perform-performance*")){
-                            newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra.Split('*')[0] + "/" + jsonControlObject.extra.Split('*')[1]);
-                        }
-                        else
-                        {
-                            newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4));
-                        }
+
+                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra);
                         
                         Debug.Log(newAudioClip);
                         //Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
@@ -164,6 +160,7 @@ public class FaceControl : MonoBehaviour
                         this.soundPlayer.GetComponent<AudioSource>().Play();
                         break;
                     case "speak":
+                        Debug.Log("speak");
                         StartCoroutine(RequestAudio(jsonControlObject.extra));
                         break;
                 }
@@ -180,8 +177,20 @@ public class FaceControl : MonoBehaviour
         {
             Debug.Log("ws error " + error);
         };
+
+        webSocket.OnClose += (e) =>
+        {
+            Debug.Log("Connection closed! Try reconnection...");
+            StartCoroutine(this.reconnect(4f));
+        };
         webSocket.Connect();
     }
+    IEnumerator reconnect(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        webSocket.Connect();
+    }
+
 
 
     void ReceivedUDPPacket(IAsyncResult result)

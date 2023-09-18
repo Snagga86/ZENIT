@@ -5,7 +5,7 @@ using System;
 
 public class SoundFileService : MonoBehaviour
 {
-    private const string serverUrl = "http://localhost:1339/getAudio"; // Replace with your server's IP and port
+    private const string serverUrl = "http://192.168.123.101:1339/getAudio"; // Replace with your server's IP and port
     private string filename = "SupermanistbesseralseinEis.wav"; // Set the default filename or change it in the Unity inspector
 
     void Start()

@@ -11,7 +11,7 @@ from io import StringIO
 from vosk import Model, KaldiRecognizer
 from datetime import datetime, timedelta
 
-IP_ADDRESS = "192.168.0.101"
+IP_ADDRESS = "192.168.123.101"
 TCP_PORT = 1342
 UDP_PORT = 1338
 
@@ -58,17 +58,19 @@ def run_websocket_client():
     def backsend(data):
         ws.send(data)
 
-    ws = websocket.WebSocketApp(webservice_ip, on_open=on_open, on_message=on_message, on_error=on_error, on_close=on_close)
     
-    try:
-         ws.run_forever()
+    
+    while True:
+        try:
+            ws = websocket.WebSocketApp(webservice_ip, on_open=on_open, on_message=on_message, on_error=on_error, on_close=on_close)
+            ws.run_forever()
 
-    except KeyboardInterrupt:
-        print("keyboard interrupt")
-        quit()  # Exit the loop on Ctrl+C
-    except Exception as e:
-        print(f"Connection error: {e}")
-        time.sleep(5)  # Wait for 5 seconds before attempting to reconnect
+        except KeyboardInterrupt:
+            print("keyboard interrupt")
+            quit()  # Exit the loop on Ctrl+C
+        except Exception as e:
+            print(f"Connection error: {e}")
+            time.sleep(5)  # Wait for 5 seconds before attempting to reconnect
 
 thread = threading.Thread(target=run_websocket_client)
 thread.start()
@@ -129,8 +131,10 @@ try:
                     print("partial result:\n")
                     print(rec.PartialResult())
                     partialResult = rec.PartialResult()
-                    sock.sendto(bytes(partialResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
-            
+                    if 'zenith' in partialResult or 'zenit' in partialResult:
+                        sock.sendto(bytes(partialResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
+                        rec.Reset()
+
 except KeyboardInterrupt:
     print("\nDone")
     parser.exit(0)
