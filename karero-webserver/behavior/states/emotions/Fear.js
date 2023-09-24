@@ -1,14 +1,14 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
-import { Brain } from '../brain.js';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
+import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { Brain } from '../../brain.js';
+import logger from '../../../tools/logger.js';
+import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Dance extends StateWrap{
+export class Fear extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("dance", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("fear", emotionProcessor, gesturePostureProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -16,7 +16,7 @@ export class Dance extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 6000; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 5000; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
@@ -38,7 +38,7 @@ export class Dance extends StateWrap{
         activity: The strategy interpreted and executed by the connected robot device */
         var payload = {
             "mode" : "setMode",
-            "activity" : "dance"
+            "activity" : "fear"
         }
 
         /* Send the activity change to the KARERO brain. */

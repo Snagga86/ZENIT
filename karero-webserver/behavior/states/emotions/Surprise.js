@@ -1,14 +1,14 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
-import { Brain } from '../brain.js';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
+import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { Brain } from '../../brain.js';
+import logger from '../../../tools/logger.js';
+import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Attack extends StateWrap{
+export class Surprise extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("attack", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("surprise", emotionProcessor, gesturePostureProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -16,7 +16,7 @@ export class Attack extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 6500; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 6000; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
@@ -38,17 +38,11 @@ export class Attack extends StateWrap{
         activity: The strategy interpreted and executed by the connected robot device */
         var payload = {
             "mode" : "setMode",
-            "activity" : "attack"
-        }
-
-        var payloadEmotion= {
-            "mode" : "setEmotion",
-            "data" : "Rage"
+            "activity" : "surprise"
         }
 
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion)
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

@@ -4,8 +4,8 @@ import { GesturePostureProcessor } from './gesture-posture-processor.js'
 import EventEmitter from 'events';
 import { Off } from './states/Off.js'
 import { Follow } from './states/Follow.js'
-import { Dance } from './states/Dance.js'
-import { Attack } from './states/Attack.js'
+import { Joy } from './states/emotions/Joy.js'
+import { Anger } from './states/emotions/Anger.js'
 import { Appreciation } from './states/Appreciation.js'
 import { BriefingForExercise } from './states/BriefingForExercise.js'
 import { CallToAction } from './states/CallToAction.js'
@@ -14,11 +14,20 @@ import { GeneralBriefing } from './states/GeneralBriefing.js'
 import { IntermediateAward } from './states/IntermediateAward.js'
 import { PerformanceAnchor } from './states/PerformanceAnchor.js'
 import { Welcoming } from './states/Welcoming.js'
-
+import { MotionVideoSequence } from './states/MotionVideoSequence.js'
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
 2. gestures/postures and Interactor location from Azure Kinetic Space. KARERO Brain is implemented as
 a sort of extended state machine. */
+
+/* neutral => neutral */
+/* happy => dance, 6000 */
+/* sadness => mourn 9000 */
+/* anger => attack, 6500 */
+/* disgust => disgust, 5000 */
+/* fear => anxious, 5000 */
+/* contempt => contempt, 5000 */
+/* surprise => surprise, 6000 */
 
 export class Brain{
 
@@ -51,8 +60,8 @@ export class Brain{
         this.start = new Off(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents)
         const off = this.start.getState();
         const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const dance = new Dance(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const attack = new Attack(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const joy = new Joy(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const anger = new Anger(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         const appreciation = new Appreciation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
@@ -62,10 +71,10 @@ export class Brain{
         const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-
+        const motionVideoSequence = new MotionVideoSequence(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
-            initialState: "off", off, follow, dance, attack, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming
+            initialState: "off", off, motionVideoSequence, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming
         };
         
         /* Create the state machine with states required. */
