@@ -14,7 +14,7 @@ export class MotionVideoSequence extends StateWrap{
         super("motionVideoSequence", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         this.emotionStates = ['neutral','contempt','joy','anger','disgust','sadness','surprise','fear','neutral'];
-        this.mode = ['only_face','only_body','face_and_body'];
+        this.mode = ['only_face',/*'only_body',/'face_and_body'*/];
 
         this.currentEmotion = 0;
         this.currentMode = 0;
@@ -165,7 +165,7 @@ export class MotionVideoSequence extends StateWrap{
             this.currentMode++;
             console.log(this.currentEmotion);
             this.currentEmotion = 0;
-            if(this.currentMode > 2){
+            if(this.currentMode >= this.mode.length){
                 this.currentMode = 0;
             }
         }

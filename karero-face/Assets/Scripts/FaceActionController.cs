@@ -11,288 +11,186 @@ using UnityEngine.Video;
 using System.Collections;
 using UnityEngine.Networking;
 
-public class FaceControl : MonoBehaviour
+public class FaceActionController : MonoBehaviour
 {
+    public FaceEmotion faceEmotion;
+
+    public GameObject particleSystem;
     public GameObject videoPlayer;
     public GameObject soundPlayer;
-    public GameObject DebugTrace;
 
-    public WebSocket webSocket;
 
-    public string WS = "ws://192.168.123.101:3344";
+    private string nv_action = "";
+    private string v_action = "";
+    public string displayEmotion = "";
 
     private string TEXT_FOLDER = "Sounds/";
     private string VIDEO_FOLDER = "Videos/";
-    private const string serverUrl = "http://192.168.123.101:1340/getAudio";
 
-    public UdpClient udpClient = new UdpClient();
-    public IPEndPoint from = new IPEndPoint(0, 0);
-    private object obj = null;
-    byte[] receivedBytes;
-    public string displayEmotion = "";
     private string lastEmotion = "init";
+
+
 
     public SkinnedMeshRenderer eyeLeft;
     public SkinnedMeshRenderer eyeRight;
 
-    public FaceEmotion faceEmotion;
     public Face targetFace;
     public Face startFace;
     private static float t = 0.0f;
     private static float tMulti = 1.5f;
 
+    public Material eyeMaterial;
+    public Material bgMaterial;
+    Color startEyeColor;
+    Color targetEyeColor;
+    Color startBgColor;
+    Color targetBgColor;
+
+    public float blendDuration = 1f;
+    private float startTime;
+
+    private float breathPulse = 0;
+    private bool breathUp = true;
+
     private Coroutine blinkCoroutine;
 
-    
-
-    private string nv_action = "";
-    private string v_action = "";
 
     void Start()
     {
         faceEmotion = new FaceEmotion();
-        //AudioClip newAudioClip;
-        //newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + "greeting/1");
-
-
-        //Debug.Log(newAudioClip);
-        //Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
-        //this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
-        //this.soundPlayer.GetComponent<AudioSource>().Play();
-    }
-
-    public void connectToWebsocket(string websocketDescription) { 
-
-        this.WS = websocketDescription;
-        webSocket = new WebSocket(this.WS.Substring(0, this.WS.Length - 1));
-
-        webSocket.OnMessage += (data) =>
-        {
-            Debug.Log("onMessage");
-            var message = System.Text.Encoding.UTF8.GetString(data);
-            FaceControlDescription jsonControlObject = JsonConvert.DeserializeObject<FaceControlDescription>(message);
-
-            if (jsonControlObject.mode == "setEmotion")
-            {
-                this.nv_action = "\nMode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
-            }
-            if (jsonControlObject.mode == "setSound")
-            {
-                Debug.Log("VERBAL ACTION TRACE");
-                this.v_action = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
-            }
-            this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.v_action + this.nv_action;
-
-            if (jsonControlObject.mode == "setEmotion")
-            {
-                displayEmotion = jsonControlObject.data;
-            }
-
-            if (jsonControlObject.mode == "setVideo")
-            {
-                VideoClip newVideoClip;
-                switch (jsonControlObject.data)
-                {
-                    case "show":
-                        Debug.Log("show video");
-                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
-                        break;
-                    case "hide":
-                        Debug.Log("hide video");
-                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
-                        break;
-                    case "start":
-                        Debug.Log("start video");
-                        this.videoPlayer.GetComponent<VideoPlayer>().Play();
-                        break;
-                    case "stop":
-                        Debug.Log("stop video");
-                        this.videoPlayer.GetComponent<VideoPlayer>().Stop();
-                        break;
-                    case "name":
-                        Debug.Log("name video");
-                        //implement video src change
-                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra);
-                        break;
-                    case "showAndPlay":
-                        Debug.Log("show and play video");
-                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
-                        newVideoClip = Resources.Load<VideoClip>(VIDEO_FOLDER + jsonControlObject.extra);
-                        this.videoPlayer.GetComponent<VideoPlayer>().clip = newVideoClip;
-                        this.videoPlayer.GetComponent<VideoPlayer>().Play();
-                        break;
-                    case "stopAndHide":
-                        Debug.Log("stop and hide video");
-                        this.videoPlayer.GetComponent<VideoPlayer>().Stop();
-                        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
-                        break;
-                }
-            }
-
-            if (jsonControlObject.mode == "setSound")
-            {
-                AudioClip newAudioClip;
-                Debug.Log(jsonControlObject);
-                switch (jsonControlObject.data)
-                {
-                    case "play":
-                        Debug.Log("play sound");
-                        this.soundPlayer.GetComponent<AudioSource>().Play();
-                        break;
-                    case "stop":
-                        Debug.Log("stop sound");
-                        this.soundPlayer.GetComponent<AudioSource>().Stop();
-                        this.soundPlayer.GetComponent<AudioSource>().time = 0;
-                        break;
-                    case "name":
-                        Debug.Log("name sound");
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4));
-                        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
-                        break;
-                    case "nameAndPlay":
-                        Debug.Log("nameAndPlay");
-
-                        newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + jsonControlObject.extra);
-                        
-                        Debug.Log(newAudioClip);
-                        //Debug.Log(TEXT_FOLDER + jsonControlObject.extra + "/" + UnityEngine.Random.Range(1, 4) + ".mp3");
-                        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
-                        this.soundPlayer.GetComponent<AudioSource>().Play();
-                        break;
-                    case "speak":
-                        Debug.Log("speak");
-                        StartCoroutine(RequestAudio(jsonControlObject.extra));
-                        break;
-                }
-            }
-
-        };
-
-        webSocket.OnOpen += () =>
-        {
-            Debug.Log("ws connect");
-        };
-
-        webSocket.OnError += (error) =>
-        {
-            Debug.Log("ws error " + error);
-        };
-
-        webSocket.OnClose += (e) =>
-        {
-            Debug.Log("Connection closed! Try reconnection...");
-            StartCoroutine(this.reconnect(4f));
-        };
-        webSocket.Connect();
-    }
-    IEnumerator reconnect(float waitTime)
-    {
-        yield return new WaitForSeconds(waitTime);
-        webSocket.Connect();
-    }
-
-
-
-    void ReceivedUDPPacket(IAsyncResult result)
-    {
-        //var recvBuffer = udpClient.EndReceive(result, ref from);
-
-        //displayEmotion = Encoding.UTF8.GetString(recvBuffer);
-        //Debug.Log(displayEmotion);
-        //Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshPro>());
-        GameObject.Find("Emotion").GetComponent<TextMeshPro>().text = displayEmotion;
-
-        this.gameObject.transform.Rotate(new Vector3(1, 0, 0), 1.2f);
-        this.gameObject.transform.Rotate(new Vector3(0, 1, 0), 1.8f);
-    }
-
-    private void FixedUpdate()
-    {
+        InvokeRepeating("EyeBreath", 0f, 0.035f);
 
     }
+
+    // Update is called once per frame
     void Update()
     {
-        //udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
-
-#if !UNITY_WEBGL || UNITY_EDITOR
-        if (this.webSocket != null)
-        {
-            webSocket.DispatchMessageQueue();
-        }
-        
-#endif
-
-        //Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>());
-        //GameObject.Find("Emotion").GetComponent<TextMeshProUGUI>().text = displayEmotion;
-
-
         if (lastEmotion != displayEmotion && displayEmotion != "Idle1" && displayEmotion != "Idle1")
         {
-            if(this.blinkCoroutine != null)StopCoroutine(this.blinkCoroutine);
+            Debug.Log("change face: " + displayEmotion);
+            if (this.blinkCoroutine != null) StopCoroutine(this.blinkCoroutine);
             this.startFace = this.getStartFace(eyeLeft, eyeRight);
             //Debug.Log("startFace: " + startFace);
             this.targetFace = faceEmotion.getEyeShapeValuesByEmotion(displayEmotion);
+            this.startEyeColor = this.eyeMaterial.color;
+            this.targetEyeColor = faceEmotion.getEyeColorByEmotion(displayEmotion);
+            this.startBgColor = this.bgMaterial.color;
+            this.targetBgColor = faceEmotion.getBgColorByEmotion(displayEmotion);
             t = 0.0f;
             tMulti = 1.0f;
         }
         this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
-        
+        this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
+        this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
-        if (lastEmotion != displayEmotion && displayEmotion == "Idle1" || displayEmotion == "Idle2")
+        if (lastEmotion != displayEmotion && displayEmotion == "neutral" || displayEmotion == "Neutral")
         {
-            Debug.Log("start Coroutine");
-            this.blinkCoroutine = StartCoroutine(this.BlinkCoroutine());
+            //Debug.Log("start Coroutine");
+            //this.blinkCoroutine = StartCoroutine(this.BlinkCoroutine());
         }
+        else
+        {
+            //Debug.Log("stop Coroutine");
+            //StopCoroutine(this.blinkCoroutine); 
+        }
+
+        if (displayEmotion == "Joy" || displayEmotion == "Contempt")
+        {
+            Debug.Log("play");
+            this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
+        }
+        else
+        {
+            this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
+        }
+
         lastEmotion = displayEmotion;
     }
 
-    private IEnumerator BlinkCoroutine()
+    internal void showVideo()
     {
-        Debug.Log("Coroutine go");
-        tMulti = 0.17f;
-        while (1 < 2)
-        {
-            Debug.Log("go while");
-            this.startFace = this.getStartFace(eyeLeft, eyeRight);
-            //Debug.Log("startFace: " + startFace);
-            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Idle1");
-            t = 0.0f;
-            
-            this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
-            // Wait for 2 seconds
-            yield return new WaitForSeconds(3.2f);
-            Debug.Log("Coroutine resumed after 0.5 seconds");
-            this.startFace = this.getStartFace(eyeLeft, eyeRight);
-            //Debug.Log("startFace: " + startFace);
-            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Neutral");
-            t = 0.0f;
-            int randomValue = UnityEngine.Random.Range(6, 12);
+        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
+    }
 
-            this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
-            yield return new WaitForSeconds(2.7f);
+    internal void hideVideo()
+    {
+        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+    }
+
+    internal void startVideo()
+    {
+        this.videoPlayer.GetComponent<VideoPlayer>().Play();
+    }
+
+    internal void stopVideo()
+    {
+        this.videoPlayer.GetComponent<VideoPlayer>().Stop();
+    }
+
+    internal void nameVideo(string name)
+    {
+        VideoClip newVideoClip = Resources.Load<VideoClip>(this.VIDEO_FOLDER + name);
+        this.videoPlayer.GetComponent<VideoPlayer>().clip = newVideoClip;
+    }
+
+    internal void playSound()
+    {
+        this.soundPlayer.GetComponent<AudioSource>().Play();
+    }
+
+    internal void stopSound()
+    {
+        this.soundPlayer.GetComponent<AudioSource>().Stop();
+        this.soundPlayer.GetComponent<AudioSource>().time = 0;
+    }
+
+    internal void nameSound(string name)
+    {
+        AudioClip newAudioClip = Resources.Load<AudioClip>(TEXT_FOLDER + name);
+        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+    }
+
+    internal void setAudioClip(AudioClip newAudioClip)
+    {
+        this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
+    }
+
+    internal void setEmotion(string emotion)
+    {
+        this.displayEmotion = emotion;
+    }
+
+
+    private void EyeBreath()
+    {
+        if (this.breathPulse > 8f)
+        {
+            this.breathUp = false;
+        }
+        else if (this.breathPulse <= 0.1f)
+        {
+            this.breathUp = true;
+        }
+
+        if (this.breathUp == true)
+        {
+            this.breathPulse += 0.08f;
+        }
+        else
+        {
+            this.breathPulse -= 0.08f;
         }
     }
 
-    private IEnumerator RequestAudio(string filename)
+    private void UpdateEyeColor(Material material, Color startColor, Color endColor)
     {
-        string audioUrl = $"{serverUrl}?filename={filename}";
-        Debug.Log(audioUrl);
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
-        {
-            yield return www.SendWebRequest();
+        //Debug.Log("start: " + startColor);
+        //Debug.Log("end: " + endColor);
+        Color lerpedColor = Color.Lerp(startColor, endColor, t);
+        //Debug.Log("lerpedColor: " + lerpedColor);
+        // Apply the lerped color to the material.
+        material.color = lerpedColor;
 
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                AudioClip newAudioClip = DownloadHandlerAudioClip.GetContent(www);
-
-                this.soundPlayer.GetComponent<AudioSource>().clip = newAudioClip;
-                this.soundPlayer.GetComponent<AudioSource>().Play();
-            }
-            else
-            {
-                Debug.LogError($"Failed to load audio: {www.error}");
-            }
-        }
     }
 
     Face getStartFace(SkinnedMeshRenderer leftEye, SkinnedMeshRenderer rightEye)
@@ -340,7 +238,7 @@ public class FaceControl : MonoBehaviour
             eyeBlendshapeDataEnd = targetFace.rightEye;
         }
 
-        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(eyeBlendshapeDataStart.full, eyeBlendshapeDataEnd.full * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(eyeBlendshapeDataStart.full, eyeBlendshapeDataEnd.full * 100 + this.breathPulse, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad, Mathf.Lerp(eyeBlendshapeDataStart.sad, eyeBlendshapeDataEnd.sad * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis, Mathf.Lerp(eyeBlendshapeDataStart.kreis, eyeBlendshapeDataEnd.kreis * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(eyeBlendshapeDataStart.disgusted, eyeBlendshapeDataEnd.disgusted * 100, t));
@@ -474,6 +372,116 @@ public class FaceEmotion
         }
 
         return this.neutral.neutral;
+    }
+
+    public Color getBgColorByEmotion(string emotion)
+    {
+        if (emotion == "Apprehension" || emotion == "Fear" || emotion == "Terror")
+        {
+            return new Color(1f, 1f, 1f);
+        }
+        return new Color(0f, 0f, 0f);
+    }
+
+    public Color getEyeColorByEmotion(string emotion)
+    {
+        Color color = new Color(255f, 255f, 255f);
+
+        switch (emotion)
+        {
+
+            case "Annoyance":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Anger":
+                color = new Color(255f, 0f, 0f);
+                break;
+            case "Rage":
+                color = new Color(255f, 0f, 0f);
+                break;
+            case "Vigilance":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Anticipation":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Interest":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Serenety":
+                color = new Color(255f, 153f, 255f);
+                break;
+            case "Joy":
+                color = new Color(255f, 153f, 255f);
+                break;
+            case "Ecstasy":
+                color = new Color(255f, 153f, 255f);
+                break;
+            case "Accepptance":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Trust":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Admiration":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Apprehension":
+                color = new Color(0f, 0f, 0f);
+                break;
+            case "Fear":
+                color = new Color(0f, 0f, 0f);
+                break;
+            case "Terror":
+                color = new Color(0f, 0f, 0f);
+                break;
+            case "Distraction":
+                color = new Color(69f, 166f, 159f);
+                break;
+            case "Surprise":
+                color = new Color(69f, 166f, 159f);
+                break;
+            case "Amazement":
+                color = new Color(69f, 166f, 159f);
+                break;
+            case "Pensiveness":
+                color = new Color(75f, 75f, 75f);
+                break;
+            case "Sadness":
+                color = new Color(75f, 75f, 75f);
+                break;
+            case "Grief":
+                color = new Color(75f, 75f, 75f);
+                break;
+            case "Boredom":
+                color = new Color(120f, 140f, 40f);
+                break;
+            case "Disgust":
+                color = new Color(120f, 140f, 40f);
+                break;
+            case "Loathing":
+                color = new Color(120f, 140f, 40f);
+                break;
+            case "Contempt":
+                color = new Color(140f, 140f, 140f);
+                break;
+            case "Neutral":
+                color = new Color(62f, 140f, 59f);
+                break;
+            case "Idle1":
+                color = new Color(255f, 255f, 0f);
+                break;
+            case "Idle2":
+                color = new Color(255f, 255f, 0f);
+                break;
+            default:
+                color = new Color(255f, 255f, 0f);
+                break;
+        }
+
+        color = new Color(color.r / 255, color.g / 255, color.b / 255);
+
+        return color;
     }
 }
 

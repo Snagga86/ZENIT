@@ -1,4 +1,4 @@
-﻿internal class FaceControlDescription
+﻿public class FaceControlDescription
 {
     public string mode { get; set; }
     public string data { get; set; }
