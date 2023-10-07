@@ -13,29 +13,25 @@ using UnityEngine.Networking;
 
 public class NetworkController : MonoBehaviour
 {
-    private const String IP_ADRESS = "192.168.123.101";
-    private const int PORT = 3344;
+    private const String IP_ADRESS = "192.168.0.101";
+    private const int WEBSOCKET_PORT = 3344;
+    private const int HTTP_PORT = 3340;
 
     public FaceActionController faceActionController;
+    public GameObject DebugTrace;
 
     public WebSocket webSocket;
 
-    public string WS = "ws://192.168.123.101:3344";
-
-    private string TEXT_FOLDER = "Sounds/";
-    private string VIDEO_FOLDER = "Videos/";
-    private const string serverUrl = "http://192.168.123.101:1340/getAudio";
+    public string websocketUrl = "ws://" + IP_ADRESS + ":" + WEBSOCKET_PORT;
+    public string httpUrl = "http://" + IP_ADRESS + ":" + HTTP_PORT + "/getAudio";
 
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
-    private object obj = null;
-    byte[] receivedBytes;
-
 
     private string nv_action = "";
     private string v_action = "";
 
-    public GameObject DebugTrace;
+
     void Start()
     {
 
@@ -44,8 +40,8 @@ public class NetworkController : MonoBehaviour
     public void connectToWebsocket(string websocketDescription)
     {
 
-        this.WS = websocketDescription;
-        webSocket = new WebSocket(this.WS.Substring(0, this.WS.Length - 1));
+        this.websocketUrl = websocketDescription;
+        webSocket = new WebSocket(this.websocketUrl.Substring(0, this.websocketUrl.Length - 1));
 
         webSocket.OnMessage += (data) =>
         {
@@ -150,23 +146,8 @@ public class NetworkController : MonoBehaviour
         webSocket.Connect();
     }
 
-
-    /*void ReceivedUDPPacket(IAsyncResult result)
-    {
-        //var recvBuffer = udpClient.EndReceive(result, ref from);
-
-        //displayEmotion = Encoding.UTF8.GetString(recvBuffer);
-        //Debug.Log(displayEmotion);
-        //Debug.Log(GameObject.Find("Emotion").GetComponent<TextMeshPro>());
-        GameObject.Find("Emotion").GetComponent<TextMeshPro>().text = displayEmotion;
-
-        this.gameObject.transform.Rotate(new Vector3(1, 0, 0), 1.2f);
-        this.gameObject.transform.Rotate(new Vector3(0, 1, 0), 1.8f);
-    }*/
-
     void Update()
     {
-        //udpClient.BeginReceive(new AsyncCallback(ReceivedUDPPacket), obj);
 
 #if !UNITY_WEBGL || UNITY_EDITOR
         if (this.webSocket != null)
@@ -177,10 +158,9 @@ public class NetworkController : MonoBehaviour
 #endif
     }
 
-
     private IEnumerator RequestAudio(string filename)
     {
-        string audioUrl = $"{serverUrl}?filename={filename}";
+        string audioUrl = $"{httpUrl}?filename={filename}";
         Debug.Log(audioUrl);
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
         {

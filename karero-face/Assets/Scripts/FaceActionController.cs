@@ -19,17 +19,11 @@ public class FaceActionController : MonoBehaviour
     public GameObject videoPlayer;
     public GameObject soundPlayer;
 
-
-    private string nv_action = "";
-    private string v_action = "";
     public string displayEmotion = "";
+    private string lastEmotion = "init";
 
     private string TEXT_FOLDER = "Sounds/";
     private string VIDEO_FOLDER = "Videos/";
-
-    private string lastEmotion = "init";
-
-
 
     public SkinnedMeshRenderer eyeLeft;
     public SkinnedMeshRenderer eyeRight;
@@ -47,7 +41,6 @@ public class FaceActionController : MonoBehaviour
     Color targetBgColor;
 
     public float blendDuration = 1f;
-    private float startTime;
 
     private float breathPulse = 0;
     private bool breathUp = true;
@@ -65,7 +58,7 @@ public class FaceActionController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (lastEmotion != displayEmotion && displayEmotion != "Idle1" && displayEmotion != "Idle1")
+        if (lastEmotion != displayEmotion)
         {
             Debug.Log("change face: " + displayEmotion);
             if (this.blinkCoroutine != null) StopCoroutine(this.blinkCoroutine);
@@ -79,20 +72,14 @@ public class FaceActionController : MonoBehaviour
             t = 0.0f;
             tMulti = 1.0f;
         }
-        this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
-        this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
-        this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
-        if (lastEmotion != displayEmotion && displayEmotion == "neutral" || displayEmotion == "Neutral")
+        if (displayEmotion == "Hot")
         {
-            //Debug.Log("start Coroutine");
-            //this.blinkCoroutine = StartCoroutine(this.BlinkCoroutine());
+            this.targetBgColor = new Color(178/255,255,255);
+            this.targetEyeColor = new Color(191/255, 207/255, 255/255);
+            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Disgust");
         }
-        else
-        {
-            //Debug.Log("stop Coroutine");
-            //StopCoroutine(this.blinkCoroutine); 
-        }
+
 
         if (displayEmotion == "Joy" || displayEmotion == "Contempt")
         {
@@ -103,6 +90,10 @@ public class FaceActionController : MonoBehaviour
         {
             this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
         }
+
+        this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
+        this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
+        this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
         lastEmotion = displayEmotion;
     }
@@ -184,13 +175,8 @@ public class FaceActionController : MonoBehaviour
 
     private void UpdateEyeColor(Material material, Color startColor, Color endColor)
     {
-        //Debug.Log("start: " + startColor);
-        //Debug.Log("end: " + endColor);
         Color lerpedColor = Color.Lerp(startColor, endColor, t);
-        //Debug.Log("lerpedColor: " + lerpedColor);
-        // Apply the lerped color to the material.
         material.color = lerpedColor;
-
     }
 
     Face getStartFace(SkinnedMeshRenderer leftEye, SkinnedMeshRenderer rightEye)
