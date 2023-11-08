@@ -1,5 +1,6 @@
 import dgram from 'node:dgram';
 import pkg from  "osc-js";
+import http from "http";
 import { WebSocketServer } from 'ws';
 import { Brain } from '../behavior/brain.js';
 

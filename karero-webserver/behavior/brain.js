@@ -15,6 +15,7 @@ import { IntermediateAward } from './states/IntermediateAward.js'
 import { PerformanceAnchor } from './states/PerformanceAnchor.js'
 import { Welcoming } from './states/Welcoming.js'
 import { MotionVideoSequence } from './states/MotionVideoSequence.js'
+import { ChatProcessor } from './chat-processor.js';
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
 2. gestures/postures and Interactor location from Azure Kinetic Space. KARERO Brain is implemented as
@@ -36,6 +37,7 @@ export class Brain{
         ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
         ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
         ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
+        RASA_ANSWER: 'RASA_ANSWER',
         TTS_ACTION: 'TTS_ACTION'
     }
   
@@ -47,8 +49,11 @@ export class Brain{
         this.gesturePostureProcessor = new GesturePostureProcessor();
         /* Create speech to text processor. */
         this.speechProcessor = new SpeechProcessor();
+        /* Crerate process for chatting with rasa bot. */
+        this.chatProcessor = new ChatProcessor();
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
+
 
         /* Websocket connections to send signals to KARERO display and body. */
         this.robotBodyWS = null;
@@ -71,7 +76,7 @@ export class Brain{
         const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const motionVideoSequence = new MotionVideoSequence(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const motionVideoSequence = new MotionVideoSequence(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
             initialState: "off", off, motionVideoSequence, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming

@@ -1,0 +1,91 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hallo
+    - hallo
+    - hallo
+    - hallo, hallo
+    - Guten Morgen
+    - Guten Abend
+    - Moin
+    - hallo
+    - los geht's
+    - Hey Kumpel
+    - Guten Morgen
+    - Guten Abend
+    - Guten Tag
+
+- intent: goodbye
+  examples: |
+    - cu
+    - auf Wiedersehen
+    - cee dich später
+    - gute Nacht
+    - Auf Wiedersehen
+    - auf Wiedersehen
+    - Einen schönen Tag noch
+    - man sieht sich
+    - tschüss tschüss
+    - Wir sehen uns später
+
+- intent: affirm
+  examples: |
+    - ja
+    - y
+    - in der Tat
+    - natürlich
+    - das klingt gut
+    - richtig
+
+- intent: deny
+  examples: |
+    - nein
+    - n
+    - nie
+    - Ich denke nicht so
+    - Ich mag das nicht
+    - auf keinen Fall
+    - nicht wirklich
+
+- intent: mood_great
+  examples: |
+    - perfekt
+    - großartig
+    - großartig
+    - sich wie ein König fühlen
+    - wunderbar
+    - Ich fühle mich sehr gut
+    - Ich bin großartig
+    - Ich bin erstaunlich
+    - Ich werde die Welt retten
+    - super aufgeregt
+    - extrem gut
+    - so perfekt
+    - so gut
+    - so perfekt
+
+- intent: mood_unhappy
+  examples: |
+    - mein Tag war furchtbar
+    - Ich bin traurig
+    - Ich fühle mich nicht sehr gut
+    - Ich bin enttäuscht
+    - super traurig
+    - Ich bin so traurig
+    - traurig
+    - sehr traurig
+    - unglücklich
+    - nicht gut
+    - nicht sehr gut
+    - sehr traurig
+    - so traurig
+    - so traurig
+
+- intent: bot_challenge
+  examples: |
+    - Bist du ein Bot?
+    - Sind Sie ein Mensch?
+    - Spreche ich mit einem Bot?
+    - Spreche ich mit einem Menschen?

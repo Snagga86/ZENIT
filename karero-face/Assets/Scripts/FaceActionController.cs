@@ -16,6 +16,12 @@ public class FaceActionController : MonoBehaviour
     public FaceEmotion faceEmotion;
 
     public GameObject particleSystem;
+    public GameObject drops1;
+    public GameObject drops2;
+
+    public GameObject water;
+    public GameObject glass;
+
     public GameObject videoPlayer;
     public GameObject soundPlayer;
 
@@ -45,9 +51,6 @@ public class FaceActionController : MonoBehaviour
     private float breathPulse = 0;
     private bool breathUp = true;
 
-    private Coroutine blinkCoroutine;
-
-
     void Start()
     {
         faceEmotion = new FaceEmotion();
@@ -61,9 +64,7 @@ public class FaceActionController : MonoBehaviour
         if (lastEmotion != displayEmotion)
         {
             Debug.Log("change face: " + displayEmotion);
-            if (this.blinkCoroutine != null) StopCoroutine(this.blinkCoroutine);
             this.startFace = this.getStartFace(eyeLeft, eyeRight);
-            //Debug.Log("startFace: " + startFace);
             this.targetFace = faceEmotion.getEyeShapeValuesByEmotion(displayEmotion);
             this.startEyeColor = this.eyeMaterial.color;
             this.targetEyeColor = faceEmotion.getEyeColorByEmotion(displayEmotion);
@@ -71,25 +72,40 @@ public class FaceActionController : MonoBehaviour
             this.targetBgColor = faceEmotion.getBgColorByEmotion(displayEmotion);
             t = 0.0f;
             tMulti = 1.0f;
-        }
-
-        if (displayEmotion == "Hot")
-        {
-            this.targetBgColor = new Color(178/255,255,255);
-            this.targetEyeColor = new Color(191/255, 207/255, 255/255);
-            this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Disgust");
-        }
 
 
-        if (displayEmotion == "Joy" || displayEmotion == "Contempt")
-        {
-            Debug.Log("play");
-            this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
+            if (displayEmotion == "Hot")
+            {
+                this.targetBgColor = new Color(178f / 255f, 0f, 0f);
+                this.targetEyeColor = new Color(191f / 255f, 207f / 255f, 1f);
+                this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Disgust");
+                this.drops1.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
+                this.drops2.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
+            }
+            else
+            {
+                this.drops1.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
+                this.drops2.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
+            }
+
+
+            if (displayEmotion == "Thirsty")
+            {
+                this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Joy");
+                this.targetBgColor = new Color(255f / 255f, 220f / 255f, 115f / 255f);
+                this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
+                this.glass.GetComponent<ObjectMover>().StartMovement();
+                this.water.GetComponent<ObjectMover>().StartMovement();
+            }
+            else
+            {
+                this.glass.GetComponent<ObjectMover>().StartInverseMovement();
+                this.water.GetComponent<ObjectMover>().StartInverseMovement();
+                this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
+            }
+
         }
-        else
-        {
-            this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
-        }
+
 
         this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
         this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);

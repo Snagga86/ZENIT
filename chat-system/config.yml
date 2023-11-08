@@ -1,0 +1,54 @@
+recipe: default.v1
+language: de
+importers:
+- name: custom.importer.TrainingDataGenerator
+- name: RasaFileImporter
+pipeline:
+- name: WhitespaceTokenizer
+- name: LanguageModelFeaturizer
+    # Name of the language model to use
+  model_name: "bert"
+    # Pre-Trained weights to be loaded
+  model_weights: "rasa/LaBSE"
+  cache_dir: null
+- name: RegexFeaturizer
+- name: LexicalSyntacticFeaturizer
+- name: CountVectorsFeaturizer
+- name: CountVectorsFeaturizer
+  analyzer: char_wb
+  min_ngram: 1
+  max_ngram: 4
+- name: DIETClassifier
+    # disable entity_recognition to fix double extraction of entities (topic_name, topic_attribute)
+  entity_recognition: false
+  epochs: 100
+  drop_rate: 0.3
+  transformer_size: 256
+  weight_sparsity: 0.7
+  batch_size: [64, 256]
+  embedding_dimension: 30
+    # number_of_transformer_layers: 4
+    # hidden_layers_sizes:
+    #   text: [512, 128]
+  # Deprecated, now we use RegexEntityExtractor to extract topic_name and topic_attribute
+  #- name: custom.extractor.SearchEntityExtractor
+  #  lookup_file: data/nlu/generated/topic_names.txt
+- name: RegexEntityExtractor
+  case_sensitive: false
+  use_lookup_tables: true
+  use_regexes: true
+- name: EntitySynonymMapper
+  #- name: custom.classifier.EntityBasedIntentClassifier
+- name: ResponseSelector
+  retrieval_intent: smalltalk
+  epochs: 100
+- name: FallbackClassifier
+  threshold: 0.5
+  ambiguity_threshold: 0.08
+policies:
+- name: AugmentedMemoizationPolicy
+  max_history: 4
+- name: RulePolicy
+  core_fallback_threshold: 0.4
+  core_fallback_action_name: action_default_fallback
+assistant_id: 20231108-140428-upbeat-leave

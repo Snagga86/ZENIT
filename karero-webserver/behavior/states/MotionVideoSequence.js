@@ -8,13 +8,15 @@ import readline from 'readline';
 
 /* Robot state class defining the robot behavior within this state */
 export class MotionVideoSequence extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+    constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
         super("motionVideoSequence", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
-        this.emotionStates = ['neutral','contempt','joy','anger','disgust','sadness','surprise','fear','neutral'];
+        this.emotionStates = ['thirsty','neutral','hot','contempt','joy','anger','disgust','sadness','surprise','fear','neutral'];
         this.mode = ['only_face',/*'only_body',/'face_and_body'*/];
+
+        this.chatProcessor = chatProcessor;
 
         this.currentEmotion = 0;
         this.currentMode = 0;
@@ -44,9 +46,31 @@ export class MotionVideoSequence extends StateWrap{
             "mode" : "setEmotion",
             "data" : "Idle1"
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload); 
+        //this.followHead();
 
-        this.followHead();
+        this.speechProcessor.speechEvent.on('FinalResult', (result) => {
+            console.log("tts result:" + result);
+            if(result.length > 1){
+                this.chatProcessor.sendMessage(result);
+            }
+            
+        });
+
+        this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, (payload) => {
+            console.log("res:");
+            console.log(payload);
+            console.log(payload[0]);
+            console.log(payload[0].text);
+            var payloadTTS = {
+                "mode" : "tts",
+                "text" : payload[0].text
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        });
+
+        
+
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -153,7 +177,13 @@ export class MotionVideoSequence extends StateWrap{
         if(this.emotionStates[this.currentEmotion] == 'contempt'){
             this.toTime = 5000;
         }
-
+        if(this.emotionStates[this.currentEmotion] == 'hot'){
+            this.toTime = 15000;
+        }
+        if(this.emotionStates[this.currentEmotion] == 'thirsty'){
+            this.toTime = 25000;
+        }
+        
         console.log(this.toTime);
 
         this.stateTimeout = setTimeout(() => {

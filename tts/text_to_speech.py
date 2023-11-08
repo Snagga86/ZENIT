@@ -9,8 +9,9 @@ import time
 from io import StringIO
 import re
 import librosa
+import os
 
-IP_ADDRESS = "192.168.123.101"
+IP_ADDRESS = "192.168.0.101"
 PORT = 1339
 IS_CONNECTED = False
 
@@ -48,9 +49,15 @@ def on_message(ws, message):
         file = file[:50]
         file = file + ".wav"
         file_path = "./generatedSoundFiles/" + file
-        tts.tts_to_file(text=text_to_generate, file_path=file_path)
-        duration = librosa.get_duration(filename=file_path)
-        print("File successfully created, duration: " + str(duration))
+
+        if os.path.exists(file_path):
+            duration = librosa.get_duration(filename=file_path)
+            print("File already exists, duration: " + str(duration))
+        else:
+            tts.tts_to_file(text=text_to_generate, file_path=file_path)
+            duration = librosa.get_duration(filename=file_path)
+            print("File successfully created, duration: " + str(duration))
+      
         payload = file + ";" + str(duration)
         backsend(payload)
 

@@ -15,7 +15,7 @@ public class NetworkController : MonoBehaviour
 {
     private const String IP_ADRESS = "192.168.0.101";
     private const int WEBSOCKET_PORT = 3344;
-    private const int HTTP_PORT = 3340;
+    private const int HTTP_PORT = 1340;
 
     public FaceActionController faceActionController;
     public GameObject DebugTrace;
@@ -111,6 +111,8 @@ public class NetworkController : MonoBehaviour
                         this.faceActionController.nameSound(name);
                         break;
                     case "nameAndPlay":
+                        Debug.Log("nameAndPlay");
+                        Debug.Log(jsonControlObject.extra);
                         this.faceActionController.nameSound(jsonControlObject.extra);
                         this.faceActionController.playSound();
                         break;
