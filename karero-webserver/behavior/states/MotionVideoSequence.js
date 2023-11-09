@@ -60,8 +60,11 @@ export class MotionVideoSequence extends StateWrap{
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, (payload) => {
             console.log("res:");
             console.log(payload);
-            console.log(payload[0]);
             console.log(payload[0].text);
+            if(payload.length > 1){
+                console.log(payload[1].image);
+            }
+            
             var payloadTTS = {
                 "mode" : "tts",
                 "text" : payload[0].text

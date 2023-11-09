@@ -2,36 +2,65 @@ version: "3.1"
 
 intents:
   - greet
+  - tell_story
+  - express_gratitude
+  - tell_joke
+  - ask_about_day
+  - share_experience
+  - ask_advice
   - goodbye
   - affirm
   - deny
-  - mood_great
-  - mood_unhappy
-  - bot_challenge
+  - default
 
 responses:
   utter_greet:
-  - text: "Hey! Wie geht es dir?"
+    - text: "Hallo! Wie kann ich Ihnen heute helfen?"
+      image: "[happy]"
+    - text: "Guten Tag! Wie kann ich Ihnen behilflich sein?"
+      image: "[happy]"
+    - text: "Hi! Wie kann ich Ihnen helfen?"
+      image: "[happy]"
 
-  utter_cheer_up:
-  - text: "Hier ist etwas um dich augfzuheitern!"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
+  utter_tell_story:
+    - text: "Einmal vor langer Zeit... Möchten Sie eine kurze Geschichte hören?"
+    - text: "Natürlich! Hier ist eine kleine Geschichte für Sie: ."
+    - text: "Ich habe eine interessante Geschichte für Sie. Möchten Sie sie hören?"
 
-  utter_did_that_help:
-  - text: "Hat dir das geholfen?"
+  utter_express_gratitude:
+    - text: "Gern geschehen! Wenn Sie weitere Hilfe benötigen, fragen Sie einfach."
+    - text: "Es war mir eine Freude! Falls Sie mehr Fragen haben, stehe ich zur Verfügung."
+    - text: "Nichts zu danken! Falls Sie noch etwas brauchen, lassen Sie es mich wissen."
 
-  utter_happy:
-  - text: "Großartig, weiter so!"
+  utter_tell_joke:
+    - text: "Natürlich! Hier ist ein kleiner Witz für Sie."
+    - text: "Wie wäre es mit einem Lächeln? Hier ist ein Witz für Sie."
+    - text: "Ein kleiner Spaß gefällig? Hier ist ein Witz."
+
+  utter_ask_about_day:
+    - text: "Wie war Ihr Tag bisher? Gibt es etwas, worüber Sie sprechen möchten?"
+    - text: "Ich hoffe, Ihr Tag verläuft gut! Gibt es etwas Bestimmtes, worüber Sie sprechen möchten?"
+    - text: "Wie läuft Ihr Tag bisher? Gibt es Neuigkeiten, die Sie teilen möchten?"
+
+  utter_share_experience:
+    - text: "Das erinnert mich an eine Erfahrung, die ich teilen möchte..."
+    - text: "Ich habe auch eine ähnliche Erfahrung gemacht. Lassen Sie mich Ihnen davon erzählen."
+    - text: "Erfahrungen sind wunderbar! Hier ist eine meiner Geschichten dazu."
+
+  utter_ask_advice:
+    - text: "Brauchen Sie Ratschläge zu etwas Bestimmtem? Ich bin hier, um zu helfen."
+    - text: "Ratschläge gesucht? Ich stehe Ihnen gerne zur Verfügung."
+    - text: "Wenn Sie Rat benötigen, bin ich hier. Worum geht es?"
 
   utter_goodbye:
-  - text: "Tschüss!"
+    - text: "Auf Wiedersehen! Passen Sie gut auf sich auf und kommen Sie gerne wieder, wenn Sie weitere Fragen haben."
+    - text: "Bis bald! Falls Sie noch etwas brauchen, bin ich hier."
+    - text: "Machen Sie es gut! Bei Bedarf bin ich für Sie da."
 
-  utter_iamabot:
-  - text: "Ich bin Zeenith!"
-
-  utter_please_rephrase:
-  - text: "Tut mir leid, das habe ich nicht verstanden... Ich bin Zeenith. Miau!"
-
+  utter_default:
+    - text: "Entschuldigung, das habe ich nicht ganz verstanden. Können Sie das bitte anders formulieren oder eine andere Frage stellen?"
+    - text: "Es tut mir leid, ich habe Schwierigkeiten, das zu verstehen. Könnten Sie die Frage anders stellen?"
+    - text: "Tut mir leid, das habe ich nicht verstanden... Ich bin Zeenith. Miau!"
 
 session_config:
   session_expiration_time: 60

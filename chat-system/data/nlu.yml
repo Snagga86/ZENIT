@@ -1,91 +1,93 @@
 version: "3.1"
-
 nlu:
 - intent: greet
   examples: |
-    - hallo
-    - hallo
-    - hallo
-    - hallo, hallo
-    - Guten Morgen
-    - Guten Abend
-    - Moin
-    - hallo
-    - los geht's
-    - Hey Kumpel
-    - Guten Morgen
-    - Guten Abend
+    - Hallo
+    - Hi
+    - Grüße
     - Guten Tag
+    - Wie geht es Ihnen?
+    - Hallo, wie kann ich Ihnen helfen?
+
+- intent: tell_story
+  examples: |
+    - Erzählen Sie mir eine Geschichte
+    - Ich möchte eine Geschichte hören
+    - Gibt es eine interessante Geschichte?
+    - Können Sie mir eine Anekdote erzählen?
+    - Erzählen Sie mir etwas Interessantes
+
+- intent: express_gratitude
+  examples: |
+    - Danke
+    - Vielen Dank
+    - Ich schätze das
+    - Herzlichen Dank
+    - Vielen Dank für Ihre Hilfe
+
+- intent: tell_joke
+  examples: |
+    - Erzählen Sie einen Witz
+    - Ich brauche etwas zum Lachen
+    - Haben Sie einen guten Witz?
+    - Lassen Sie uns etwas Lustiges hören
+    - Können Sie mir einen Witz erzählen?
+
+- intent: ask_about_day
+  examples: |
+    - Wie war Ihr Tag?
+    - Wie läuft es heute?
+    - Gibt es Neuigkeiten von Ihrem Tag?
+    - Haben Sie einen guten Tag gehabt?
+    - Wie geht es Ihnen heute?
+
+- intent: share_experience
+  examples: |
+    - Ich möchte meine Erfahrung teilen
+    - Ich habe etwas erlebt, was ich besprechen möchte
+    - Lassen Sie uns Erfahrungen austauschen
+    - Kann ich Ihnen von etwas berichten?
+    - Teilen Sie Ihre Erlebnisse mit mir
+
+- intent: ask_advice
+  examples: |
+    - Brauche Ratschläge
+    - Können Sie mir bei etwas helfen?
+    - Benötige Hilfe bei einer Entscheidung
+    - Welche Tipps haben Sie für mich?
+    - Kann ich Ihre Meinung zu etwas bekommen?
 
 - intent: goodbye
   examples: |
-    - cu
-    - auf Wiedersehen
-    - cee dich später
-    - gute Nacht
     - Auf Wiedersehen
-    - auf Wiedersehen
-    - Einen schönen Tag noch
-    - man sieht sich
-    - tschüss tschüss
-    - Wir sehen uns später
+    - Bis später
+    - Tschüss
+    - Bis bald
+    - Machen Sie es gut
+    - Bis zum nächsten Mal
 
 - intent: affirm
   examples: |
-    - ja
-    - y
-    - in der Tat
-    - natürlich
-    - das klingt gut
-    - richtig
+    - Ja
+    - Sicher
+    - Absolut
+    - Ich stimme zu
+    - Natürlich
+    - Das ist richtig
 
 - intent: deny
   examples: |
-    - nein
-    - n
-    - nie
-    - Ich denke nicht so
-    - Ich mag das nicht
-    - auf keinen Fall
-    - nicht wirklich
+    - Nein
+    - Ich glaube nicht
+    - Ich bin anderer Meinung
+    - Das sehe ich anders
+    - Stimme nicht zu
 
-- intent: mood_great
+- intent: default
   examples: |
-    - perfekt
-    - großartig
-    - großartig
-    - sich wie ein König fühlen
-    - wunderbar
-    - Ich fühle mich sehr gut
-    - Ich bin großartig
-    - Ich bin erstaunlich
-    - Ich werde die Welt retten
-    - super aufgeregt
-    - extrem gut
-    - so perfekt
-    - so gut
-    - so perfekt
-
-- intent: mood_unhappy
-  examples: |
-    - mein Tag war furchtbar
-    - Ich bin traurig
-    - Ich fühle mich nicht sehr gut
-    - Ich bin enttäuscht
-    - super traurig
-    - Ich bin so traurig
-    - traurig
-    - sehr traurig
-    - unglücklich
-    - nicht gut
-    - nicht sehr gut
-    - sehr traurig
-    - so traurig
-    - so traurig
-
-- intent: bot_challenge
-  examples: |
-    - Bist du ein Bot?
-    - Sind Sie ein Mensch?
-    - Spreche ich mit einem Bot?
-    - Spreche ich mit einem Menschen?
+    - Was?
+    - Ich bin mir nicht sicher
+    - Kannst du das wiederholen?
+    - Ich verstehe nicht
+    - Könnten Sie das bitte klären?
+    - Entschuldigen Sie, ich habe das nicht verstanden

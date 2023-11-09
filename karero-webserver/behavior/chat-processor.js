@@ -15,15 +15,15 @@ export class ChatProcessor {
             "message": text
         });
 
+        console.log(postData);
         
         var options = {
-            hostname: 'localhost',
+            hostname: '127.0.0.1',
             port: 5005,
             path: '/webhooks/rest/webhook',
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': postData.length
+                'Content-Type': 'application/json'
                 }
         };
 

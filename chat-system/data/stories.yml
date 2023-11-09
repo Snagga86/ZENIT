@@ -1,30 +1,43 @@
 version: "3.1"
 
 stories:
-
-- story: happy path
+- story: Grüßen, Geschichte erzählen und sich verabschieden
   steps:
   - intent: greet
   - action: utter_greet
-  - intent: mood_great
-  - action: utter_happy
-
-- story: sad path 1
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: affirm
-  - action: utter_happy
-
-- story: sad path 2
-  steps:
-  - intent: greet
-  - action: utter_greet
-  - intent: mood_unhappy
-  - action: utter_cheer_up
-  - action: utter_did_that_help
-  - intent: deny
+  - intent: tell_story
+  - action: utter_tell_story
+  - intent: goodbye
   - action: utter_goodbye
+
+- story: Danke ausdrücken und sich verabschieden
+  steps:
+  - intent: express_gratitude
+  - action: utter_express_gratitude
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Witz erzählen und nach dem Tag fragen
+  steps:
+  - intent: tell_joke
+  - action: utter_tell_joke
+  - intent: ask_about_day
+  - action: utter_ask_about_day
+  - intent: affirm
+  - action: utter_share_experience
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Ratschlag anfragen, Geschichte erzählen und sich verabschieden
+  steps:
+  - intent: ask_advice
+  - action: utter_ask_advice
+  - intent: share_experience
+  - action: utter_share_experience
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Nicht erkannte Eingabe
+  steps:
+  - intent: default
+  - action: utter_default
