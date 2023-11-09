@@ -1,6 +1,28 @@
 version: "3.1"
 
 stories:
+- story: Vorstellung
+  steps:
+  - intent: close_distance
+  - action: utter_self_introduction
+  - intent: ask_details_about_bot
+  - action: utter_self_introduction_details
+  - intent: thanks
+  - action: utter_express_gratitude
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Vorstellung2
+  steps:
+  - intent: ask_introduction
+  - action: utter_self_introduction
+  - intent: ask_details_about_bot
+  - action: utter_self_introduction_details
+  - intent: thanks
+  - action: utter_express_gratitude
+  - intent: goodbye
+  - action: utter_goodbye
+
 - story: Grüßen, Geschichte erzählen und sich verabschieden
   steps:
   - intent: greet

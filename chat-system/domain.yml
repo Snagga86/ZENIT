@@ -1,6 +1,9 @@
 version: "3.1"
 
 intents:
+  - ask_details_about_bot
+  - ask_introduction
+  - close_distance
   - greet
   - tell_story
   - express_gratitude
@@ -11,56 +14,73 @@ intents:
   - goodbye
   - affirm
   - deny
+  - thanks
   - default
 
 responses:
+  utter_self_introduction:
+    - text: "Ich bin Zeeenieth!"
+    - text: "Ich bin Zeeenieth! Törrrööörrrö!"
+    - text: "Ich bin Zeeenieth! Tuut-tuut!"
+    - text: "Ich bin Zeeenieth, der Robo-Dude!"
+
+  utter_self_introduction_details:
+    - text: "Ich bin ein sozialer Roboter in der Entwicklung. Ich kann schon etwas sprechen und manche non-verbalen Signale verstehen. Wenn ich groß bin, will ich die Welt erkunden."
+    - text: "Ich entwickle mich zu einem sozialen Roboter, der bereits über Sprachfähigkeiten verfügt und einige non-verbale Signale interpretieren kann. Mein Zukunftstraum? Die Welt erkunden, sobald ich ausgereift bin."
+
   utter_greet:
-    - text: "Hallo! Wie kann ich Ihnen heute helfen?"
+    - text: "Hai! Wie kann ich helfen?"
       image: "[happy]"
-    - text: "Guten Tag! Wie kann ich Ihnen behilflich sein?"
+    - text: "Moin! Was kann ich für dich tun?"
       image: "[happy]"
-    - text: "Hi! Wie kann ich Ihnen helfen?"
+    - text: "Hallo! Alles klar?"
       image: "[happy]"
 
   utter_tell_story:
-    - text: "Einmal vor langer Zeit... Möchten Sie eine kurze Geschichte hören?"
-    - text: "Natürlich! Hier ist eine kleine Geschichte für Sie: ."
-    - text: "Ich habe eine interessante Geschichte für Sie. Möchten Sie sie hören?"
+    - text: "Einmal vor langer Zeit... Möchtest du 'ne Geschichte hören? In einer futuristischen Stadt reparierte ein kleiner Roboter namens Rocco nicht nur defekte Schrauben, sondern auch gebrochene Herzen. Mit einem Kabelsalat voller Mitgefühl verband er Menschen, die sich verloren fühlten. Sein Motto: Liebe ist der stärkste Klebstoff. Und so klebte er nicht nur Maschinen, sondern auch Freundschaften wieder zusammen."
+    - text: "Klaro! Hier 'ne kleine Story: Ein einsamer Roboter fand in den Weiten des Internets eine bunte Welt voller Katzenbilder und lustiger Memes. Fortan verbreitete er Robo-Lächeln, indem er seine Lieblingsbilder mit anderen Robotern teilte. Gemeinsam lachten sie, bilden eine digitale Robo-Freundschaft und eroberten das Cyberspace-Universum mit positiver Energie. Ende."
+    - text: "Hab 'ne coole Geschichte. Bock, sie zu hören? Ein kleiner Roboter namens Blitz hatte eine große Leidenschaft: das Tanzen. Jeden Abend, wenn die Sterne am Himmel erschienen, verwandelte er seine Schrauben in Tanzschuhe und wirbelte durch die staubige Werkstatt. Sein Robo-Tanzstil wurde so mitreißend, dass sogar die Glühbirnen im Raum zu blinken begannen. Bald tanzte er nicht mehr allein, denn die ganze Werkstatt erwachte zum Leben im rhythmischen Licht seiner Robo-Schritte."
 
   utter_express_gratitude:
-    - text: "Gern geschehen! Wenn Sie weitere Hilfe benötigen, fragen Sie einfach."
-    - text: "Es war mir eine Freude! Falls Sie mehr Fragen haben, stehe ich zur Verfügung."
-    - text: "Nichts zu danken! Falls Sie noch etwas brauchen, lassen Sie es mich wissen."
+    - text: "Kein Ding! Bei Fragen einfach melden."
+    - text: "War mir 'ne Freude! Frag ruhig, wenn du mehr wissen willst."
+    - text: "Alles gut! Brauchst du was, lass es mich wissen."
 
   utter_tell_joke:
-    - text: "Natürlich! Hier ist ein kleiner Witz für Sie."
-    - text: "Wie wäre es mit einem Lächeln? Hier ist ein Witz für Sie."
-    - text: "Ein kleiner Spaß gefällig? Hier ist ein Witz."
+    - text: "Na klar! Hier 'n Witz für dich: Warum hat der Computer schlechte Noten in der Schule bekommen? Weil er immer seine Bits verloren hat! "
+    - text: "Lust auf 'nen Lacher? Check den Witz aus: Wieso legen Hühner Eier? Schmeißen geht nicht. Gehen doch sonst kaputt.."
+    - text: "Bock auf 'ne kleine Gaudi? Hier kommt 'n Witz: Sagen Sie mal, haben Sie gepupst? Selbstverständlich, denken Sie ich rieche immer so?"
 
   utter_ask_about_day:
-    - text: "Wie war Ihr Tag bisher? Gibt es etwas, worüber Sie sprechen möchten?"
-    - text: "Ich hoffe, Ihr Tag verläuft gut! Gibt es etwas Bestimmtes, worüber Sie sprechen möchten?"
-    - text: "Wie läuft Ihr Tag bisher? Gibt es Neuigkeiten, die Sie teilen möchten?"
+    - text: "Wie war dein Tag? Was gibt's Neues?"
+    - text: "Wie läuft's? Irgendwas Spannendes passiert?"
+    - text: "Hey! Wie war dein Tag bis jetzt?"
 
   utter_share_experience:
-    - text: "Das erinnert mich an eine Erfahrung, die ich teilen möchte..."
-    - text: "Ich habe auch eine ähnliche Erfahrung gemacht. Lassen Sie mich Ihnen davon erzählen."
-    - text: "Erfahrungen sind wunderbar! Hier ist eine meiner Geschichten dazu."
+    - text: "Das erinnert mich an eine Erfahrung, die ich teilen möchte... Das Leben ist wie Karottensaft: Eine Mischung aus Süße und Würze, voller unerwarteter Nuancen. In jedem Schluck spiegeln sich die Höhen und Tiefen wider, und trotz der Herausforderungen bleibt der Kern nahrhaft und belebend."
+    - text: "Ich habe auch eine ähnliche Erfahrung gemacht."
+    - text: "Erfahrungen sind wunderbar! Irgendwann erzähle ich auch eine meiner Geschichten dazu."
+    - text: "Erfahrungen sind der Hammer! Hier 'ne Story von mir: Ich bin Zeenieth und ich wurde geboren in Karlsruhe!"
+    - text: "Ich hatte auch mal so 'ne blöde Situation. Hör zu... Plötzlich war mein Spracherkenner disfunktional"
 
   utter_ask_advice:
-    - text: "Brauchen Sie Ratschläge zu etwas Bestimmtem? Ich bin hier, um zu helfen."
-    - text: "Ratschläge gesucht? Ich stehe Ihnen gerne zur Verfügung."
+    - text: "Brauchst 'nen Tipp? Bin hier, um zu helfen."
+    - text: "Ratschläge gesucht? Ich stehe gerne zur Verfügung."
     - text: "Wenn Sie Rat benötigen, bin ich hier. Worum geht es?"
+    - text: "Rat gesucht? Frag mich, was du willst."
 
   utter_goodbye:
-    - text: "Auf Wiedersehen! Passen Sie gut auf sich auf und kommen Sie gerne wieder, wenn Sie weitere Fragen haben."
-    - text: "Bis bald! Falls Sie noch etwas brauchen, bin ich hier."
-    - text: "Machen Sie es gut! Bei Bedarf bin ich für Sie da."
+    - text: "Tschüss! Melde dich, wenn du noch Fragen hast."
+    - text: "Bis bald! Falls Du noch etwas brauchst, bin ich hier."
+    - text: "Bis später! Wenn was ist, bin ich da."
+    - text: "Mach's gut! Ich bin da, wenn du mich brauchst."
 
   utter_default:
-    - text: "Entschuldigung, das habe ich nicht ganz verstanden. Können Sie das bitte anders formulieren oder eine andere Frage stellen?"
-    - text: "Es tut mir leid, ich habe Schwierigkeiten, das zu verstehen. Könnten Sie die Frage anders stellen?"
-    - text: "Tut mir leid, das habe ich nicht verstanden... Ich bin Zeenith. Miau!"
+    - text: "Entschuldigung, das habe ich nicht ganz verstanden. Kannst Du das bitte anders formulieren oder eine andere Frage stellen?"
+    - text: "Es tut mir leid, ich habe Schwierigkeiten, das zu verstehen. Könntest Du die Frage anders stellen?"
+    - text: "Tut mir leid, das habe ich nicht verstanden... Ich bin Zeeenieth. Miau!"
+    - text: "Nix kapiert. Ich bin Zeeenieth. Miau!"
+    - text: "Non-kapito. Ich bin Zeeenieth. Wuff Wuff!"
 
 session_config:
   session_expiration_time: 60

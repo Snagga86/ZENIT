@@ -1,21 +1,38 @@
 version: "3.1"
 nlu:
+- intent: close_distance
+
+- intent: ask_details_about_bot
+  examples: |
+    - Was machst du?
+    - Was kannst du?
+    - Warum gibt es dich?
+    - Warum wurdest du erfunden?
+    - Weshalb bist du hier?
+
+- intent: ask_introduction
+  examples: |
+    - Wer bist du?
+    - Was ist das?
+    - Was bist du?
+
 - intent: greet
   examples: |
     - Hallo
     - Hi
+    - Moin
     - Grüße
     - Guten Tag
-    - Wie geht es Ihnen?
-    - Hallo, wie kann ich Ihnen helfen?
+    - Wie geht es dir?
+    - Hallo, wie kann ich dir helfen?
 
 - intent: tell_story
   examples: |
     - Erzählen Sie mir eine Geschichte
     - Ich möchte eine Geschichte hören
     - Gibt es eine interessante Geschichte?
-    - Können Sie mir eine Anekdote erzählen?
-    - Erzählen Sie mir etwas Interessantes
+    - Kannst Du mir eine Anekdote erzählen?
+    - Erzähl mir etwas Interessantes
 
 - intent: express_gratitude
   examples: |
@@ -23,15 +40,15 @@ nlu:
     - Vielen Dank
     - Ich schätze das
     - Herzlichen Dank
-    - Vielen Dank für Ihre Hilfe
+    - Vielen Dank für deine Hilfe
 
 - intent: tell_joke
   examples: |
-    - Erzählen Sie einen Witz
+    - Erzähl mir einen Witz
     - Ich brauche etwas zum Lachen
-    - Haben Sie einen guten Witz?
-    - Lassen Sie uns etwas Lustiges hören
-    - Können Sie mir einen Witz erzählen?
+    - Hast Du einen guten Witz?
+    - Lass uns etwas Lustiges hören
+    - Kannst du mir einen Witz erzählen?
 
 - intent: ask_about_day
   examples: |
@@ -45,17 +62,17 @@ nlu:
   examples: |
     - Ich möchte meine Erfahrung teilen
     - Ich habe etwas erlebt, was ich besprechen möchte
-    - Lassen Sie uns Erfahrungen austauschen
-    - Kann ich Ihnen von etwas berichten?
-    - Teilen Sie Ihre Erlebnisse mit mir
+    - Lass uns Erfahrungen austauschen
+    - Kann ich dir von etwas berichten?
+    - Teil deine Erlebnisse mit mir
 
 - intent: ask_advice
   examples: |
     - Brauche Ratschläge
-    - Können Sie mir bei etwas helfen?
+    - Kannst du mir bei etwas helfen?
     - Benötige Hilfe bei einer Entscheidung
-    - Welche Tipps haben Sie für mich?
-    - Kann ich Ihre Meinung zu etwas bekommen?
+    - Welche Tipps hast du für mich?
+    - Kann ich deine Meinung zu etwas bekommen?
 
 - intent: goodbye
   examples: |
@@ -74,6 +91,14 @@ nlu:
     - Ich stimme zu
     - Natürlich
     - Das ist richtig
+
+- intent: thanks
+  examples: |
+    - Danke
+    - Vielen Dank
+    - Merci
+    - Danke für die Auskunft
+    - Dankeschön
 
 - intent: deny
   examples: |
