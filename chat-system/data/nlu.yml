@@ -4,17 +4,17 @@ nlu:
 
 - intent: ask_details_about_bot
   examples: |
-    - Was machst du?
-    - Was kannst du?
-    - Warum gibt es dich?
-    - Warum wurdest du erfunden?
-    - Weshalb bist du hier?
+    - Was machst du
+    - Was kannst du
+    - Warum gibt es dich
+    - Warum wurdest du erfunden
+    - Weshalb bist du hier
 
 - intent: ask_introduction
   examples: |
-    - Wer bist du?
-    - Was ist das?
-    - Was bist du?
+    - Wer bist du
+    - Was ist das
+    - Was bist du
 
 - intent: greet
   examples: |
@@ -23,56 +23,67 @@ nlu:
     - Moin
     - Grüße
     - Guten Tag
-    - Wie geht es dir?
-    - Hallo, wie kann ich dir helfen?
+    - Wie geht es dir
+    - Hallo, wie kann ich dir helfen
 
 - intent: tell_story
   examples: |
-    - Erzählen Sie mir eine Geschichte
+    - Erzähl mir eine Geschichte
     - Ich möchte eine Geschichte hören
-    - Gibt es eine interessante Geschichte?
-    - Kannst Du mir eine Anekdote erzählen?
+    - Gibt es eine interessante Geschichte
+    - Kannst Du mir eine Anekdote erzählen
     - Erzähl mir etwas Interessantes
+    - Ich möchte eine nette Geschichte hören
+    - Erzähl doch mal ne nette Geschichte
+    - Bitte erzähl mir etwas
+    - Kannst du etwas berichten
+    - Eine nette Geschichte zu hören wäre super
 
 - intent: express_gratitude
   examples: |
     - Danke
-    - Vielen Dank
     - Ich schätze das
     - Herzlichen Dank
     - Vielen Dank für deine Hilfe
+    - Vielen Dank
+    - Merci
+    - Danke für die Auskunft
+    - Dankeschön
 
 - intent: tell_joke
   examples: |
     - Erzähl mir einen Witz
     - Ich brauche etwas zum Lachen
-    - Hast Du einen guten Witz?
+    - Hast Du einen guten Witz
     - Lass uns etwas Lustiges hören
-    - Kannst du mir einen Witz erzählen?
+    - Kannst du mir einen Witz erzählen
 
 - intent: ask_about_day
   examples: |
-    - Wie war Ihr Tag?
-    - Wie läuft es heute?
-    - Gibt es Neuigkeiten von Ihrem Tag?
-    - Haben Sie einen guten Tag gehabt?
-    - Wie geht es Ihnen heute?
+    - Wie war Ihr Tag
+    - Wie läuft es heute
+    - Gibt es Neuigkeiten von Ihrem Tag
+    - Hast du einen guten Tag gehabt
+    - Wie geht es dir heute
+    - Wie geht es dir so heute
+    - Wie gehts
+    - Hattest du einen guten Tag
 
 - intent: share_experience
   examples: |
     - Ich möchte meine Erfahrung teilen
     - Ich habe etwas erlebt, was ich besprechen möchte
     - Lass uns Erfahrungen austauschen
-    - Kann ich dir von etwas berichten?
+    - Kann ich dir von etwas berichten
     - Teil deine Erlebnisse mit mir
 
 - intent: ask_advice
   examples: |
     - Brauche Ratschläge
-    - Kannst du mir bei etwas helfen?
+    - Kannst du mir bei etwas helfen
     - Benötige Hilfe bei einer Entscheidung
-    - Welche Tipps hast du für mich?
-    - Kann ich deine Meinung zu etwas bekommen?
+    - Welche Tipps hast du für mich
+    - Kann ich deine Meinung zu etwas bekommen
 
 - intent: goodbye
   examples: |
@@ -92,14 +103,6 @@ nlu:
     - Natürlich
     - Das ist richtig
 
-- intent: thanks
-  examples: |
-    - Danke
-    - Vielen Dank
-    - Merci
-    - Danke für die Auskunft
-    - Dankeschön
-
 - intent: deny
   examples: |
     - Nein
@@ -108,11 +111,100 @@ nlu:
     - Das sehe ich anders
     - Stimme nicht zu
 
+- intent: start_squads
+  examples: |
+    - Ich möchte Squats machen
+    - Ich möchte Sport machen
+    - Ich möchte Kniebeugen machen
+    - Zeige mir eine Sportübung bitte
+    - Ich brauche etwas Bewegung
+
+- intent: stop_squads
+  examples: |
+    - Ich möchte aufhören
+    - Kein Bock mehr
+    - Stop die Übung bitte
+    - Das ist genug
+    - Es reicht mir
+
+- intent: dance_show
+  examples: |
+    - Kannst du tanzen
+    - Kannst du dich bewegen
+    - Zeig mir ein Kunststück
+    - Zeig mir einen Tanz
+    - Beweg dich doch mal etwas
+    - Wie wäre es mit einer Show Einlage
+
+- intent: insult
+  examples: |
+    - Du bist blöd
+    - Bist du dumm
+    - Du bist mir zu blöd
+    - Du idiot
+    - Du Arsch
+    - Du ärgerst mich
+    - Du baust nur Mist
+    - Du bist scheisse
+    - Du bist kacke
+
+- intent: pity
+  examples: |
+    - Mir geht es nicht gut
+    - Mir geht es schlecht
+    - Ich bin krank
+    - Es ist etwas schlimmes passiert
+    - Ich bin alleine
+    - Ich bin einsam
+
+- intent: disgust
+  examples: |
+    - Mir ist übel
+    - Ich habe Durchfall
+    - Ich habe mich übergeben
+    - Ich habe eine verfaultes Obst gegessen
+    - Das Essen war schlecht
+    - Ich habe etwas ekeliges gesehen
+    - Ekelerregend
+
+- intent: surprise
+  examples: |
+    - Damit hast du wohl nicht gerechnet
+    - Das hast du nicht gedacht oder
+    - Überraschung
+
+- intent: heat_protection
+  examples: |
+    - Hitzeschutz Maßnahmen an
+    - Es ist wirklich heiss heute
+    - Ouf ich bin richtig am schwitzen
+    - Eine Bomben Hitze
+    - Es ist viel zu warm
+    - Aktiviere Hitzeschutz
+
+- intent: show_emotion_array
+  examples: |
+    - Demonstriere, welche Emotionen du zeigen kannst
+    - Zeig doch mal welche non-verbalen Signal du anzeigen kannst
+    - Aktiviere die Emotionen Demonstration
+    - Welche Bewegungen kannst du zeigen
+    - Welche Animationen sind in deinem Repartoire
+
+- intent: praise
+  examples: |
+    - Du bist toll
+    - Du bist wirklich nett
+    - Ich mag dich
+    - Ich will mit dir Zeit verbringen
+    - Ich bin froh, dass du da bist
+    - Mich freut es mit dir zu reden
+    - Es ist wirklich schön, dass wir uns kennen
+
 - intent: default
   examples: |
-    - Was?
+    - Was
     - Ich bin mir nicht sicher
-    - Kannst du das wiederholen?
+    - Kannst du das wiederholen
     - Ich verstehe nicht
-    - Könnten Sie das bitte klären?
+    - Könnten Sie das bitte klären
     - Entschuldigen Sie, ich habe das nicht verstanden

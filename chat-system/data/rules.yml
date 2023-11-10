@@ -7,6 +7,63 @@ rules:
   - intent: ask_introduction
   - action: utter_self_introduction
 
+- rule: Activate squads
+  steps:
+  - intent: start_squads
+  - action: utter_start_squads
+
+- rule: Activate Heat Protection
+  steps:
+  - intent: heat_protection
+  - action: utter_heat_protection
+
+- rule: Activate Animation Demo
+  steps:
+  - intent: show_emotion_array
+  - action: utter_animation_demo
+
+- rule: Show insult
+  steps:
+  - intent: insult
+  - action: utter_insult
+
+- rule: Show pity
+  steps:
+  - intent: pity
+  - action: utter_pity
+
+- rule: Show surprise
+  steps:
+  - intent: surprise
+  - action: utter_surprise
+
+- rule: Show disgust
+  steps:
+  - intent: disgust
+  - action: utter_disgust
+
+- rule: Show dance
+  steps:
+  - intent: dance_show
+  - action: utter_dance_show
+
+- rule: Show praise
+  steps:
+  - intent: praise
+  - action: utter_love
+# - rule: Deactivate squads
+#   condition:
+#   # Condition that form is active.
+#   - active_loop: squad_form
+#   steps:
+#   # Form is deactivated
+#   - action: squad_form
+#   - active_loop: null
+#   - slot_was_set:
+#     - requested_slot: null
+#   # The actions we want to run when the form is submitted.
+#   - action: utter_stop_squads
+
 # - rule: Say goodbye anytime the user says goodbye
 #   steps:
 #   - intent: goodbye

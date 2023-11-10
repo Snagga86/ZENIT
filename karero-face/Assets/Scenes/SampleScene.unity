@@ -736,8 +736,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   faceActionController: {fileID: 254195710}
   DebugTrace: {fileID: 1512551678}
-  websocketUrl: ws://192.168.123.101:3344
-  httpUrl: http://192.168.123.101:1340/getAudio
+  websocketUrl: ws://192.168.0.101:3344
+  httpUrl: http://192.168.0.101:1340/getAudio
 --- !u!4 &254195708
 Transform:
   m_ObjectHideFlags: 0

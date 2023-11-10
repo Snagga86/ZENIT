@@ -5,23 +5,16 @@ stories:
   steps:
   - intent: close_distance
   - action: utter_self_introduction
-  - intent: ask_details_about_bot
-  - action: utter_self_introduction_details
-  - intent: thanks
-  - action: utter_express_gratitude
-  - intent: goodbye
-  - action: utter_goodbye
 
 - story: Vorstellung2
   steps:
   - intent: ask_introduction
   - action: utter_self_introduction
+
+- story: Vorstellung3
+  steps:
   - intent: ask_details_about_bot
   - action: utter_self_introduction_details
-  - intent: thanks
-  - action: utter_express_gratitude
-  - intent: goodbye
-  - action: utter_goodbye
 
 - story: Grüßen, Geschichte erzählen und sich verabschieden
   steps:
@@ -35,7 +28,7 @@ stories:
 - story: Danke ausdrücken und sich verabschieden
   steps:
   - intent: express_gratitude
-  - action: utter_express_gratitude
+  - action: utter_gratitude
   - intent: goodbye
   - action: utter_goodbye
 
@@ -58,6 +51,16 @@ stories:
   - action: utter_share_experience
   - intent: goodbye
   - action: utter_goodbye
+
+# - story: Benutzer möchste aufhören Squads zu machen
+#   steps:
+#   - intent: start_squads
+#   - action: squad_form
+#   - active_loop: squad_form
+#   - intent: stop_squads
+#   - action: action_deactivate_loop
+#   - active_loop: null
+#   - action: utter_stop_squads
 
 - story: Nicht erkannte Eingabe
   steps:

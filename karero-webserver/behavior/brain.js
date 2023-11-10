@@ -16,6 +16,7 @@ import { PerformanceAnchor } from './states/PerformanceAnchor.js'
 import { Welcoming } from './states/Welcoming.js'
 import { MotionVideoSequence } from './states/MotionVideoSequence.js'
 import { ChatProcessor } from './chat-processor.js';
+import { ChatBase } from './states/ChatBase.js';
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
 2. gestures/postures and Interactor location from Azure Kinetic Space. KARERO Brain is implemented as
@@ -77,9 +78,10 @@ export class Brain{
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const motionVideoSequence = new MotionVideoSequence(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
-            initialState: "off", off, motionVideoSequence, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming
+            initialState: "off", off, motionVideoSequence, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming, chatBase
         };
         
         /* Create the state machine with states required. */

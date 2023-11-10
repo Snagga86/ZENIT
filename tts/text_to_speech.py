@@ -11,7 +11,7 @@ import re
 import librosa
 import os
 
-IP_ADDRESS = "192.168.123.101"
+IP_ADDRESS = "192.168.0.101"
 PORT = 1339
 IS_CONNECTED = False
 
