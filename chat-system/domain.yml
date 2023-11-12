@@ -24,6 +24,8 @@ intents:
   - heat_protection
   - show_emotion_array
   - praise
+  - useless_device
+  - more_functionalities
   - default
 
 responses:
@@ -132,6 +134,12 @@ responses:
   - text: "Das tut mir richtig leid. Ich hoffe es wird bald besser sein."
     image: "{'action': 'sadness_show', 'face': 'none', 'body': 'none'}"
 
+  utter_sorry:
+  - text: "Es tut mir leid, wenn meine vorherige Antwort nicht hilfreich war."
+  - text: "Es tut mir leid, wenn meine Aussage nicht deinen Erwartungen entsprochen hat."
+  - text: "Entschuldigung, falls ich für Verwirrung gesorgt habe."
+  - text: "Entschuldige bitte, wenn ich nicht die gewünschten Informationen geliefert habe."
+
   utter_surprise:
   - text: "Ist ja verrückt!"
     image: "{'action': 'none', 'face': 'surprise', 'body': 'none'}"
@@ -164,6 +172,12 @@ responses:
     - text: "Das ist so lieb von dir das du das sagst."
       image: "{'action': 'none', 'face': 'joy', 'body': 'none'}"
 
+  utter_concrete_usage:
+    - text: "Ich bin zwar ein technisches Gerät und besitze nur künstliche Gefühle, aber ich kann trotzdem nützlich sein. Ich kann keinen Menschen ersetzen aber ich könnte dich zum Beispiel daran erinnern genug zu trinken oder Medikamente regelmäßig einzunehmen. Ausserdem kann ich etwas der Unterhaltung dienen, wenn dir langweilig ist."
+  
+  utter_concrete_usage_level2:
+    - text: "Ich könnte dich auch an Arztbesuche erinnern, eine Telefonverbindung zu deinen Kindern und Freunden herstellen. Auch für das Pflegepersonal könnte ich einen Videoanruf einrichten."
+    
 # entities:
 # - squad_stop
 # slots:

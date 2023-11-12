@@ -195,10 +195,36 @@ nlu:
     - Du bist toll
     - Du bist wirklich nett
     - Ich mag dich
+    - Du bist lustig
+    - Du bereitest mir Vergnügen
     - Ich will mit dir Zeit verbringen
     - Ich bin froh, dass du da bist
     - Mich freut es mit dir zu reden
     - Es ist wirklich schön, dass wir uns kennen
+
+- intent: useless_device
+  examples: |
+    - Was bringt mir das
+    - Was soll das Ding
+    - Und wofür soll ich den benutzen
+    - Damit kann ich nichts anfangen
+    - Was soll ich mit dem Gerät machen
+    - Das will ich nicht benutzen
+    - Aber wie kannst du mir helfen
+    - Was kannst du denn für mich tun
+    - Wofür soll ich dich denn benutzen
+    - Wie willst du mich denn unterstützen
+    - Wie könntest du mich unterstützen
+    - Wie kannst du mir denn konkret helfen
+    - Dann erzähl doch mal was du für mich tun kannst
+
+- intent: more_functionalities
+  examples: |
+    - Das ist ja hilfreich
+    - Das könnte mir etwas bringen
+    - Das könnte mir helfen
+    - Möglicherweise ist das nützlich
+    - Das könnte nützlich für mich sein
 
 - intent: default
   examples: |

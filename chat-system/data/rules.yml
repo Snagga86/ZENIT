@@ -27,6 +27,11 @@ rules:
   - intent: insult
   - action: utter_insult
 
+- rule: Show denial
+  steps:
+  - intent: deny
+  - action: utter_sorry
+
 - rule: Show pity
   steps:
   - intent: pity

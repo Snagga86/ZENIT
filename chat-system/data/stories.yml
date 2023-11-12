@@ -52,6 +52,17 @@ stories:
   - intent: goodbye
   - action: utter_goodbye
 
+- story: Roboter nutzlos finden und eventuell Hilfe annehmen
+  steps:
+  - intent: useless_device
+  - action: utter_concrete_usage
+  - intent: more_functionalities
+  - action: utter_concrete_usage_level2
+  - intent: express_gratitude
+  - action: utter_gratitude
+  - intent: goodbye
+  - action: utter_goodbye
+  
 # - story: Benutzer möchste aufhören Squads zu machen
 #   steps:
 #   - intent: start_squads

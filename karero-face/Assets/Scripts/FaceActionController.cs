@@ -108,8 +108,8 @@ public class FaceActionController : MonoBehaviour
 
 
         this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
-        this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
-        this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
+        //this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
+        //this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
         lastEmotion = displayEmotion;
     }
@@ -239,7 +239,8 @@ public class FaceActionController : MonoBehaviour
             eyeBlendshapeDataStart = startFace.rightEye;
             eyeBlendshapeDataEnd = targetFace.rightEye;
         }
-
+        Debug.Log("set Eye,  " + eyeBlendshapeDataEnd.happy);
+        Debug.Log("set Eye lerp,  " + Mathf.Lerp(eyeBlendshapeDataStart.happy, eyeBlendshapeDataEnd.happy * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(eyeBlendshapeDataStart.full, eyeBlendshapeDataEnd.full * 100 + this.breathPulse, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad, Mathf.Lerp(eyeBlendshapeDataStart.sad, eyeBlendshapeDataEnd.sad * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis, Mathf.Lerp(eyeBlendshapeDataStart.kreis, eyeBlendshapeDataEnd.kreis * 100, t));
@@ -282,90 +283,90 @@ public class FaceEmotion
 
     public Face getEyeShapeValuesByEmotion(string emotion)
     {
-        switch (emotion)
+        switch (emotion.ToLower())
         {
-            case "Annoyance":
+            case "annoyance":
                 return this.anger.annoyance;
                 break;
-            case "Anger":
+            case "anger":
                 return this.anger.anger;
                 break;
-            case "Rage":
+            case "rage":
                 return this.anger.rage;
                 break;
-            case "Vigilance":
+            case "vigilance":
                 return this.anticipation.vigilance;
                 break;
-            case "Anticipation":
+            case "anticipation":
                 return this.anticipation.anticipation;
                 break;
-            case "Interest":
+            case "interest":
                 return this.anticipation.interest;
                 break;
-            case "Serenety":
+            case "serenety":
                 return this.joy.serenety;
                 break;
-            case "Joy":
+            case "joy":
                 return this.joy.joy;
                 break;
-            case "Ecstasy":
+            case "ecstasy":
                 return this.joy.ecstasy;
                 break;
-            case "Accepptance":
+            case "accepptance":
                 return this.trust.acceptance;
                 break;
-            case "Trust":
+            case "trust":
                 return this.trust.trust;
                 break;
-            case "Admiration":
+            case "admiration":
                 return this.trust.admiration;
                 break;
-            case "Apprehension":
+            case "apprehension":
                 return this.fear.apprehension;
                 break;
-            case "Fear":
+            case "fear":
                 return this.fear.fear;
                 break;
-            case "Terror":
+            case "terror":
                 return this.fear.terror;
                 break;
-            case "Distraction":
+            case "distraction":
                 return this.surprise.distraction;
                 break;
-            case "Surprise":
+            case "surprise":
                 return this.surprise.surprise;
                 break;
-            case "Amazement":
+            case "amazement":
                 return this.surprise.amazement;
                 break;
-            case "Pensiveness":
+            case "pensiveness":
                 return this.sadness.pensiveness;
                 break;
-            case "Sadness":
+            case "sadness":
                 return this.sadness.sadness;
                 break;
-            case "Grief":
+            case "grief":
                 return this.sadness.grief;
                 break;
-            case "Boredom":
+            case "boredom":
                 return this.disgust.boredom;
                 break;
-            case "Disgust":
+            case "disgust":
                 return this.disgust.disgust;
                 break;
-            case "Loathing":
+            case "loathing":
                 return this.disgust.loathing;
                 break;
-            case "Contempt":
+            case "contempt":
                 return this.contempt.contempt;
                 break;
-            case "Neutral":
+            case "neutral":
                 return this.neutral.neutral;
                 break;
-            case "Idle1":
+            case "idle1":
                 return this.neutral.idle1;
                 break;
-            case "Idle2":
+            case "idle2":
                 return this.neutral.idle2;
                 break;
             default:
@@ -389,91 +390,91 @@ public class FaceEmotion
     {
         Color color = new Color(255f, 255f, 255f);
 
-        switch (emotion)
+        switch (emotion.ToLower())
         {
 
-            case "Annoyance":
+            case "annoyance":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Anger":
+            case "anger":
                 color = new Color(255f, 0f, 0f);
                 break;
-            case "Rage":
+            case "rage":
                 color = new Color(255f, 0f, 0f);
                 break;
-            case "Vigilance":
+            case "vigilance":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Anticipation":
+            case "anticipation":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Interest":
+            case "interest":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Serenety":
+            case "serenety":
                 color = new Color(255f, 153f, 255f);
                 break;
-            case "Joy":
+            case "joy":
                 color = new Color(255f, 153f, 255f);
                 break;
-            case "Ecstasy":
+            case "ecstasy":
                 color = new Color(255f, 153f, 255f);
                 break;
-            case "Accepptance":
+            case "accepptance":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Trust":
+            case "trust":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Admiration":
+            case "admiration":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Apprehension":
+            case "apprehension":
                 color = new Color(0f, 0f, 0f);
                 break;
-            case "Fear":
+            case "fear":
                 color = new Color(0f, 0f, 0f);
                 break;
-            case "Terror":
+            case "terror":
                 color = new Color(0f, 0f, 0f);
                 break;
-            case "Distraction":
+            case "distraction":
                 color = new Color(69f, 166f, 159f);
                 break;
-            case "Surprise":
+            case "surprise":
                 color = new Color(69f, 166f, 159f);
                 break;
-            case "Amazement":
+            case "amazement":
                 color = new Color(69f, 166f, 159f);
                 break;
-            case "Pensiveness":
+            case "pensiveness":
                 color = new Color(75f, 75f, 75f);
                 break;
-            case "Sadness":
+            case "sadness":
                 color = new Color(75f, 75f, 75f);
                 break;
-            case "Grief":
+            case "grief":
                 color = new Color(75f, 75f, 75f);
                 break;
-            case "Boredom":
+            case "boredom":
                 color = new Color(120f, 140f, 40f);
                 break;
-            case "Disgust":
+            case "disgust":
                 color = new Color(120f, 140f, 40f);
                 break;
-            case "Loathing":
+            case "loathing":
                 color = new Color(120f, 140f, 40f);
                 break;
-            case "Contempt":
+            case "contempt":
                 color = new Color(140f, 140f, 140f);
                 break;
-            case "Neutral":
+            case "neutral":
                 color = new Color(62f, 140f, 59f);
                 break;
-            case "Idle1":
+            case "idle1":
                 color = new Color(255f, 255f, 0f);
                 break;
-            case "Idle2":
+            case "idle2":
                 color = new Color(255f, 255f, 0f);
                 break;
             default:

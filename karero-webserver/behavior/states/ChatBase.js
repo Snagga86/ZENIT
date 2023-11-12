@@ -15,6 +15,8 @@ export class ChatBase extends StateWrap{
 
         this.chatProcessor = chatProcessor;
 
+        this.nextNonverbalSignals = null;
+
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
         this.state.actions.onExit = this.exitFunction.bind(this);
@@ -25,10 +27,7 @@ export class ChatBase extends StateWrap{
             console.log('transition action for "callToAction" in "welcoming" state')
         }));
 
-        this.timeout;
-        this.toTime;
-
-        this.stateTimeout;
+        this.chatDuration = 0;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -46,14 +45,10 @@ export class ChatBase extends StateWrap{
 
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, (payload) => {
             console.log("res:");
-            console.log(payload);
-            
+
             if(payload.length > 1){
-                var result = JSON.parse(payload[1].image.toString().replace(/'/g, '"'));
-                //var customAction = payload[1].image.split(',');
-                console.log(result.action);
-                console.log(result.face);
-                console.log(result.body);
+                this.nextNonverbalSignals = JSON.parse(payload[1].image.toString().replace(/'/g, '"'));
+
             }
             
             var payloadTTS = {
@@ -62,6 +57,16 @@ export class ChatBase extends StateWrap{
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
         });
+
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, (duration) => {
+            if(this.nextNonverbalSignals != null){
+                this.chatDuration = duration * 1000;
+                this.setNonverbalSignals(this.nextNonverbalSignals);
+                console.log(this.nextNonverbalSignals);
+                console.log(this.nextNonverbalSignals);
+                console.log(this.nextNonverbalSignals);
+            }
+        });
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -69,7 +74,6 @@ export class ChatBase extends StateWrap{
 
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        clearTimeout(this.timeout);
         //this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
     }
 
@@ -83,21 +87,32 @@ export class ChatBase extends StateWrap{
         }
     }
 
-    nvcAction(action){
-
+    setNonverbalSignals(action){
+        console.log(action.face)
         var payloadFace = {
             "mode" : "setEmotion",
-            "data" : action[0]
+            "data" : action.face
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
-        
-        if(action.length > 1){
+
+        this.chatEmotionTimeout = setTimeout(() => {
+            console.log(this.chatDuration);
+            var payloadFace = {
+                "mode" : "setEmotion",
+                "data" : "neutral"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+
+            clearTimeout(this.chatEmotionTimeout);
+        }, this.chatDuration);
+
+        /*if(action.length > 1){
             var payloadBody = {
                 "mode" : "setMode",
                 "activity" : action[1]
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payloadBody)
-        }  
+        }*/
     }
 
     followHead(){
