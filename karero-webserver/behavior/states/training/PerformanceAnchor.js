@@ -1,8 +1,8 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
-import { Brain } from '../brain.js';
+import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { Brain } from '../../brain.js';
 import keypress from 'keypress';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
+import logger from '../../../tools/logger.js';
+import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class PerformanceAnchor extends StateWrap{

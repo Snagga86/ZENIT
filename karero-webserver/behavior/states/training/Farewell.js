@@ -1,14 +1,14 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
-import { Brain } from '../brain.js';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
+import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { Brain } from '../../brain.js';
+import logger from '../../../tools/logger.js';
+import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class BriefingForExercise extends StateWrap{
+export class Farewell extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("briefingForExercise", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("farewell", emotionProcessor, gesturePostureProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -16,68 +16,46 @@ export class BriefingForExercise extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("performanceAnchor", "performanceAnchor", () => {
-            console.log('transition action for "briefingForExercise" in "performanceAnchor" state')
-        }));
-        this.state.transitions.push(new Transition("farewell", "farewell", () => {
-            console.log('transition action for "BriefingForExercise" in "farewell" state')
+        this.state.transitions.push(new Transition("callToAction", "callToAction", () => {
         }));
 
         this.timeout;
-        this.videoTimeout;
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        logger(globalStore.filename, "StateChange", "BriefingForExercise");
+        logger(globalStore.filename, "StateChange", "Farewell");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
+        var payload = {
+            "mode" : "setMode",
+            "activity" : "followHead"
+        }
+
+        /* Send the activity change to the KARERO brain. */
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
 
         var facePayload = {
             "mode" : "setSound",
             "data" : "nameAndPlay",
-            "extra" : "briefing-exercises"
+            "extra" : "farewell"
         }
 
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 
         var facePayload = {
-            "mode" : "setVideo",
-            "data" : "showAndPlay",
-            "extra" : "squads"
+            "mode" : "setEmotion",
+            "data" : "Idle1"
         }
-
-        /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
-
-        this.timeout = setTimeout(() => {
-            var facePayload = {
-                "mode" : "setVideo",
-                "data" : "stopAndHide"
-            }
-    
-            /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "performanceAnchor");
-        }, 15000);
-
-        this.videoTimeout = setTimeout(() => {
-            var facePayload = {
-                "mode" : "setVideo",
-                "data" : "stopAndHide"
-            }
-    
-            /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
-        }, 10000);
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -86,23 +64,15 @@ export class BriefingForExercise extends StateWrap{
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         clearTimeout(this.timeout);
-        clearTimeout(this.videoTimeout);
     }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
-
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(distance > globalStore.welcomeDistance){
-            var facePayload = {
-                "mode" : "setVideo",
-                "data" : "stopAndHide"
-            }
-    
-            /* Send the activity change to the KARERO brain. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload)
+
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
         }
     }
 }

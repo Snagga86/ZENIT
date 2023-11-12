@@ -1,6 +1,6 @@
 import http from "http"
 import EventEmitter from 'events';
-import { Brain } from './brain.js';
+import { Brain } from '../brain.js';
 
 export class ChatProcessor {
 

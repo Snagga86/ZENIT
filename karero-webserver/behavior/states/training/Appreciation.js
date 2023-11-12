@@ -1,15 +1,14 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
-import { Brain } from '../brain.js';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
-import shortid from 'shortid';
+import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { Brain } from '../../brain.js';
+import logger from '../../../tools/logger.js';
+import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Welcoming extends StateWrap{
+export class Appreciation extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("welcoming", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("appreciation", emotionProcessor, gesturePostureProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -17,11 +16,8 @@ export class Welcoming extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("generalBriefing", "generalBriefing", () => {
-            console.log('transition action for "Welcoming" in "generalBriefing" state')
-        }));
         this.state.transitions.push(new Transition("farewell", "farewell", () => {
-            console.log('transition action for "Welcoming" in "farewell" state')
+            console.log('transition action for "appreciation" in "farewell" state');
         }));
 
         this.timeout;
@@ -30,26 +26,7 @@ export class Welcoming extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        var newParticipantID = shortid.generate();
-        globalStore.countVisits++;
-        console.log(globalStore.countVisits);
-        globalStore.filename = newParticipantID;
-        console.log(globalStore.communicationMode);
-        if(globalStore.communicationMode == "random"){
-            globalStore.currentCommunicationLevel = globalStore.communicationLevel[Math.floor(Math.random() * 3)];
-            console.log(globalStore.currentCommunicationLevel);
-        }
-        else if(globalStore.communicationMode == "order"){
-            globalStore.currentCommunicationLevel = globalStore.communicationLevel[globalStore.countVisits%3];
-            console.log(globalStore.currentCommunicationLevel);
-        }
-        else{
-            globalStore.currentCommunicationLevel = globalStore.communicationMode;
-        }
-
-        logger(globalStore.filename, "BehaviorMode", globalStore.currentCommunicationLevel);
-        logger(globalStore.filename, "StateChange", "Welcoming");
-
+        logger(globalStore.filename, "StateChange", "Appreciation");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
@@ -59,12 +36,12 @@ export class Welcoming extends StateWrap{
         }
 
         /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
 
         var facePayload = {
             "mode" : "setSound",
             "data" : "nameAndPlay",
-            "extra" : "greeting"
+            "extra" : "appreciation"
         }
 
         /* Send the activity change to the KARERO brain. */
@@ -72,7 +49,7 @@ export class Welcoming extends StateWrap{
 
         var facePayload = {
             "mode" : "setEmotion",
-            "data" : "Serenety"
+            "data" : "Joy"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 
@@ -82,8 +59,8 @@ export class Welcoming extends StateWrap{
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
         this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "generalBriefing");
-        }, 11000);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
+        }, 7500);
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -96,6 +73,7 @@ export class Welcoming extends StateWrap{
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
+
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(distance > globalStore.welcomeDistance){
 

@@ -1,21 +1,20 @@
-import { EmotionProcessor } from './emotion-processor.js'
-import { SpeechProcessor } from './speech-processor.js'
-import { GesturePostureProcessor } from './gesture-posture-processor.js'
+import { EmotionProcessor } from './processors/emotion-processor.js'
+import { SpeechProcessor } from './processors/speech-processor.js'
+import { GesturePostureProcessor } from './processors/gesture-posture-processor.js'
 import EventEmitter from 'events';
 import { Off } from './states/Off.js'
 import { Follow } from './states/Follow.js'
 import { Joy } from './states/emotions/Joy.js'
 import { Anger } from './states/emotions/Anger.js'
-import { Appreciation } from './states/Appreciation.js'
-import { BriefingForExercise } from './states/BriefingForExercise.js'
+import { Appreciation } from './states/training/Appreciation.js'
+import { BriefingForExercise } from './states/training/BriefingForExercise.js'
 import { CallToAction } from './states/CallToAction.js'
-import { Farewell } from './states/Farewell.js'
-import { ExerciseEntry } from './states/ExerciseEntry.js'
-import { IntermediateAward } from './states/IntermediateAward.js'
-import { PerformanceAnchor } from './states/PerformanceAnchor.js'
-import { Welcoming } from './states/Welcoming.js'
-import { EmotionCascade } from './states/EmotionCascade.js'
-import { ChatProcessor } from './chat-processor.js';
+import { Farewell } from './states/training/Farewell.js'
+import { ExerciseEntry } from './states/training/ExerciseEntry.js'
+import { IntermediateAward } from './states/training/IntermediateAward.js'
+import { PerformanceAnchor } from './states/training/PerformanceAnchor.js'
+import { EmotionCascade } from './states/emotions/EmotionCascade.js'
+import { ChatProcessor } from './processors/chat-processor.js';
 import { ChatBase } from './states/ChatBase.js';
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
@@ -76,12 +75,11 @@ export class Brain{
         const exerciseEntry = new ExerciseEntry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
-            initialState: "off", off, emotionCascade, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, welcoming, chatBase
+            initialState: "off", off, emotionCascade, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase
         };
         
         /* Create the state machine with states required. */

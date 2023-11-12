@@ -1,8 +1,8 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
-import { Brain } from '../brain.js';
+import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { Brain } from '../../brain.js';
 import keypress from 'keypress';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
+import logger from '../../../tools/logger.js';
+import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class ExerciseEntry extends StateWrap{
@@ -48,17 +48,12 @@ export class ExerciseEntry extends StateWrap{
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureDetection.bind(this));
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
 
         this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
         }, 9000);
-
-        
-        /*process.stdin.on('keypress', this.keyPressHandler);
-        process.stdin.resume();*/
-        
     }
 
     /*keyPressHandler = (ch, key) =>{
@@ -85,21 +80,9 @@ export class ExerciseEntry extends StateWrap{
         //process.stdin.removeListener('keypress', this.keyPressHandler);
 
         // Stop listening for input
-        process.stdin.pause();
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
+        //process.stdin.pause();
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         clearTimeout(this.timeout);
-    }
-
-    /* Interpretion function of received data coming from Azure Kinectic Space. */
-    gesturePostureDetection(receivedGesture){
-
-        /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(receivedGesture == "clapHands"){
-
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExcercise");
-        }
     }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
