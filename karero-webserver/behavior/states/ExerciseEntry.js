@@ -5,11 +5,11 @@ import logger from '../../tools/logger.js';
 import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class GeneralBriefing extends StateWrap{
+export class ExerciseEntry extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("generalBriefing", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("exerciseEntry", emotionProcessor, gesturePostureProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);

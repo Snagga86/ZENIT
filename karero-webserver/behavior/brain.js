@@ -10,11 +10,11 @@ import { Appreciation } from './states/Appreciation.js'
 import { BriefingForExercise } from './states/BriefingForExercise.js'
 import { CallToAction } from './states/CallToAction.js'
 import { Farewell } from './states/Farewell.js'
-import { GeneralBriefing } from './states/GeneralBriefing.js'
+import { ExerciseEntry } from './states/ExerciseEntry.js'
 import { IntermediateAward } from './states/IntermediateAward.js'
 import { PerformanceAnchor } from './states/PerformanceAnchor.js'
 import { Welcoming } from './states/Welcoming.js'
-import { MotionVideoSequence } from './states/MotionVideoSequence.js'
+import { EmotionCascade } from './states/EmotionCascade.js'
 import { ChatProcessor } from './chat-processor.js';
 import { ChatBase } from './states/ChatBase.js';
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
@@ -73,15 +73,15 @@ export class Brain{
         const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const callToAction = new CallToAction(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const farewell = new Farewell(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const generalBriefing = new GeneralBriefing(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const exerciseEntry = new ExerciseEntry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const welcoming = new Welcoming(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const motionVideoSequence = new MotionVideoSequence(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
-            initialState: "off", off, motionVideoSequence, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, generalBriefing, intermediateAward, performanceAnchor, welcoming, chatBase
+            initialState: "off", off, emotionCascade, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, welcoming, chatBase
         };
         
         /* Create the state machine with states required. */

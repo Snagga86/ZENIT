@@ -7,11 +7,11 @@ import readline from 'readline';
 
 
 /* Robot state class defining the robot behavior within this state */
-export class MotionVideoSequence extends StateWrap{
+export class EmotionCascade extends StateWrap{
     constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("motionVideoSequence", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("emotionCascade", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         this.emotionStates = ['thirsty','neutral','hot','contempt','joy','anger','disgust','sadness','surprise','fear','neutral'];
         this.mode = ['only_face',/*'only_body',/'face_and_body'*/];
