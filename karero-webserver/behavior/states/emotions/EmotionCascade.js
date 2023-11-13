@@ -13,13 +13,12 @@ export class EmotionCascade extends StateWrap{
         /* Call the super constructor and set the identification name for the state class */
         super("emotionCascade", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
-        this.emotionStates = ['thirsty','neutral','hot','contempt','joy','anger','disgust','sadness','surprise','fear','neutral'];
-        this.mode = ['only_face',/*'only_body',/'face_and_body'*/];
-
-        this.chatProcessor = chatProcessor;
+        this.emotionStates = ['neutral','contempt','joy','anger','disgust','sadness','surprise','fear','neutral','thirsty','hot'];
 
         this.currentEmotion = 0;
         this.currentMode = 0;
+
+        this.breakWords = ["stop", "stoppen", "aufhören", "chatten","unterhalten"]
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -27,53 +26,25 @@ export class EmotionCascade extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("welcoming", "welcoming", () => {
-            console.log('transition action for "callToAction" in "welcoming" state')
+        this.state.transitions.push(new Transition("callToAction", "callToAction", () => {
+            console.log('transition action for "emotionCascade" in "callToAction" state')
+        }));
+        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
+            console.log('transition action for "emotionCascade" in "chatBase" state')
         }));
 
-        this.timeout;
-        this.toTime;
-
-        this.stateTimeout;
+        this.waitForNextAnimationTimeout;
+        this.currentAnimationDuration;
+        this.changeAnimationTimeout;
     }
-
-
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-
-        var payload = {
-            "mode" : "setEmotion",
-            "data" : "Idle1"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload); 
-        //this.followHead();
-
-        this.speechProcessor.speechEvent.on('FinalResult', (result) => {
-            console.log("tts result:" + result);
-            if(result.length > 1){
-                this.chatProcessor.sendMessage(result);
-            }
-            
-        });
-
-        this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, (payload) => {
-            console.log("res:");
-            console.log(payload);
-            console.log(payload[0].text);
-            if(payload.length > 1){
-                console.log(payload[1].image);
-            }
-            
-            var payloadTTS = {
-                "mode" : "tts",
-                "text" : payload[0].text
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
-        });
-
+        this.currentEmotion = 0;
+        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         
-
+        this.followHead();
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -81,17 +52,39 @@ export class EmotionCascade extends StateWrap{
 
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        clearTimeout(this.timeout);
-        //this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
+        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
+        clearTimeout(this.waitForNextAnimationTimeout);
+        clearTimeout(this.changeAnimationTimeout);
     }
+
+    finalResultHandler(result){
+        console.log("tts result:" + result);
+
+        if(this.containsWords(result, this.breakWords)){
+            var payloadTTS = {
+                "mode" : "tts",
+                "text" : "Alles klar. Kein Problem!"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
+        }
+    }
+
+    containsWords(str, wordsArray) {
+        // Create a regular expression pattern from the array of words
+        const pattern = new RegExp(wordsArray.join('|'), 'i');
+      
+        // Test if the string contains any of the words
+        return pattern.test(str);
+      }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
         /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance <= globalStore.welcomeDistance){
+        if(distance >= globalStore.welcomeDistance){
 
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "welcoming");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
         }
     }
 
@@ -104,15 +97,15 @@ export class EmotionCascade extends StateWrap{
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
 
-        this.timeout = setTimeout(() => {
+        this.waitForNextAnimationTimeout = setTimeout(() => {
             this.followHead();
         }, 4500);
     }
 
     followHead(){
         console.log("next follow head");
-        clearTimeout(this.stateTimeout);
-        clearTimeout(this.timeout);
+        clearTimeout(this.changeAnimationTimeout);
+        clearTimeout(this.waitForNextAnimationTimeout);
 
         var payload = {
             "mode" : "setMode",
@@ -128,22 +121,21 @@ export class EmotionCascade extends StateWrap{
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
 
-        this.timeout = setTimeout(() => {
+        this.waitForNextAnimationTimeout = setTimeout(() => {
             this.nextEmotion();
-        }, 8000);
+        }, 5000);
     }
 
     nextEmotion(){
         console.log("next iteration...");
-        console.log("Mode: " + this.mode[this.currentMode]);
         console.log("Emotion: " + this.emotionStates[this.currentEmotion]);
-        clearTimeout(this.stateTimeout);
-        clearTimeout(this.timeout);
+        clearTimeout(this.changeAnimationTimeout);
+        clearTimeout(this.waitForNextAnimationTimeout);
         var payloadBody = {
             "mode" : "setMode",
             "activity" : this.emotionStates[this.currentEmotion]
         }
-        if(this.currentMode != 0)this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payloadBody)
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payloadBody)
 
         var curEmo = this.emotionStates[this.currentEmotion];
         if(curEmo == "fear"){
@@ -153,54 +145,51 @@ export class EmotionCascade extends StateWrap{
             "mode" : "setEmotion",
             "data" : curEmo[0].toUpperCase() + curEmo.slice(1)
         }
-        if(this.currentMode != 1)this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
         console.log(this.currentEmotion);
 
         if(this.emotionStates[this.currentEmotion] == 'neutral'){
-            this.toTime = 3000;
+            this.currentAnimationDuration = 3000;
         }
         if(this.emotionStates[this.currentEmotion] == 'joy'){
-            this.toTime = 6000;
+            this.currentAnimationDuration = 6000;
         }
         if(this.emotionStates[this.currentEmotion] == 'anger'){
-            this.toTime = 6500;
+            this.currentAnimationDuration = 6500;
         }
         if(this.emotionStates[this.currentEmotion] == 'disgust'){
-            this.toTime = 5000;
+            this.currentAnimationDuration = 5000;
         }
         if(this.emotionStates[this.currentEmotion] == 'sadness'){
-            this.toTime = 10000;
+            this.currentAnimationDuration = 10000;
         }
         if(this.emotionStates[this.currentEmotion] == 'surprise'){
-            this.toTime = 6000;
+            this.currentAnimationDuration = 6000;
         }
         if(this.emotionStates[this.currentEmotion] == 'fear'){
-            this.toTime = 5000;
+            this.currentAnimationDuration = 5000;
         }
         if(this.emotionStates[this.currentEmotion] == 'contempt'){
-            this.toTime = 5000;
+            this.currentAnimationDuration = 5000;
         }
         if(this.emotionStates[this.currentEmotion] == 'hot'){
-            this.toTime = 15000;
+            this.currentAnimationDuration = 15000;
         }
         if(this.emotionStates[this.currentEmotion] == 'thirsty'){
-            this.toTime = 25000;
+            this.currentAnimationDuration = 25000;
         }
         
-        console.log(this.toTime);
+        console.log(this.currentAnimationDuration);
 
-        this.stateTimeout = setTimeout(() => {
+        this.changeAnimationTimeout = setTimeout(() => {
             this.followHead();
-        }, this.toTime);
+        }, this.currentAnimationDuration);
 
         this.currentEmotion++;
         if(this.currentEmotion >= this.emotionStates.length - 1){
             this.currentMode++;
             console.log(this.currentEmotion);
             this.currentEmotion = 0;
-            if(this.currentMode >= this.mode.length){
-                this.currentMode = 0;
-            }
         }
     }
 }

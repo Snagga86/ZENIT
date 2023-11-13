@@ -33,17 +33,36 @@ export class ChatBase extends StateWrap{
             console.log('transition action for "ChatBase" in "emotionCascade" state')
         }));
 
+        /* Temporary transitions to animation demos and speech. */
+        this.state.transitions.push(new Transition("angerShow", "angerShow", () => {
+            console.log('transition action for "ChatBase" in "angerShow" state')
+        }));
+        this.state.transitions.push(new Transition("sadnessShow", "sadnessShow", () => {
+            console.log('transition action for "ChatBase" in "sadnessShow" state')
+        }));
+        this.state.transitions.push(new Transition("contemptShow", "contemptShow", () => {
+            console.log('transition action for "ChatBase" in "contemptShow" state')
+        }));
+        this.state.transitions.push(new Transition("danceShow", "danceShow", () => {
+            console.log('transition action for "ChatBase" in "danceShow" state')
+        }));
+        this.state.transitions.push(new Transition("disgustShow", "disgustShow", () => {
+            console.log('transition action for "ChatBase" in "disgustShow" state')
+        }));
+        
+
         this.chatDuration = 0;
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        //this.followHead();
+        this.followHead();
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
+
     }
 
     /* Exit function is executed whenever the state is left. */
@@ -74,16 +93,24 @@ export class ChatBase extends StateWrap{
     }
 
     RASAAnswerHandler(payload){
-            console.log("res:");
-            if(payload.length > 1){
-                this.nextNonverbalSignals = JSON.parse(payload[1].image.toString().replace(/'/g, '"'));
+        console.log("res:");      
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : payload[0].text
+        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+
+        if(payload.length > 1){
+            this.nextNonverbalSignals = JSON.parse(payload[1].image.toString().replace(/'/g, '"'));
+                    
+            if(this.nextNonverbalSignals.action != "none"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, this.nextNonverbalSignals.action);
             }
-            
-            var payloadTTS = {
-                "mode" : "tts",
-                "text" : payload[0].text
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        }
+        else{
+            this.nextNonverbalSignals = null;
+        }
     }
 
     closestBodyRecognition(distance){
@@ -136,43 +163,5 @@ export class ChatBase extends StateWrap{
             "data" : "Neutral"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
-    }
-
-    getRoboAnimationTime(emotion){
-        var timeOutRoboAnimation = 0;
-        if(emotion == 'neutral'){
-            this.timeOutRoboAnimation = 3000;
-        }
-        if(emotion == 'joy'){
-            this.timeOutRoboAnimation = 6000;
-        }
-        if(emotion == 'anger'){
-            this.timeOutRoboAnimation = 6500;
-        }
-        if(emotion == 'disgust'){
-            this.timeOutRoboAnimation = 5000;
-        }
-        if(emotion == 'sadness'){
-            this.timeOutRoboAnimation = 10000;
-        }
-        if(emotion== 'surprise'){
-            this.timeOutRoboAnimation = 6000;
-        }
-        if(emotion == 'fear'){
-            this.timeOutRoboAnimation = 5000;
-        }
-        if(emotion == 'contempt'){
-            this.timeOutRoboAnimation = 5000;
-        }
-        if(emotion == 'hot'){
-            this.timeOutRoboAnimation = 15000;
-        }
-        if(emotion == 'thirsty'){
-            this.timeOutRoboAnimation = 25000;
-        }
-        else{
-            this.timeOutRoboAnimation = 2000;
-        }
-        return timeOutRoboAnimation;
     }
 }

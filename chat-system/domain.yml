@@ -100,7 +100,7 @@ responses:
 
   utter_start_squads:
     - text: "Auf gehts! Lass uns zusammen trainieren... Wenn du aufhören möchtest mit dem Training sag mir bescheid!"
-      image: "{'action': 'exercise_start', 'face': 'none', 'body': 'none'}"
+      image: "{'action': 'exerciseEntry', 'face': 'none', 'body': 'none'}"
 
   utter_stop_squads:
     - text: "Das Training wird beendet! Toll, dass du dabei warst! Du bist einfach sehr sehr geil!"
@@ -110,29 +110,29 @@ responses:
 
   utter_disgust:
   - text: "Ieeeh! Das ist ja fies!"
-    image: "{'action': 'disgust_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'disgustShow', 'face': 'none', 'body': 'none'}"
   - text: "Baaah! Das war wohl richtig fies!"
-    image: "{'action': 'disgust_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'disgustShow', 'face': 'none', 'body': 'none'}"
   - text: "Igitt!"
-    image: "{'action': 'disgust_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'disgustShow', 'face': 'none', 'body': 'none'}"
   - text: "Davon will ich nichts wissen!"
-    image: "{'action': 'disgust_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'disgustShow', 'face': 'none', 'body': 'none'}"
 
   utter_dance_show:
   - text: "Dies ist der Robi-Tanz! Lalala!"
-    image: "{'action': 'dance_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'danceShow', 'face': 'none', 'body': 'none'}"
   - text: "Ich mache manchmal Gymnastik um meine Servomotoren zu schmieren."
-    image: "{'action': 'dance_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'danceShow', 'face': 'none', 'body': 'none'}"
   - text: "Bewegung ist Leben!"
-    image: "{'action': 'dance_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'danceShow', 'face': 'none', 'body': 'none'}"
 
   utter_pity:
   - text: "Das tut mir echt leid. Richtig blöd!"
-    image: "{'action': 'sadness_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'sadnessShow', 'face': 'none', 'body': 'none'}"
   - text: "Ui, das ist aber richtig traurig."
-    image: "{'action': 'sadness_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'sadnessShow', 'face': 'none', 'body': 'none'}"
   - text: "Das tut mir richtig leid. Ich hoffe es wird bald besser sein."
-    image: "{'action': 'sadness_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'sadnessShow', 'face': 'none', 'body': 'none'}"
 
   utter_sorry:
   - text: "Es tut mir leid, wenn meine vorherige Antwort nicht hilfreich war."
@@ -150,19 +150,19 @@ responses:
 
   utter_insult:
   - text: "Ne, so nicht mein Freund!"
-    image: "{'action': 'anger_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'angerShow', 'face': 'none', 'body': 'none'}"
   - text: "Echt jetzt? Dein Ernst?"
-    image: "{'action': 'contempt_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'contemptShow', 'face': 'none', 'body': 'none'}"
   - text: "Schade, dass du jetzt sauer auf mich bist."
-    image: "{'action': 'sadness_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'sadnessShow', 'face': 'none', 'body': 'none'}"
 
   utter_heat_protection:
   - text: "Hitzeschutzmodus aktiviert!"
-    image: "{'action': 'heat_protection', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'heatProtectionEntry', 'face': 'none', 'body': 'none'}"
 
   utter_animation_demo:
   - text: "Demomodus für Animationen aktiviert!"
-    image: "{'action': 'animation_show', 'face': 'none', 'body': 'none'}"
+    image: "{'action': 'emotionCascade', 'face': 'none', 'body': 'none'}"
 
   utter_love:
     - text: "Danke! Du bist wirklich so lieb zu mir."

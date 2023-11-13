@@ -9,8 +9,8 @@ export class Off extends StateWrap{
         
         this.state.actions.onEnter = this.enterFunction.bind(this);
 
-        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
-            console.log('transition action for "off" in "chatBase" state')
+        this.state.transitions.push(new Transition("callToAction", "callToAction", () => {
+            console.log('transition action for "off" in "callToAction" state')
         }));
         
         this.state.transitions.push(new Transition("off", "off", () => {
@@ -21,8 +21,8 @@ export class Off extends StateWrap{
     enterFunction(){
         this.stateChangeInitiated = false;
         this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");
-        }, 5000);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
+        }, 4000);
         
     }
 

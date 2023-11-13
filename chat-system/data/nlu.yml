@@ -225,6 +225,7 @@ nlu:
     - Das könnte mir helfen
     - Möglicherweise ist das nützlich
     - Das könnte nützlich für mich sein
+    - Was kannst du sonst noch
 
 - intent: default
   examples: |

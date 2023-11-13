@@ -5,14 +5,16 @@ import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class CallToAction extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("callToAction", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("callToAction", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
         this.state.actions.onExit = this.exitFunction.bind(this);
+
+        this.chatProcessor = chatProcessor;
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
@@ -26,7 +28,6 @@ export class CallToAction extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        logger(globalStore.filename, "StateChange", "CallToAction");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
@@ -37,7 +38,7 @@ export class CallToAction extends StateWrap{
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
         var payload = {
             "mode" : "setEmotion",
-            "data" : "Idle1"
+            "data" : "neutral"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
         this.followHead();
@@ -46,6 +47,7 @@ export class CallToAction extends StateWrap{
     /* Exit function is executed whenever the state is left. */
     exitFunction(){
 
+        this.chatProcessor.sendMessage("/greet");
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         clearTimeout(this.timeout);
@@ -58,7 +60,7 @@ export class CallToAction extends StateWrap{
         if(distance <= globalStore.welcomeDistance){
 
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "welcoming");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");
         }
     }
 

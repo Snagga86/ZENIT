@@ -16,6 +16,13 @@ import { PerformanceAnchor } from './states/training/PerformanceAnchor.js'
 import { EmotionCascade } from './states/emotions/EmotionCascade.js'
 import { ChatProcessor } from './processors/chat-processor.js';
 import { ChatBase } from './states/ChatBase.js';
+
+import { DisgustShow } from './states/DisgustShow.js'
+import { ContemptShow } from './states/ContemptShow.js'
+import { DanceShow } from './states/DanceShow.js'
+import { SadnessShow } from './states/SadnessShow.js'
+import { AngerShow } from './states/AngerShow.js';
+
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
 2. gestures/postures and Interactor location from Azure Kinetic Space. KARERO Brain is implemented as
@@ -70,7 +77,7 @@ export class Brain{
 
         const appreciation = new Appreciation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const callToAction = new CallToAction(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const callToAction = new CallToAction(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const farewell = new Farewell(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const exerciseEntry = new ExerciseEntry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
@@ -78,8 +85,15 @@ export class Brain{
         const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
+        const contemptShow = new ContemptShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const angerShow = new AngerShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const disgustShow = new DisgustShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const sadnessShow = new SadnessShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const danceShow = new DanceShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+
+
         this.stateMachineDefinition = {
-            initialState: "off", off, emotionCascade, follow, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase
+            initialState: "off", off, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow
         };
         
         /* Create the state machine with states required. */
