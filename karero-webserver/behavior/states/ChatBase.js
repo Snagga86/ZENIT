@@ -16,6 +16,7 @@ export class ChatBase extends StateWrap{
         this.chatProcessor = chatProcessor;
 
         this.nextNonverbalSignals = null;
+        this.lastRASAPayload = null;
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -83,6 +84,18 @@ export class ChatBase extends StateWrap{
     }
 
     newChatDurationCalculatedHandler(duration){
+        
+        if(this.lastRASAPayload.length > 1){
+            this.nextNonverbalSignals = JSON.parse(this.lastRASAPayload[1].image.toString().replace(/'/g, '"'));
+                    
+            if(this.nextNonverbalSignals.action != "none"){
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, this.nextNonverbalSignals.action);
+            }
+        }
+        else{
+            this.nextNonverbalSignals = null;
+        }
+
         if(this.nextNonverbalSignals != null){
             this.chatDuration = duration * 1000;
             this.setNonverbalSignals(this.nextNonverbalSignals);
@@ -98,19 +111,9 @@ export class ChatBase extends StateWrap{
             "mode" : "tts",
             "text" : payload[0].text
         }
-
+        this.lastRASAPayload = payload;
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
 
-        if(payload.length > 1){
-            this.nextNonverbalSignals = JSON.parse(payload[1].image.toString().replace(/'/g, '"'));
-                    
-            if(this.nextNonverbalSignals.action != "none"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, this.nextNonverbalSignals.action);
-            }
-        }
-        else{
-            this.nextNonverbalSignals = null;
-        }
     }
 
     closestBodyRecognition(distance){
@@ -123,23 +126,24 @@ export class ChatBase extends StateWrap{
 
     setNonverbalSignals(action){
         console.log(action.face)
-        var payloadFace = {
-            "mode" : "setEmotion",
-            "data" : action.face
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
-
-        this.chatEmotionTimeout = setTimeout(() => {
-            console.log(this.chatDuration);
+        if(action.face != "none"){
             var payloadFace = {
                 "mode" : "setEmotion",
-                "data" : "neutral"
+                "data" : action.face
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
-
-            clearTimeout(this.chatEmotionTimeout);
-        }, this.chatDuration);
-
+    
+            this.chatEmotionTimeout = setTimeout(() => {
+                console.log(this.chatDuration);
+                var payloadFace = {
+                    "mode" : "setEmotion",
+                    "data" : "neutral"
+                }
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+    
+                clearTimeout(this.chatEmotionTimeout);
+            }, this.chatDuration);
+        }
         /*if(action.length > 1){
             var payloadBody = {
                 "mode" : "setMode",

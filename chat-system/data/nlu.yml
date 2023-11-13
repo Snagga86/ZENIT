@@ -118,6 +118,7 @@ nlu:
     - Ich möchte Kniebeugen machen
     - Zeige mir eine Sportübung bitte
     - Ich brauche etwas Bewegung
+    - Ich möchte trainieren
 
 - intent: stop_squads
   examples: |
@@ -217,6 +218,7 @@ nlu:
     - Wie könntest du mich unterstützen
     - Wie kannst du mir denn konkret helfen
     - Dann erzähl doch mal was du für mich tun kannst
+    - wofür bist du gut
 
 - intent: more_functionalities
   examples: |

@@ -18,7 +18,7 @@ export class EmotionCascade extends StateWrap{
         this.currentEmotion = 0;
         this.currentMode = 0;
 
-        this.breakWords = ["stop", "stoppen", "aufhören", "chatten","unterhalten"]
+        this.breakWords = ["stop", "stoppen", "aufhören", "chatten","unterhalten"];
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);

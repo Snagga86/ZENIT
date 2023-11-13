@@ -5,10 +5,10 @@ import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class IntermediateAward extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("intermediateAward", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("intermediateAward", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -20,9 +20,15 @@ export class IntermediateAward extends StateWrap{
 
         this.timeout = null;
 
+        this.utterances = [
+            "Großartig, Du hast fünf Kniebeugen geschafft. Los, lass uns einen weiteren Satz starten.",
+            "Fantastisch, Du hast fünf Kniebeugen absolviert. Los, lass uns den nächsten Satz beginnen!",
+            "Super, Du hast fünf Kniebeugen geschafft. Auf gehts, wir schaffen noch einen weiteren Satz!"
+        ];
+
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
-
+        this.state.actions.onExit = this.exitFunction.bind(this);
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("performanceAnchor", "performanceAnchor", () => {
@@ -36,33 +42,26 @@ export class IntermediateAward extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var v_face_payload = {
-            "mode" : "setSound",
-            "data" : "nameAndPlay",
-            "extra" : "intermediate-award"
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
         }
-        if(globalStore.currentCommunicationLevel != "only_nonverbal"){
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, v_face_payload);
-        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);   
 
         var nv_body_payload = {
             "mode" : "setMode",
-            "activity" : "dance"
+            "activity" : "joy"
         }
 
-        /* Send the activity change to the KARERO brain. */
-        if(globalStore.currentCommunicationLevel != "only_verbal"){
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
-        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
 
         var nv_face_payload = {
             "mode" : "setEmotion",
             "data" : "Ecstasy"
         }
 
-        if(globalStore.currentCommunicationLevel != "only_verbal"){
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
-        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

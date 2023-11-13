@@ -42,6 +42,15 @@ export class ContemptShow extends StateWrap{
 
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+        var payloadEmotion= {
+            "mode" : "setEmotion",
+            "data" : "contempt"
+        }
+
+        /* Send the activity change to the KARERO brain. */
+
+        console.log("face action");
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion);
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

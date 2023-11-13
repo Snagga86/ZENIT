@@ -5,10 +5,10 @@ import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Farewell extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("farewell", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("farewell", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -18,14 +18,20 @@ export class Farewell extends StateWrap{
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("callToAction", "callToAction", () => {
         }));
+        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
+        }));
 
-        this.timeout;
+        this.chatEmotionTimeout;
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
+        
+        /* Add the event listener to listen on GesturePostureDetection events.
+        Execute gesturePostureRecognition function on received detections. */
+        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
 
-        logger(globalStore.filename, "StateChange", "Farewell");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
@@ -37,24 +43,18 @@ export class Farewell extends StateWrap{
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
 
-        var facePayload = {
-            "mode" : "setSound",
-            "data" : "nameAndPlay",
-            "extra" : "farewell"
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : "Danke fürs mitmachen. Gerne wieder!"
         }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
 
         var facePayload = {
             "mode" : "setEmotion",
-            "data" : "Idle1"
+            "data" : "neutral"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 
-        /* Add the event listener to listen on GesturePostureDetection events.
-        Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
     }
 
@@ -63,8 +63,19 @@ export class Farewell extends StateWrap{
 
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        clearTimeout(this.timeout);
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
+        clearTimeout(this.chatEmotionTimeout);
     }
+
+    newChatDurationCalculatedHandler(duration){
+        this.chatEmotionTimeout = setTimeout(() => {
+
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");
+    
+            clearTimeout(this.chatEmotionTimeout);
+        }, this.chatDuration);
+    }
+
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){

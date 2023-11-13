@@ -25,6 +25,8 @@ public class FaceActionController : MonoBehaviour
     public GameObject videoPlayer;
     public GameObject soundPlayer;
 
+    public GameObject videoObj;
+
     public string displayEmotion = "";
     private string lastEmotion = "init";
 
@@ -116,16 +118,19 @@ public class FaceActionController : MonoBehaviour
 
     internal void showVideo()
     {
-        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
+        //this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
+        this.videoObj.SetActive(true);
     }
 
     internal void hideVideo()
     {
-        this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+        //this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+        this.videoObj.SetActive(false);
     }
 
     internal void startVideo()
     {
+        Debug.Log("Play video");
         this.videoPlayer.GetComponent<VideoPlayer>().Play();
     }
 

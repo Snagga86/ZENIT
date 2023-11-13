@@ -13,7 +13,7 @@ using UnityEngine.Networking;
 
 public class NetworkController : MonoBehaviour
 {
-    private const String IP_ADRESS = "192.168.0.101";
+    private const String IP_ADRESS = "192.168.123.101";
     private const int WEBSOCKET_PORT = 3344;
     private const int HTTP_PORT = 1340;
 
@@ -86,8 +86,11 @@ public class NetworkController : MonoBehaviour
                         this.faceActionController.nameVideo(jsonControlObject.extra);
                         break;
                     case "showAndPlay":
+                        Debug.Log("show video");
                         this.faceActionController.showVideo();
+                        Debug.Log("name video");
                         this.faceActionController.nameVideo(jsonControlObject.extra);
+                        Debug.Log("start video");
                         this.faceActionController.startVideo();
                         break;
                     case "stopAndHide":

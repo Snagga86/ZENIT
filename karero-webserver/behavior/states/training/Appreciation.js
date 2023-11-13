@@ -5,10 +5,10 @@ import globalStore from '../../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Appreciation extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("appreciation", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("appreciation", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -19,6 +19,12 @@ export class Appreciation extends StateWrap{
         this.state.transitions.push(new Transition("farewell", "farewell", () => {
             console.log('transition action for "appreciation" in "farewell" state');
         }));
+
+        this.utterances = [
+            "Bravo! Du hast das Training mit Bravour gemeistert! Starke Leistung!",
+            "Deine Entschlossenheit war beeindruckend. Danke, dass du dich so stark engagiert hast!",
+            "Ich möchte dir für deine hervorragende Leistung danken. Du bist ein Vorbild für andere!"
+        ];
 
         this.timeout;
     }
@@ -38,18 +44,16 @@ export class Appreciation extends StateWrap{
         /* Send the activity change to the KARERO brain. */
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
 
-        var facePayload = {
-            "mode" : "setSound",
-            "data" : "nameAndPlay",
-            "extra" : "appreciation"
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
         }
 
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
 
         var facePayload = {
             "mode" : "setEmotion",
-            "data" : "Joy"
+            "data" : "joy"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
 

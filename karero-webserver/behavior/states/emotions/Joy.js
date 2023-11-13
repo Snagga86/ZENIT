@@ -38,7 +38,7 @@ export class Joy extends StateWrap{
         activity: The strategy interpreted and executed by the connected robot device */
         var payload = {
             "mode" : "setMode",
-            "activity" : "dance"
+            "activity" : "joy"
         }
 
         /* Send the activity change to the KARERO brain. */
