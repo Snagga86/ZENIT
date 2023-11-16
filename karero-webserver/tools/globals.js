@@ -4,7 +4,7 @@ var globalStore = {
     currentCommunicationLevel: "",
     communicationMode: "verbal_and_nonverbal",
     countVisits: 0,
-    welcomeDistance: 2.0
+    welcomeDistance: 2.3
   };
   
   export default globalStore;

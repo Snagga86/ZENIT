@@ -22,6 +22,12 @@ import { ContemptShow } from './states/ContemptShow.js'
 import { DanceShow } from './states/DanceShow.js'
 import { SadnessShow } from './states/SadnessShow.js'
 import { AngerShow } from './states/AngerShow.js';
+import { HeatProtectionEntry } from './states/heatprotection/HeatProtectionEntry.js';
+import { SubtleActivation } from './states/heatprotection/subtleActivation.js';
+import { ExplicitActivation } from './states/heatprotection/ExplicitActivation.js';
+import { InformHelp } from './states/heatprotection/InformHelp.js';
+import { VideoCall } from './states/heatprotection/VideoCall.js';
+import { EmergencyCall } from './states/heatprotection/EmergencyCall.js';
 
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
@@ -91,9 +97,16 @@ export class Brain{
         const sadnessShow = new SadnessShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const danceShow = new DanceShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
+        /* Heat Protection State declaration. */
+        const heatProtectionEntry = new HeatProtectionEntry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const subtleActivation = new SubtleActivation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const explicitActivation = new ExplicitActivation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const informHelp = new InformHelp(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const videoCall = new VideoCall(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const emergencyCall = new EmergencyCall(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
-            initialState: "off", off, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow
+            initialState: "off", off, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
         };
         
         /* Create the state machine with states required. */

@@ -30,7 +30,7 @@ websocket.enableTrace(False)
 agentIsTalking = False
 agentStartTalkTime = 0
 agentEndTalkTime = 0
-safetyDelay = 0.5
+safetyDelay = 0.7
 
 # Initialize a flag to track connection status
 IS_CONNECTED = False

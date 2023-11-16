@@ -34,6 +34,10 @@ export class ChatBase extends StateWrap{
             console.log('transition action for "ChatBase" in "emotionCascade" state')
         }));
 
+        this.state.transitions.push(new Transition("heatProtectionEntry", "heatProtectionEntry", () => {
+            console.log('transition action for "ChatBase" in "heatProtectionEntry" state')
+        }));
+
         /* Temporary transitions to animation demos and speech. */
         this.state.transitions.push(new Transition("angerShow", "angerShow", () => {
             console.log('transition action for "ChatBase" in "angerShow" state')

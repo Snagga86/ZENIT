@@ -65,23 +65,6 @@ export class PerformanceAnchor extends StateWrap{
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
     }  
 
-
-    keyPressHandler = (ch, key) =>{
-        if (key && key.name === 'a') {
-            // 'Enter' key was pressed, react accordingly
-            console.log('a key pressed');
-            this.gesturePostureDetection("squad");
-            // You can perform other actions here
-        } else if (key && key.ctrl && key.name === 'c') {
-            // Ctrl + C was pressed, exit the program
-            process.exit();
-        } else {
-            // Other key presses
-            console.log(`Key pressed: ${ch}`);
-        }
-        console.log('Press Enter or any other key (Ctrl + C to exit):');
-    }
-
     /* Exit function is executed whenever the state is left. */
     exitFunction(){
 

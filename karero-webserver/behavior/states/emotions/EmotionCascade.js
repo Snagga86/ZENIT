@@ -76,7 +76,7 @@ export class EmotionCascade extends StateWrap{
       
         // Test if the string contains any of the words
         return pattern.test(str);
-      }
+    }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
     closestBodyRecognition(distance){
