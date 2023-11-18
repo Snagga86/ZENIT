@@ -1,3 +1,5 @@
+import { Brain } from '../brain.js';
+
 export class State{
     constructor(stateName){
         this.target = stateName;
@@ -21,15 +23,284 @@ export class Transition{
     }
 }
 
+export class RoboticArm{
+    constructor(brainEvents){
+        this.brainEvents = brainEvents;
+    }
+
+    seekAttantion(){
+        this.bodyAction("seekAttention");
+    }
+
+    followHead(){
+        this.bodyAction("followHead");
+    }
+
+    neutral(){
+        this.bodyAction("neutral");
+    }
+
+    anger(){
+        this.bodyAction("anger");
+    }
+
+    contempt(){
+        this.bodyAction("contempt");
+    }
+
+    disgust(){
+        this.bodyAction("disgust");
+    }
+
+    fear(){
+        this.bodyAction("fear");
+    }
+
+    joy(){
+        this.bodyAction("joy");
+    }
+
+    sadness(){
+        this.bodyAction("sadness");
+    }
+
+    surprise(){
+        this.bodyAction("surprise");
+    }
+
+    bodyAction(action){
+        var payload = {
+            "mode" : "setMode",
+            "activity" : action
+        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+    }
+}
+
+export class Video{
+    constructor(brainEvents){
+        this.brainEvents = brainEvents;
+    }
+
+    show(){
+        this.setVideo("show");
+    }
+
+    hide(){
+        this.setVideo("hide");
+    }
+
+    start(){
+        this.setVideo("start");
+    }
+
+    stop(){
+        this.setVideo("stop");
+    }
+
+    name(name){
+        this.setVideo("name", name);
+    }
+
+    showAndPlay(name){
+        this.setVideo("showAndPlay", name);
+    }
+
+    stopAndHide(){
+        this.setVideo("stopAndHide");
+    }
+
+    setVideo(data, extra = ""){
+        var facePayload = {
+            "mode" : "setVideo",
+            "data" : data,
+            "extra" : extra
+        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+    }
+}
+
+export class Emotion{
+    constructor(brainEvents){
+        this.brainEvents = brainEvents;
+    }
+
+    annnoyance() {
+        this.setEmotion("annnoyance");
+    }
+
+    anger() {
+        this.setEmotion("anger");
+    }
+
+    rage() {
+        this.setEmotion("rage");
+    }
+
+    vigilance() {
+        this.setEmotion("vigilance");
+    }
+
+    anticipation() {
+        this.setEmotion("anticipation");
+    }
+
+    interest() {
+        this.setEmotion("interest");
+    }
+
+    serenity() {
+        this.setEmotion("serenity");
+    }
+
+    joy() {
+        this.setEmotion("joy");
+    }
+
+    ecstasy() {
+        this.setEmotion("ecstasy");
+    }
+
+    acceptance() {
+        this.setEmotion("acceptance");
+    }
+
+    trust() {
+        this.setEmotion("trust");
+    }
+
+    admiration() {
+        this.setEmotion("admiration");
+    }
+
+    apprehension() {
+        this.setEmotion("apprehension");
+    }
+
+    fear() {
+        this.setEmotion("fear");
+    }
+
+    terror() {
+        this.setEmotion("terror");
+    }
+
+    distraction() {
+        this.setEmotion("distraction");
+    }
+
+    surprise() {
+        this.setEmotion("surprise");
+    }
+
+    amazement() {
+        this.setEmotion("amazement");
+    }
+
+    pensiveness() {
+        this.setEmotion("pensiveness");
+    }
+
+    sadness() {
+        this.setEmotion("sadness");
+    }
+
+    grief() {
+        this.setEmotion("grief");
+    }
+
+    boredom() {
+        this.setEmotion("boredom");
+    }
+
+    disgust() {
+        this.setEmotion("disgust");
+    }
+
+    loathing() {
+        this.setEmotion("loathing");
+    }
+
+    contempt() {
+        this.setEmotion("contempt");
+    }
+
+    neutral() {
+        this.setEmotion("neutral");
+    }
+
+    thirsty() {
+        this.setEmotion("thirsty");
+    }
+
+    hot() {
+        this.setEmotion("hot");
+    }
+
+    setEmotion(emotion){
+        var payloadEmotion = {
+            "mode" : "setEmotion",
+            "data" : emotion
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion)
+    }
+}
+
+export class Sound{
+    constructor(brainEvents){
+        this.brainEvents = brainEvents;
+    }
+
+    play(){
+        this.setSound("play");
+    }
+
+    stop(){
+        this.setSound("stop");
+    }
+
+    name(name){
+        this.setSound("name", name);
+    }
+
+    nameAndPlay(name){
+        this.setSound("nameAndPlay", name);
+    }
+
+    setSound(data, extra = ""){
+        var payloadSound = {
+            "mode" : "setSound",
+            "data" : data,
+            "extra" : extra
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadSound)
+    }
+}
+
+export class DisplayDevice{
+    constructor(brainEvents){
+        this.brainEvents = brainEvents;
+        this.emotion = new Emotion(this.brainEvents);
+        this.video = new Video(this.brainEvents);
+        this.sound = new Sound(this.brainEvents);
+    }
+}
+
 export class StateWrap{
     constructor(stateName, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
-        this.state = new State(stateName);
         this.stateChangeInitiated = false;
         this.emotionProcessor = emotionProcessor;
         this.gesturePostureProcessor = gesturePostureProcessor;
         this.speechProcessor = speechProcessor;
         this.brainEvents = brainEvents;
+        this.state = new State(stateName);
+        this.RoboticBody = new RoboticArm(this.brainEvents);
+        this.ScreenFace = new DisplayDevice(this.brainEvents);
     }
+
+    
     
     getState(){
         return this.state;

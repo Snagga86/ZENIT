@@ -59,7 +59,7 @@ public class NetworkController : MonoBehaviour
                 this.v_action = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
             }
             this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.v_action + this.nv_action;
-
+            
             if (jsonControlObject.mode == "setEmotion")
             {
                 Debug.Log(jsonControlObject.data);
@@ -111,7 +111,7 @@ public class NetworkController : MonoBehaviour
                         this.faceActionController.stopSound();
                         break;
                     case "name":
-                        this.faceActionController.nameSound(name);
+                        this.faceActionController.nameSound(jsonControlObject.extra);
                         break;
                     case "nameAndPlay":
                         Debug.Log("nameAndPlay");

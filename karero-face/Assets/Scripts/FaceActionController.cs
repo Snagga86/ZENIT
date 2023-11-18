@@ -43,8 +43,10 @@ public class FaceActionController : MonoBehaviour
 
     public Material eyeMaterial;
     public Material bgMaterial;
+    Color neutralEyeColor;
     Color startEyeColor;
     Color targetEyeColor;
+    Color neutralBgColor;
     Color startBgColor;
     Color targetBgColor;
 
@@ -76,7 +78,7 @@ public class FaceActionController : MonoBehaviour
             tMulti = 1.0f;
 
 
-            if (displayEmotion == "Hot")
+            if (displayEmotion == "hot")
             {
                 this.targetBgColor = new Color(178f / 255f, 0f, 0f);
                 this.targetEyeColor = new Color(191f / 255f, 207f / 255f, 1f);
@@ -90,11 +92,11 @@ public class FaceActionController : MonoBehaviour
                 this.drops2.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
             }
 
-
-            if (displayEmotion == "Thirsty")
+            if (displayEmotion == "thirsty")
             {
                 this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Joy");
                 this.targetBgColor = new Color(255f / 255f, 220f / 255f, 115f / 255f);
+                this.targetEyeColor = new Color(255f / 255f, 107f / 255f, 1f);
                 this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
                 this.glass.GetComponent<ObjectMover>().StartMovement();
                 this.water.GetComponent<ObjectMover>().StartMovement();
@@ -110,8 +112,8 @@ public class FaceActionController : MonoBehaviour
 
 
         this.setFace(eyeLeft, eyeRight, this.startFace, this.targetFace);
-        //this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
-        //this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
+        this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
+        this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
         lastEmotion = displayEmotion;
     }
@@ -244,8 +246,7 @@ public class FaceActionController : MonoBehaviour
             eyeBlendshapeDataStart = startFace.rightEye;
             eyeBlendshapeDataEnd = targetFace.rightEye;
         }
-        Debug.Log("set Eye,  " + eyeBlendshapeDataEnd.happy);
-        Debug.Log("set Eye lerp,  " + Mathf.Lerp(eyeBlendshapeDataStart.happy, eyeBlendshapeDataEnd.happy * 100, t));
+
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(eyeBlendshapeDataStart.full, eyeBlendshapeDataEnd.full * 100 + this.breathPulse, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad, Mathf.Lerp(eyeBlendshapeDataStart.sad, eyeBlendshapeDataEnd.sad * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis, Mathf.Lerp(eyeBlendshapeDataStart.kreis, eyeBlendshapeDataEnd.kreis * 100, t));
@@ -384,20 +385,20 @@ public class FaceEmotion
 
     public Color getBgColorByEmotion(string emotion)
     {
-        if (emotion == "Apprehension" || emotion == "Fear" || emotion == "Terror")
+        /*if (emotion == "Apprehension" || emotion == "Fear" || emotion == "Terror")
         {
             return new Color(1f, 1f, 1f);
-        }
+        }*/
         return new Color(0f, 0f, 0f);
     }
 
     public Color getEyeColorByEmotion(string emotion)
     {
         Color color = new Color(255f, 255f, 255f);
-
+        /*
         switch (emotion.ToLower())
         {
-
+            
             case "annoyance":
                 color = new Color(255f, 255f, 0f);
                 break;
@@ -482,11 +483,11 @@ public class FaceEmotion
             case "idle2":
                 color = new Color(255f, 255f, 0f);
                 break;
-            default:
+        default:
                 color = new Color(255f, 255f, 0f);
                 break;
-        }
-
+        }*/
+        color = new Color(75f, 156f, 48f);
         color = new Color(color.r / 255, color.g / 255, color.b / 255);
 
         return color;

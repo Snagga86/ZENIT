@@ -16,12 +16,16 @@ export class Off extends StateWrap{
         this.state.transitions.push(new Transition("off", "off", () => {
             console.log('transition action for "off" in "off" state')
         }));  
+
+        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
+            console.log('transition action for "off" in "chatBase" state')
+        }));  
     }
 
     enterFunction(){
         this.stateChangeInitiated = false;
         this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");
         }, 4000);
         
     }

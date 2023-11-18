@@ -36,11 +36,7 @@ export class CallToAction extends StateWrap{
         Execute gesturePostureRecognition function on received detections. */
         this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
-        var payload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
+        this.ScreenFace.emotion.neutral();
         this.followHead();
     }
 
@@ -65,13 +61,7 @@ export class CallToAction extends StateWrap{
     }
 
     seekAttention(){
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "seekAttention"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+        this.RoboticBody.seekAttantion();
 
         this.timeout = setTimeout(() => {
             this.followHead();
@@ -79,13 +69,7 @@ export class CallToAction extends StateWrap{
     }
 
     followHead(){
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "followHead"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+        this.RoboticBody.followHead();
 
         this.timeout = setTimeout(() => {
             this.seekAttention();

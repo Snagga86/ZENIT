@@ -11,7 +11,7 @@ from io import StringIO
 from vosk import Model, KaldiRecognizer
 from datetime import datetime, timedelta
 
-IP_ADDRESS = "192.168.123.101"
+IP_ADDRESS = "192.168.0.101"
 TCP_PORT = 1342
 UDP_PORT = 1338
 

@@ -26,33 +26,22 @@ export class HeatProtectionEntry extends StateWrap{
         this.breakWords = ["stop", "stoppen", "aufhören", "schluss","unterhalten"];
 
         this.timeout;
-        process.stdin.addListener('keypress', this.keyPressHandler);
-        keypress(process.stdin);
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        console.log("Hitzeschutzmodus Demo: Press Key 'k' to simulate critical local climate.")
+        process.stdin.addListener('keypress', this.keyPressHandler);
 
-        var facePayload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        console.log("Hitzeschutzmodus Demo: Press Key 'k' to simulate critical local climate.")
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
 
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
 
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "followHead"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+        this.ScreenFace.emotion.neutral();
+        this.RoboticBody.followHead();
     }
 
     keyPressHandler = (ch, key) =>{
@@ -102,21 +91,5 @@ export class HeatProtectionEntry extends StateWrap{
       
         // Test if the string contains any of the words
         return pattern.test(str);
-    }
-
-    newChatDurationCalculatedHandler(duration){
-        this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
-        }, duration * 1000);
-    }
-
-    /* Interpretion function of received data coming from Azure Kinectic Space. */
-    closestBodyRecognition(distance){
-        /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > globalStore.welcomeDistance){
-
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
-        }
     }
 }

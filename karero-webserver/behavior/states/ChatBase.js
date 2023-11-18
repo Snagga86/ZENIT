@@ -62,8 +62,9 @@ export class ChatBase extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        this.followHead();
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        this.RoboticBody.followHead();
+        this.ScreenFace.emotion.neutral();
+        //this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
@@ -131,19 +132,12 @@ export class ChatBase extends StateWrap{
     setNonverbalSignals(action){
         console.log(action.face)
         if(action.face != "none"){
-            var payloadFace = {
-                "mode" : "setEmotion",
-                "data" : action.face
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+
+            this.ScreenFace.emotion.setEmotion(action.face);
     
             this.chatEmotionTimeout = setTimeout(() => {
                 console.log(this.chatDuration);
-                var payloadFace = {
-                    "mode" : "setEmotion",
-                    "data" : "neutral"
-                }
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+                this.ScreenFace.emotion.neutral();
     
                 clearTimeout(this.chatEmotionTimeout);
             }, this.chatDuration);
@@ -155,21 +149,5 @@ export class ChatBase extends StateWrap{
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payloadBody)
         }*/
-    }
-
-    followHead(){
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "followHead"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
-
-        var payloadFace = {
-            "mode" : "setEmotion",
-            "data" : "Neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
     }
 }
