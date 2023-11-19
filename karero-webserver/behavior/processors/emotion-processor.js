@@ -67,35 +67,35 @@ export class EmotionProcessor {
         //console.log(emotion + ": " + valence);
         //console.log(emotion + ": " + valenceClass);
         switch(emotion){
-            case "Anger":
-                emotion = BEmotion.Anger[valenceClass];
+            case "anger":
+                emotion = BEmotion.anger[valenceClass];
                 break;
-            case "Anticipation":
-                emotion = BEmotion.Anticipation[valenceClass];
+            case "anticipation":
+                emotion = BEmotion.anticipation[valenceClass];
                 break;
-            case "Happiness":
-                emotion = BEmotion.Happiness[valenceClass];
+            case "happiness":
+                emotion = BEmotion.happiness[valenceClass];
                 break;
-            case "Trust":
-                emotion = BEmotion.Trust[valenceClass];
+            case "trust":
+                emotion = BEmotion.trust[valenceClass];
                 break;
-            case "Fear":
-                emotion = BEmotion.Fear[valenceClass];
+            case "fear":
+                emotion = BEmotion.fear[valenceClass];
                 break;
-            case "Surprise":
-                emotion = BEmotion.Surprise[valenceClass];
+            case "surprise":
+                emotion = BEmotion.surprise[valenceClass];
                 break;
-            case "Sadness":
-                emotion = BEmotion.Sadness[valenceClass];
+            case "sadness":
+                emotion = BEmotion.sadness[valenceClass];
                 break;
-            case "Disgust":
-                emotion = BEmotion.Disgust[valenceClass];
+            case "disgust":
+                emotion = BEmotion.disgust[valenceClass];
                 break;
-            case "Contempt":
-                emotion = BEmotion.Contempt[valenceClass];
+            case "contempt":
+                emotion = BEmotion.contempt[valenceClass];
                 break;
             default:
-                emotion = "Neutral";
+                emotion = "neutral";
         }
         //console.log("Emotion:" + emotion);
         return emotion;
@@ -123,21 +123,21 @@ const NUM_VALENCE_CLASSES = 3.333;
 const EMOTION_BUFFER_LEN = 12;
 const BEmotion = {
 
-    "Anger" : ['Annoyance','Anger', 'Rage']
+    "anger" : ['annoyance','anger', 'rage']
     ,
-    "Anticipation" : ['Interest','Anticipation','Vigilance']
+    "anticipation" : ['interest','anticipation','vigilance']
     ,
-    "Happiness" :  ['Serenity','Joy','Ecstasy']
+    "happiness" :  ['serenity','joy','ecstasy']
     ,
-    "Trust" : ['Acceptance', 'Trust', 'Admiration']
+    "trust" : ['acceptance', 'trust', 'admiration']
     ,
-    "Fear" : ['Apprehension', 'Fear', 'Terror']
+    "fear" : ['apprehension', 'fear', 'terror']
     ,
-    "Surprise" : ['Distraction','Surprise','Amazement']
+    "surprise" : ['distraction','surprise','amazement']
     ,
-    "Sadness" : ['Pensiveness', 'Sadness', 'Grief']
+    "sadness" : ['pensiveness', 'sadness', 'grief']
     ,
-    "Disgust" : ['Boredom', 'Disgust','Loathing']
+    "disgust" : ['boredom', 'disgust','loathing']
     ,
-    "Contempt" : ['Contempt', 'Contempt','Contempt']
+    "contempt" : ['contempt', 'contempt','contempt']
 }

@@ -89,13 +89,7 @@ export class EmotionCascade extends StateWrap{
     }
 
     seekAttention(){
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "seekAttention"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+        this.RoboticBody.seekAttention();
 
         this.waitForNextAnimationTimeout = setTimeout(() => {
             this.followHead();
@@ -107,19 +101,8 @@ export class EmotionCascade extends StateWrap{
         clearTimeout(this.changeAnimationTimeout);
         clearTimeout(this.waitForNextAnimationTimeout);
 
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "followHead"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
-
-        var payloadFace = {
-            "mode" : "setEmotion",
-            "data" : "Neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+        this.ScreenFace.emotion.neutral();
+        this.RoboticBody.followHead();
 
         this.waitForNextAnimationTimeout = setTimeout(() => {
             this.nextEmotion();
@@ -131,21 +114,16 @@ export class EmotionCascade extends StateWrap{
         console.log("Emotion: " + this.emotionStates[this.currentEmotion]);
         clearTimeout(this.changeAnimationTimeout);
         clearTimeout(this.waitForNextAnimationTimeout);
-        var payloadBody = {
-            "mode" : "setMode",
-            "activity" : this.emotionStates[this.currentEmotion]
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payloadBody)
+
+        this.RoboticBody.bodyAction(this.emotionStates[this.currentEmotion]);
 
         var curEmo = this.emotionStates[this.currentEmotion];
         if(curEmo == "fear"){
             curEmo = "terror";
         }
-        var payloadFace = {
-            "mode" : "setEmotion",
-            "data" : curEmo[0].toUpperCase() + curEmo.slice(1)
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadFace);
+
+        this.ScreenFace.emotion.setEmotion(curEmo[0].toUpperCase() + curEmo.slice(1));
+
         console.log(this.currentEmotion);
 
         if(this.emotionStates[this.currentEmotion] == 'neutral'){

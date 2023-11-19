@@ -35,22 +35,8 @@ export class ContemptShow extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "contempt"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
-        var payloadEmotion= {
-            "mode" : "setEmotion",
-            "data" : "contempt"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-
-        console.log("face action");
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion);
+        this.ScreenFace.emotion.contempt();
+        this.RoboticBody.contempt();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

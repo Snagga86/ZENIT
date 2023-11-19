@@ -33,16 +33,11 @@ export class ExplicitActivation extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        var facePayload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        this.ScreenFace.emotion.neutral();
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
 
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
 
@@ -79,7 +74,6 @@ export class ExplicitActivation extends StateWrap{
 
         // Stop listening for input
         //process.stdin.pause();
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
         clearTimeout(this.timeout);
@@ -110,15 +104,5 @@ export class ExplicitActivation extends StateWrap{
         this.timeout = setTimeout(() => {
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
         }, duration * 1000);
-    }
-
-    /* Interpretion function of received data coming from Azure Kinectic Space. */
-    closestBodyRecognition(distance){
-        /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > globalStore.welcomeDistance){
-
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
-        }
     }
 }

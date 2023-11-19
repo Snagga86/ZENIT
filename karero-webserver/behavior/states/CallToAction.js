@@ -61,7 +61,7 @@ export class CallToAction extends StateWrap{
     }
 
     seekAttention(){
-        this.RoboticBody.seekAttantion();
+        this.RoboticBody.seekAttention();
 
         this.timeout = setTimeout(() => {
             this.followHead();

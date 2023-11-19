@@ -21,8 +21,6 @@ export class SubtleActivation extends StateWrap{
         }));
         this.state.transitions.push(new Transition("heatProtectionEntry", "heatProtectionEntry", () => {
         }));
-        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
-        }));
 
         this.drinkingDetected = false;
         this.drinkingMotivationAttempts = 0;
@@ -34,8 +32,8 @@ export class SubtleActivation extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
         
-        //process.stdin.addListener('keypress', this.keyPressHandler);
-        //keypress(process.stdin);
+        process.stdin.addListener('keypress', this.keyPressHandler);
+
         this.drinkingDetected = false;
         this.ScreenFace.emotion.neutral();
         this.animationSchedule();

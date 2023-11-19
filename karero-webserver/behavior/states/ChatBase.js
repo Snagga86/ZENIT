@@ -142,12 +142,5 @@ export class ChatBase extends StateWrap{
                 clearTimeout(this.chatEmotionTimeout);
             }, this.chatDuration);
         }
-        /*if(action.length > 1){
-            var payloadBody = {
-                "mode" : "setMode",
-                "activity" : action[1]
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payloadBody)
-        }*/
     }
 }

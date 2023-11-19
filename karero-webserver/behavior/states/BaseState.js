@@ -28,7 +28,7 @@ export class RoboticArm{
         this.brainEvents = brainEvents;
     }
 
-    seekAttantion(){
+    seekAttention(){
         this.bodyAction("seekAttention");
     }
 

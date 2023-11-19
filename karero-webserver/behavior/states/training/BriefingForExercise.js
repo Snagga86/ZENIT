@@ -41,23 +41,7 @@ export class BriefingForExercise extends StateWrap{
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
 
-        var facePayload = {
-            "mode" : "setSound",
-            "data" : "nameAndPlay",
-            "extra" : "briefing-exercises"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
-
-        var facePayload = {
-            "mode" : "setVideo",
-            "data" : "showAndPlay",
-            "extra" : "squads"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        this.ScreenFace.video.showAndPlay("squads")
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */

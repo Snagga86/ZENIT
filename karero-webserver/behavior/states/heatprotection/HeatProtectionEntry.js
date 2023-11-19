@@ -24,8 +24,6 @@ export class HeatProtectionEntry extends StateWrap{
         }));
 
         this.breakWords = ["stop", "stoppen", "aufhören", "schluss","unterhalten"];
-
-        this.timeout;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -71,7 +69,7 @@ export class HeatProtectionEntry extends StateWrap{
         process.stdin.pause();
 
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
-        clearTimeout(this.timeout);
+
     }
 
     finalResultHandler(result){

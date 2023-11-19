@@ -35,21 +35,9 @@ export class AngerShow extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "anger"
-        }
 
-        var payloadEmotion= {
-            "mode" : "setEmotion",
-            "data" : "Rage"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
-
-        console.log("face action");
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion);
+        this.ScreenFace.emotion.rage();
+        this.RoboticBody.anger();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

@@ -38,7 +38,6 @@ export class IntermediateAward extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        logger(globalStore.filename, "StateChange", "IntermediateAward");
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
@@ -49,19 +48,8 @@ export class IntermediateAward extends StateWrap{
 
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);   
 
-        var nv_body_payload = {
-            "mode" : "setMode",
-            "activity" : "joy"
-        }
-
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
-
-        var nv_face_payload = {
-            "mode" : "setEmotion",
-            "data" : "Ecstasy"
-        }
-
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+        this.RoboticBody.joy();
+        this.ScreenFace.emotion.ecstasy();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

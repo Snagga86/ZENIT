@@ -6,7 +6,6 @@ export class ChatProcessor {
 
     constructor() {
         this.chatEvents = new EventEmitter();
-
     }
 
     sendMessage(text){

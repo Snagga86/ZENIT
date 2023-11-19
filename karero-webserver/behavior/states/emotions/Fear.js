@@ -36,13 +36,8 @@ export class Fear extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "fear"
-        }
 
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+        this.RoboticBody.fear();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

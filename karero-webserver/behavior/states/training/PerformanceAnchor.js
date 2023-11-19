@@ -50,19 +50,8 @@ export class PerformanceAnchor extends StateWrap{
         this.intermediateMotivationTimeout();
         this.appreciationTimeout();
 
-        var nv_body_payload = {
-            "mode" : "setMode",
-            "activity" : "followHead"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
-    
-        var nv_face_payload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+        this.RoboticBody.followHead();
+        this.ScreenFace.emotion.neutral();
     }  
 
     /* Exit function is executed whenever the state is left. */
@@ -110,12 +99,7 @@ export class PerformanceAnchor extends StateWrap{
     
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);        
 
-            var nv_face_payload = {
-                "mode" : "setEmotion",
-                "data" : "Sadness"
-            }
-
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, nv_face_payload);
+            this.ScreenFace.emotion.sadness();
             
             this.intermediateMotivationTimeout();
         }, 8000);
@@ -129,11 +113,7 @@ export class PerformanceAnchor extends StateWrap{
 
     squadTimeout(){
         this.timeoutSquad = setTimeout(() => {
-            var payload = {
-                "mode" : "setMode",
-                "activity" : "followHead"
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+            this.RoboticBody.followHead();
         }, 2000);
     }
 

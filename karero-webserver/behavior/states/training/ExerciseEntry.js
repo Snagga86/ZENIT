@@ -36,12 +36,8 @@ export class ExerciseEntry extends StateWrap{
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-
-        var facePayload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        
+        this.ScreenFace.emotion.neutral();
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */

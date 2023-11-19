@@ -23,7 +23,7 @@ import { DanceShow } from './states/DanceShow.js'
 import { SadnessShow } from './states/SadnessShow.js'
 import { AngerShow } from './states/AngerShow.js';
 import { HeatProtectionEntry } from './states/heatprotection/HeatProtectionEntry.js';
-import { SubtleActivation } from './states/heatprotection/subtleActivation.js';
+import { SubtleActivation } from './states/heatprotection/SubtleActivation.js';
 import { ExplicitActivation } from './states/heatprotection/ExplicitActivation.js';
 import { InformHelp } from './states/heatprotection/InformHelp.js';
 import { VideoCall } from './states/heatprotection/VideoCall.js';
@@ -66,7 +66,6 @@ export class Brain{
         this.chatProcessor = new ChatProcessor();
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
-
 
         /* Websocket connections to send signals to KARERO display and body. */
         this.robotBodyWS = null;

@@ -35,17 +35,8 @@ export class DanceShow extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "joy"
-        }
-
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
-        var payloadEmotion= {
-            "mode" : "setEmotion",
-            "data" : "joy"
-        }
+        this.ScreenFace.emotion.joy();
+        this.RoboticBody.joy();
 
         /* Send the activity change to the KARERO brain. */
 

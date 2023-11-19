@@ -35,27 +35,15 @@ export class Farewell extends StateWrap{
         /* Set the payload for robot mode activation over websocket.
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
-        var payload = {
-            "mode" : "setMode",
-            "activity" : "followHead"
-        }
 
-        /* Send the activity change to the KARERO brain. */
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload)
+        this.RoboticBody.followHead();
+        this.ScreenFace.emotion.neutral();
 
         var payloadTTS = {
             "mode" : "tts",
             "text" : "Danke fürs mitmachen. Gerne wieder!"
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
-
-        var facePayload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
-        }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
-
-        //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
     }
 
     /* Exit function is executed whenever the state is left. */
