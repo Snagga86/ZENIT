@@ -38,10 +38,7 @@ export class DanceShow extends StateWrap{
         this.ScreenFace.emotion.joy();
         this.RoboticBody.joy();
 
-        /* Send the activity change to the KARERO brain. */
-
-        console.log("face action");
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion);
+        /* Send the activity change to the KARERO brain. *
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */

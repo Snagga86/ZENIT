@@ -66,6 +66,7 @@ export class EmotionCascade extends StateWrap{
                 "text" : "Alles klar. Kein Problem!"
             }
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            console.log("goto chatBase");
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
         }
     }
@@ -105,6 +106,7 @@ export class EmotionCascade extends StateWrap{
         this.RoboticBody.followHead();
 
         this.waitForNextAnimationTimeout = setTimeout(() => {
+            console.log("changenextEmotionTimeout set nextEmotion");
             this.nextEmotion();
         }, 5000);
     }
@@ -160,6 +162,7 @@ export class EmotionCascade extends StateWrap{
         console.log(this.currentAnimationDuration);
 
         this.changeAnimationTimeout = setTimeout(() => {
+            console.log("changeAnimationTimeout set followhead");
             this.followHead();
         }, this.currentAnimationDuration);
 

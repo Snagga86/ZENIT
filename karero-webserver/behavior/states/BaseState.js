@@ -36,6 +36,10 @@ export class RoboticArm{
         this.bodyAction("followHead");
     }
 
+    followHeadVertical(){
+        this.bodyAction("followHeadVertical");
+    }
+
     neutral(){
         this.bodyAction("neutral");
     }

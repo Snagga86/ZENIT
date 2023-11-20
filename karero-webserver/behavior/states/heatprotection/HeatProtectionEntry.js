@@ -29,17 +29,20 @@ export class HeatProtectionEntry extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
-        process.stdin.addListener('keypress', this.keyPressHandler);
+        //process.stdin.addListener('keypress', this.keyPressHandler);
 
-        console.log("Hitzeschutzmodus Demo: Press Key 'k' to simulate critical local climate.")
+        //console.log("Hitzeschutzmodus Demo: Press Key 'k' to simulate critical local climate.")
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
 
-        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
+        //this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
 
         this.ScreenFace.emotion.neutral();
         this.RoboticBody.followHead();
+        console.log("this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, subtleActivation");
+
+        var to = setTimeout(() => {this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");},400);
     }
 
     keyPressHandler = (ch, key) =>{
@@ -63,12 +66,12 @@ export class HeatProtectionEntry extends StateWrap{
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        process.stdin.removeListener('keypress', this.keyPressHandler);
+        //process.stdin.removeListener('keypress', this.keyPressHandler);
 
         // Stop listening for input
-        process.stdin.pause();
+        //process.stdin.pause();
 
-        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
+        //this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
 
     }
 

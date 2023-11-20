@@ -19,27 +19,32 @@ export class SubtleActivation extends StateWrap{
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("explicitActivation", "explicitActivation", () => {
         }));
-        this.state.transitions.push(new Transition("heatProtectionEntry", "heatProtectionEntry", () => {
+        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
         }));
+        /*this.state.transitions.push(new Transition("heatProtectionEntry", "heatProtectionEntry", () => {
+        }));*/
 
         this.drinkingDetected = false;
         this.drinkingMotivationAttempts = 0;
-        this.MAX_DRINKING_MOTIVATION_ATTEMPTS = 3;
+        this.MAX_DRINKING_MOTIVATION_ATTEMPTS = 0;
 
+        this.breakWords = ["stop", "stoppen", "aufhören", "schluss","unterhalten"];
         this.timerSchedule = [];
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-        
-        process.stdin.addListener('keypress', this.keyPressHandler);
-
+        //process.stdin.resume();
+        //process.stdin.addListener('keypress', this.keyPressHandler);
+        this.drinkingMotivationAttempts = 0;
         this.drinkingDetected = false;
         this.ScreenFace.emotion.neutral();
         this.animationSchedule();
+        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
     }
 
     animationSchedule(){    
+        this.animationReset();
         this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 100));
         this.timerSchedule.push(setTimeout(() => {this.RoboticBody.sadness()}, 15000));
         this.timerSchedule.push(setTimeout(() => {this.RoboticBody.followHead()}, 25000));
@@ -78,26 +83,33 @@ export class SubtleActivation extends StateWrap{
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        process.stdin.removeListener('keypress', this.keyPressHandler);
+        //process.stdin.removeListener('keypress', this.keyPressHandler);
 
         // Stop listening for input
-        process.stdin.pause();
+        //process.stdin.pause();
+        this.animationReset();
+        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
     }
     
-    keyPressHandler = (ch, key) =>{
-        if (key && key.name === 'g') {
-            // 'Enter' key was pressed, react accordingly
-            console.log('g key pressed');
-            process.stdin.pause();
-            this.drinkingDetected = true;
-            // You can perform other actions here
-        } else if (key && key.ctrl && key.name === 'c') {
-            // Ctrl + C was pressed, exit the program
-            process.exit();
-        } else {
-            // Other key presses
-            console.log(`Key pressed: ${ch}`);
+    finalResultHandler(result){
+        console.log("tts result:" + result);
+
+        if(this.containsWords(result, this.breakWords)){
+            var payloadTTS = {
+                "mode" : "tts",
+                "text" : "Alles klar. Kein Problem!"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            console.log("goto chatBase");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
         }
-        console.log('Press Enter or any other key (Ctrl + C to exit):');
+    }
+
+    containsWords(str, wordsArray) {
+        // Create a regular expression pattern from the array of words
+        const pattern = new RegExp(wordsArray.join('|'), 'i');
+      
+        // Test if the string contains any of the words
+        return pattern.test(str);
     }
 }

@@ -16,44 +16,147 @@ export class InformHelp extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("explicitActivation", "explicitActivation", () => {
-        }));
-        this.state.transitions.push(new Transition("heatProtectionEntry", "heatProtectionEntry", () => {
+        this.state.transitions.push(new Transition("subtleActivation", "subtleActivation", () => {
         }));
         this.state.transitions.push(new Transition("videoCall", "videoCall", () => {
         }));
-        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
-        }));
 
-        this.utterances = [];
-        this.breakWords = ["stop", "stoppen", "aufhören", "schluss","unterhalten"];
+        this.utterancesHelp = ["Große Hitze ist gefährlich. Ich habe leider nicht erkennen können ob du ausreichend getrunken hast, deshalb habe ich Betreuungspersonal informiert. Es wird sich in kürze jemand bei dir melden!",
+        "Extreme Hitze birgt Gefahren. Leider konnte ich nicht feststellen, ob du ausreichend Flüssigkeit zu dir genommen hast. Daher habe ich das Betreuungspersonal informiert, das sich in Kürze bei dir melden wird!"];
 
-        this.timeout;
-        keypress(process.stdin);
+        this.utterancesDrinking = ["Heute ist es wirklich heiss. Hast du schon etwas getrunken?",
+                           "Bitte nicht dehydrieren. Hast du genug Flüssigkeit zu dir genommen?",
+                           "Es ist heiß draußen. Trinkst du regelmäßig etwas, um nicht auszutrocknen?",
+                           "Heute ist es echt warm. Bist du sicher, dass du genug getrunken hast?"];
+                           
+        this.utterancesVideo = ["Ich habe eine Nachricht von deiner Tochter für dich. Ich spiele sie für dich ab!",
+        "Deine Tochter hat eine Nachricht für dich hinterlassen. Die Wiedergabe ist bereit.",
+        "Deine Tochter hat eine Nachricht für dich hinterlassen. Ich spiele sie für dich ab."];
+    
+        this.confirmWords = ["ja", "selbstverständlich", "natürlich", "klar"];
+
+        this.readyForSpeechTO;
+        this.closeSpeechInputWindowTO;
+
+        this.drinkingDetected = false;
+        this.drinkingMotivationAttempts = 0;
+        this.MAX_DRINKING_MOTIVATION_ATTEMPTS = 0;
+
+        this.timerSchedule = [];
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
+        this.drinkingMotivationAttempts = 0;
+        this.drinkingDetected = false;
+        this.ScreenFace.emotion.sadness();
+        this.RoboticBody.followHead();  
+        this.animationSchedule();
+        console.log("Betreuendes Personal wurde informiert!");
+    }
 
-        var facePayload = {
-            "mode" : "setEmotion",
-            "data" : "neutral"
+    animationSchedule(){
+        this.animationReset();
+        clearTimeout(this.readyForSpeechTO);
+        clearTimeout(this.closeSpeechInputWindowTO);
+        this.timerSchedule.push(setTimeout(() => {this.informReminderSpeech()}, 100));
+        this.timerSchedule.push(setTimeout(() => {this.drinkMotivationSpeech()}, 20100));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 35000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.sadness()}, 55000));
+        this.timerSchedule.push(setTimeout(() => {this.videoMotivationSpeech()}, 58000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 110000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.sadness()}, 117000));
+        this.timerSchedule.push(setTimeout(() => {this.schedulerCallback()}, 117000));
+    }
+
+    animationReset(){
+        var i = 0;
+        while(i < this.timerSchedule.length){
+            clearTimeout(this.timerSchedule[i]);
+            i++;
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+    }
 
-        /* Add the event listener to listen on GesturePostureDetection events.
-        Execute gesturePostureRecognition function on received detections. */
+    schedulerCallback(){
+        this.animationReset();
+        this.drinkingMotivationAttempts++;
+        if(this.drinkingMotivationAttempts > this.MAX_DRINKING_MOTIVATION_ATTEMPTS){
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "videoCall");
+        }
+        else{
+            if(this.drinkingDetected == false){
+                this.animationSchedule();
+            }
+            else{
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");
+            }
+        }
+    }
 
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
-        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
-        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
-
+    informReminderSpeech(){
         var payloadTTS = {
             "mode" : "tts",
-            "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
+            "text" : this.utterancesHelp[Math.floor(Math.random()*this.utterancesHelp.length)]
         }
 
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+    }
+
+    drinkMotivationSpeech(){
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers.bind(this));
+
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : this.utterancesDrinking[Math.floor(Math.random()*this.utterancesDrinking.length)]
+        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+    }
+
+    videoMotivationSpeech(){
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.videoMotivationOpenForAnswers.bind(this));
+
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : this.utterancesVideo[Math.floor(Math.random()*this.utterancesVideo.length)]
+        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+    }
+
+    drinkMotivationOpenForAnswers(duration){
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers);
+        this.readyForSpeechTO = setTimeout(() => {
+            this.speechProcessor.speechEvent.on('FinalResult', this.checkAnswer.bind(this));
+        }, duration * 1000);
+
+        this.closeSpeechInputWindowTO = setTimeout(() => {
+            this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
+        }, (duration * 1000 + 10000));
+    }
+
+    videoMotivationOpenForAnswers(duration){     
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.videoMotivationOpenForAnswers);
+        this.readyForSpeechTO = setTimeout(() => {
+            this.ScreenFace.video.showAndPlay("drinkingMotivation");
+        }, (duration * 1000));
+
+        this.closeSpeechInputWindowTO = setTimeout(() => {
+            this.ScreenFace.video.stopAndHide();
+        }, (duration * 1000 + 27000));
+    }
+
+    checkAnswer(result){
+        console.log("tts result:" + result);
+
+        if(this.containsWords(result, this.confirmWords)){
+            var payloadTTS = {
+                "mode" : "tts",
+                "text" : "Alles klar. Super!"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");     
+        }
     }
 
     /*keyPressHandler = (ch, key) =>{
@@ -81,24 +184,14 @@ export class InformHelp extends StateWrap{
 
         // Stop listening for input
         //process.stdin.pause();
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
-        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
-        clearTimeout(this.timeout);
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers);
+        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
+        clearTimeout(this.readyForSpeechTO);
+        clearTimeout(this.closeSpeechInputWindowTO);
+        this.animationReset();
     }
 
-    finalResultHandler(result){
-        console.log("tts result:" + result);
 
-        if(this.containsWords(result, this.breakWords)){
-            var payloadTTS = {
-                "mode" : "tts",
-                "text" : "Alles klar. Kein Problem!"
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
-        }
-    }
 
     containsWords(str, wordsArray) {
         // Create a regular expression pattern from the array of words
@@ -108,19 +201,5 @@ export class InformHelp extends StateWrap{
         return pattern.test(str);
     }
 
-    newChatDurationCalculatedHandler(duration){
-        this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
-        }, duration * 1000);
-    }
 
-    /* Interpretion function of received data coming from Azure Kinectic Space. */
-    closestBodyRecognition(distance){
-        /* If the arnold gesture was detected the robot changes its state to attack. */
-        if(distance > globalStore.welcomeDistance){
-
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "farewell");
-        }
-    }
 }

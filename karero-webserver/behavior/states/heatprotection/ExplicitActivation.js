@@ -20,17 +20,15 @@ export class ExplicitActivation extends StateWrap{
         }));
         this.state.transitions.push(new Transition("informHelp", "informHelp", () => {
         }));
-        this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
-        }));
 
         this.utterancesDrinking = ["Heute ist es wirklich heiss. Hast du schon etwas getrunken?",
                            "Bitte nicht dehydrieren. Hast du genug Flüssigkeit zu dir genommen?",
                            "Es ist heiß draußen. Trinkst du regelmäßig etwas, um nicht auszutrocknen?",
                            "Heute ist es echt warm. Bist du sicher, dass du genug getrunken hast?"];
                            
-        this.utterancesVideo = ["Ich habe eine Nachricht von deiner Tochter für dich. Ich spiele sie für dich ab!",
-        "Deine Tochter hat eine Nachricht für dich hinterlassen. Die Wiedergabe ist bereit.",
-        "Deine Tochter hat eine Nachricht für dich hinterlassen. Ich spiele sie für dich ab."];
+        this.utterancesVideo = ["Ich habe eine Nachricht von Katja für dich. Ich spiele sie für dich ab!",
+        "Katja hat eine Nachricht für dich hinterlassen. Die Wiedergabe ist bereit.",
+        "Katja hat eine Nachricht für dich hinterlassen. Ich spiele sie für dich ab."];
     
         this.confirmWords = ["ja", "selbstverständlich", "natürlich", "klar"];
 
@@ -39,25 +37,32 @@ export class ExplicitActivation extends StateWrap{
 
         this.drinkingDetected = false;
         this.drinkingMotivationAttempts = 0;
-        this.MAX_DRINKING_MOTIVATION_ATTEMPTS = 3;
+        this.MAX_DRINKING_MOTIVATION_ATTEMPTS = 0;
 
         this.timerSchedule = [];
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-
+        this.drinkingMotivationAttempts = 0;
         this.drinkingDetected = false;
         this.ScreenFace.emotion.neutral();
         this.RoboticBody.followHead();  
         this.animationSchedule();
     }
 
-    animationSchedule(){    
+    animationSchedule(){
+        this.animationReset();
+        clearTimeout(this.readyForSpeechTO);
+        clearTimeout(this.closeSpeechInputWindowTO);
         this.timerSchedule.push(setTimeout(() => {this.drinkMotivationSpeech()}, 100));
-        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 20000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 15000));
         this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.neutral()}, 35000));
-        this.timerSchedule.push(setTimeout(() => {this.schedulerCallback()}, 60000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.joy()}, 38000));
+        this.timerSchedule.push(setTimeout(() => {this.videoMotivationSpeech()}, 38000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 90000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.neutral()}, 97000));
+        this.timerSchedule.push(setTimeout(() => {this.schedulerCallback()}, 97000));
     }
 
     animationReset(){
@@ -72,20 +77,20 @@ export class ExplicitActivation extends StateWrap{
         this.animationReset();
         this.drinkingMotivationAttempts++;
         if(this.drinkingMotivationAttempts > this.MAX_DRINKING_MOTIVATION_ATTEMPTS){
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "explicitActivation");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "informHelp");
         }
         else{
             if(this.drinkingDetected == false){
                 this.animationSchedule();
             }
             else{
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "heatProtectionEntry");
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");
             }
         }
     }
 
     drinkMotivationSpeech(){
-        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.openForAnswers.bind(this));
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers.bind(this));
 
         var payloadTTS = {
             "mode" : "tts",
@@ -96,6 +101,8 @@ export class ExplicitActivation extends StateWrap{
     }
 
     videoMotivationSpeech(){
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.videoMotivationOpenForAnswers.bind(this));
+
         var payloadTTS = {
             "mode" : "tts",
             "text" : this.utterancesVideo[Math.floor(Math.random()*this.utterancesVideo.length)]
@@ -104,8 +111,8 @@ export class ExplicitActivation extends StateWrap{
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
     }
 
-    openForAnswers(duration){
-        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.openForAnswers);
+    drinkMotivationOpenForAnswers(duration){
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers);
         this.readyForSpeechTO = setTimeout(() => {
             this.speechProcessor.speechEvent.on('FinalResult', this.checkAnswer.bind(this));
         }, duration * 1000);
@@ -113,6 +120,23 @@ export class ExplicitActivation extends StateWrap{
         this.closeSpeechInputWindowTO = setTimeout(() => {
             this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
         }, (duration * 1000 + 10000));
+    }
+
+    videoMotivationOpenForAnswers(duration){     
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.videoMotivationOpenForAnswers);
+
+        this.turnHandlerTO = setTimeout(() => {
+            this.RoboticBody.followHeadVertical();
+        }, (duration * 1000 - 1000));
+
+        this.readyForSpeechTO = setTimeout(() => {
+            this.ScreenFace.video.showAndPlay("drinkingMotivation");
+        }, (duration * 1000 + 500));
+
+        this.closeSpeechInputWindowTO = setTimeout(() => {
+            this.ScreenFace.video.stopAndHide();
+            this.RoboticBody.followHead();
+        }, (duration * 1000 + 27000));
     }
 
     checkAnswer(result){
@@ -153,9 +177,11 @@ export class ExplicitActivation extends StateWrap{
 
         // Stop listening for input
         //process.stdin.pause();
-        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.openForAnswers);
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
         clearTimeout(this.readyForSpeechTO);
+        clearTimeout(this.closeSpeechInputWindowTO);
+        this.animationReset();
     }
 
 

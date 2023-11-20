@@ -9,3 +9,6 @@ timeout 2
 cd ../../../tts
 start startFileService.bat
 start startTTS.bat
+
+cd ../chat-system
+start start.bat

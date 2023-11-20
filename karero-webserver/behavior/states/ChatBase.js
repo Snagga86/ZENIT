@@ -61,7 +61,8 @@ export class ChatBase extends StateWrap{
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-
+        this.nextNonverbalSignals = null;
+        this.lastRASAPayload = null;
         this.RoboticBody.followHead();
         this.ScreenFace.emotion.neutral();
         //this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
@@ -89,24 +90,25 @@ export class ChatBase extends StateWrap{
     }
 
     newChatDurationCalculatedHandler(duration){
-        
-        if(this.lastRASAPayload.length > 1){
-            this.nextNonverbalSignals = JSON.parse(this.lastRASAPayload[1].image.toString().replace(/'/g, '"'));
-                    
-            if(this.nextNonverbalSignals.action != "none"){
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, this.nextNonverbalSignals.action);
+        if(this.lastRASAPayload != null){
+            if(this.lastRASAPayload.length > 1){
+                this.nextNonverbalSignals = JSON.parse(this.lastRASAPayload[1].image.toString().replace(/'/g, '"'));
+                        
+                if(this.nextNonverbalSignals.action != "none"){
+                    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, this.nextNonverbalSignals.action);
+                }
             }
-        }
-        else{
-            this.nextNonverbalSignals = null;
-        }
+            else{
+                this.nextNonverbalSignals = null;
+            }
 
-        if(this.nextNonverbalSignals != null){
-            this.chatDuration = duration * 1000;
-            this.setNonverbalSignals(this.nextNonverbalSignals);
-            console.log(this.nextNonverbalSignals);
-            console.log(this.nextNonverbalSignals);
-            console.log(this.nextNonverbalSignals);
+            if(this.nextNonverbalSignals != null){
+                this.chatDuration = duration * 1000;
+                this.setNonverbalSignals(this.nextNonverbalSignals);
+                console.log(this.nextNonverbalSignals);
+                console.log(this.nextNonverbalSignals);
+                console.log(this.nextNonverbalSignals);
+            }
         }
     }
 

@@ -737,8 +737,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   faceActionController: {fileID: 254195710}
   DebugTrace: {fileID: 1512551678}
-  websocketUrl: ws://192.168.0.101:3344
-  httpUrl: http://192.168.0.101:1340/getAudio
+  websocketUrl: ws://192.168.123.101:3344
+  httpUrl: http://192.168.123.101:1340/getAudio
 --- !u!4 &254195708
 Transform:
   m_ObjectHideFlags: 0
@@ -10986,7 +10986,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 927164512}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.0207}
+  m_LocalPosition: {x: 51, y: 0, z: -0.0207}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11827,7 +11827,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 0.066, y: -0.0374, z: 0.0004}
+  m_LocalPosition: {x: 0.1028, y: -0.0374, z: 0.0004}
   m_LocalScale: {x: 0.3, y: 0.1, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11940,7 +11940,7 @@ AudioDistortionFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DistortionLevel: 0
 --- !u!164 &1111824181
 AudioReverbFilter:
@@ -11949,7 +11949,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -100
@@ -11972,7 +11972,7 @@ AudioChorusFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryMix: 0.5
   m_WetMix1: 0.5
   m_WetMix2: 0.5
@@ -11987,7 +11987,7 @@ AudioEchoFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Delay: 15
   m_DecayRatio: 0.2
   m_WetMix: 0.7
@@ -11999,7 +11999,7 @@ AudioHighPassFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CutoffFrequency: 10
   m_HighpassResonanceQ: 1
 --- !u!169 &1111824185
@@ -12009,7 +12009,7 @@ AudioLowPassFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_LowpassResonanceQ: 1
   lowpassLevelCustomCurve:
@@ -17854,7 +17854,7 @@ RectTransform:
   m_GameObject: {fileID: 2045300468}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 23}
-  m_LocalScale: {x: 1.0594264, y: 0.92044, z: 0.92044}
+  m_LocalScale: {x: 1.8897767, y: 1.6014987, z: 1.6014987}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 55752853}
@@ -17862,7 +17862,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -7, y: 0}
+  m_AnchoredPosition: {x: 5, y: 0}
   m_SizeDelta: {x: 1280, y: 720}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2045300470
@@ -18095,7 +18095,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 550, y: 314}
+  m_AnchoredPosition: {x: 958, y: 444}
   m_SizeDelta: {x: 160, y: 60}
   m_Pivot: {x: 0.5, y: 0.5000003}
 --- !u!114 &2129492621
