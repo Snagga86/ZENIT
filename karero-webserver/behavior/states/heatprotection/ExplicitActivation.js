@@ -23,30 +23,109 @@ export class ExplicitActivation extends StateWrap{
         this.state.transitions.push(new Transition("chatBase", "chatBase", () => {
         }));
 
-        this.utterances = [];
-        this.breakWords = ["stop", "stoppen", "aufhören", "schluss","unterhalten"];
+        this.utterancesDrinking = ["Heute ist es wirklich heiss. Hast du schon etwas getrunken?",
+                           "Bitte nicht dehydrieren. Hast du genug Flüssigkeit zu dir genommen?",
+                           "Es ist heiß draußen. Trinkst du regelmäßig etwas, um nicht auszutrocknen?",
+                           "Heute ist es echt warm. Bist du sicher, dass du genug getrunken hast?"];
+                           
+        this.utterancesVideo = ["Ich habe eine Nachricht von deiner Tochter für dich. Ich spiele sie für dich ab!",
+        "Deine Tochter hat eine Nachricht für dich hinterlassen. Die Wiedergabe ist bereit.",
+        "Deine Tochter hat eine Nachricht für dich hinterlassen. Ich spiele sie für dich ab."];
+    
+        this.confirmWords = ["ja", "selbstverständlich", "natürlich", "klar"];
 
-        this.timeout;
-        keypress(process.stdin);
+        this.readyForSpeechTO;
+        this.closeSpeechInputWindowTO;
+
+        this.drinkingDetected = false;
+        this.drinkingMotivationAttempts = 0;
+        this.MAX_DRINKING_MOTIVATION_ATTEMPTS = 3;
+
+        this.timerSchedule = [];
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
 
+        this.drinkingDetected = false;
         this.ScreenFace.emotion.neutral();
+        this.RoboticBody.followHead();  
+        this.animationSchedule();
+    }
 
-        /* Add the event listener to listen on GesturePostureDetection events.
-        Execute gesturePostureRecognition function on received detections. */
+    animationSchedule(){    
+        this.timerSchedule.push(setTimeout(() => {this.drinkMotivationSpeech()}, 100));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 20000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.neutral()}, 35000));
+        this.timerSchedule.push(setTimeout(() => {this.schedulerCallback()}, 60000));
+    }
 
-        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
-        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
+    animationReset(){
+        var i = 0;
+        while(i < this.timerSchedule.length){
+            clearTimeout(this.timerSchedule[i]);
+            i++;
+        }
+    }
+
+    schedulerCallback(){
+        this.animationReset();
+        this.drinkingMotivationAttempts++;
+        if(this.drinkingMotivationAttempts > this.MAX_DRINKING_MOTIVATION_ATTEMPTS){
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "explicitActivation");
+        }
+        else{
+            if(this.drinkingDetected == false){
+                this.animationSchedule();
+            }
+            else{
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "heatProtectionEntry");
+            }
+        }
+    }
+
+    drinkMotivationSpeech(){
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.openForAnswers.bind(this));
 
         var payloadTTS = {
             "mode" : "tts",
-            "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
+            "text" : this.utterancesDrinking[Math.floor(Math.random()*this.utterancesDrinking.length)]
         }
 
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+    }
+
+    videoMotivationSpeech(){
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : this.utterancesVideo[Math.floor(Math.random()*this.utterancesVideo.length)]
+        }
+
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+    }
+
+    openForAnswers(duration){
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.openForAnswers);
+        this.readyForSpeechTO = setTimeout(() => {
+            this.speechProcessor.speechEvent.on('FinalResult', this.checkAnswer.bind(this));
+        }, duration * 1000);
+
+        this.closeSpeechInputWindowTO = setTimeout(() => {
+            this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
+        }, (duration * 1000 + 10000));
+    }
+
+    checkAnswer(result){
+        console.log("tts result:" + result);
+
+        if(this.containsWords(result, this.confirmWords)){
+            var payloadTTS = {
+                "mode" : "tts",
+                "text" : "Alles klar. Super!"
+            }
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");     
+        }
     }
 
     /*keyPressHandler = (ch, key) =>{
@@ -74,23 +153,12 @@ export class ExplicitActivation extends StateWrap{
 
         // Stop listening for input
         //process.stdin.pause();
-        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
-        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
-        clearTimeout(this.timeout);
+        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.openForAnswers);
+        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
+        clearTimeout(this.readyForSpeechTO);
     }
 
-    finalResultHandler(result){
-        console.log("tts result:" + result);
 
-        if(this.containsWords(result, this.breakWords)){
-            var payloadTTS = {
-                "mode" : "tts",
-                "text" : "Alles klar. Kein Problem!"
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
-        }
-    }
 
     containsWords(str, wordsArray) {
         // Create a regular expression pattern from the array of words
@@ -100,9 +168,5 @@ export class ExplicitActivation extends StateWrap{
         return pattern.test(str);
     }
 
-    newChatDurationCalculatedHandler(duration){
-        this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "briefingForExercise");
-        }, duration * 1000);
-    }
+
 }

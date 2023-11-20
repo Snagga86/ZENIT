@@ -41,10 +41,13 @@ export class SubtleActivation extends StateWrap{
 
     animationSchedule(){    
         this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.hot()}, 100));
-        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.thirsty()}, 12000));
-        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.neutral()}, 22000));
-        this.timerSchedule.push(setTimeout(() => {this.RoboticBody.followHead()}, 22000));
-        this.timerSchedule.push(setTimeout(() => {this.schedulerCallback()}, 33000));
+        this.timerSchedule.push(setTimeout(() => {this.RoboticBody.sadness()}, 15000));
+        this.timerSchedule.push(setTimeout(() => {this.RoboticBody.followHead()}, 25000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.thirsty()}, 35000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.sound.nameAndPlay("drinking")}, 37000));
+        this.timerSchedule.push(setTimeout(() => {this.ScreenFace.emotion.neutral()}, 55000));
+        this.timerSchedule.push(setTimeout(() => {this.RoboticBody.followHead()}, 60000));
+        this.timerSchedule.push(setTimeout(() => {this.schedulerCallback()}, 60000));
     }
 
     animationReset(){
