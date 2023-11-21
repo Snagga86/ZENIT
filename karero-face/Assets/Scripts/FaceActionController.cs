@@ -15,6 +15,8 @@ public class FaceActionController : MonoBehaviour
 {
     public FaceEmotion faceEmotion;
 
+    public GameObject infoText;
+
     public GameObject particleSystem;
     public GameObject drops1;
     public GameObject drops2;
@@ -174,6 +176,15 @@ public class FaceActionController : MonoBehaviour
         this.displayEmotion = emotion;
     }
 
+    internal void setInfoText(string text)
+    {
+        this.infoText.GetComponent<Blink>().setText(text);
+    }
+
+    internal void showInfoText(bool show)
+    {
+        this.infoText.SetActive(show);
+    }
 
     private void EyeBreath()
     {

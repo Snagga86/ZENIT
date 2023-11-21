@@ -50,6 +50,8 @@ export class InformHelp extends StateWrap{
         this.drinkingMotivationAttempts = 0;
         this.drinkingDetected = false;
         this.ScreenFace.emotion.sadness();
+        this.ScreenFace.text.show();
+        this.ScreenFace.text.text("Betreuendes Personal wurde informiert!");
         this.RoboticBody.followHead();  
         this.animationSchedule();
         console.log("Betreuendes Personal wurde informiert!");
@@ -184,6 +186,7 @@ export class InformHelp extends StateWrap{
 
         // Stop listening for input
         //process.stdin.pause();
+        this.ScreenFace.text.hide();
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.drinkMotivationOpenForAnswers);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.checkAnswer);
         clearTimeout(this.readyForSpeechTO);

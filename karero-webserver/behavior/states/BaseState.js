@@ -283,12 +283,40 @@ export class Sound{
     }
 }
 
+export class Text{
+    constructor(brainEvents){
+        this.brainEvents = brainEvents;
+    }
+
+    text(name){
+        this.setText("text", name);
+    }
+
+    show(){
+        this.setText("show");
+    }
+
+    hide(){
+        this.setText("hide");
+    }
+
+    setText(data, extra = ""){
+        var payloadText = {
+            "mode" : "setInfoText",
+            "data" : data,
+            "extra" : extra
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadText)
+    }
+}
+
 export class DisplayDevice{
     constructor(brainEvents){
         this.brainEvents = brainEvents;
         this.emotion = new Emotion(this.brainEvents);
         this.video = new Video(this.brainEvents);
         this.sound = new Sound(this.brainEvents);
+        this.text = new Text(this.brainEvents);
     }
 }
 

@@ -126,6 +126,21 @@ public class NetworkController : MonoBehaviour
                 }
             }
 
+            if (jsonControlObject.mode == "setInfoText")
+            {
+                switch (jsonControlObject.data)
+                {
+                    case "text":
+                        this.faceActionController.setInfoText(jsonControlObject.extra);
+                        break;
+                    case "show":
+                        this.faceActionController.showInfoText(true);
+                        break;
+                    case "hide":
+                        this.faceActionController.showInfoText(false);
+                        break;
+                }
+            }
         };
 
         webSocket.OnOpen += () =>
