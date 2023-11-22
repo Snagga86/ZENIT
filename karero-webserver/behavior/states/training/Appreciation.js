@@ -49,7 +49,7 @@ export class Appreciation extends StateWrap{
             "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
 
         this.ScreenFace.emotion.joy();
 

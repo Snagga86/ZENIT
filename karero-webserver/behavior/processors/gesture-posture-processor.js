@@ -25,7 +25,7 @@ export class GesturePostureProcessor {
             if(this.recentlyDetected == false && this.closestBody.trackedGesture != ""){
                 this.recentlyDetected = true;
                 this.timeDetected = Date.now();
-                this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);  
+                this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);
             }
             this.debounceGesture();
             this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);

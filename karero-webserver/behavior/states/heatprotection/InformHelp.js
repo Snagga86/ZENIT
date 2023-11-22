@@ -47,7 +47,7 @@ export class InformHelp extends StateWrap{
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-        this.drinkingMotivationAttempts = 0;
+        this.drinkingMotivationAttempts = 200;
         this.drinkingDetected = false;
         this.ScreenFace.emotion.sadness();
         this.ScreenFace.text.show();
@@ -101,7 +101,7 @@ export class InformHelp extends StateWrap{
             "text" : this.utterancesHelp[Math.floor(Math.random()*this.utterancesHelp.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 
     drinkMotivationSpeech(){
@@ -112,7 +112,7 @@ export class InformHelp extends StateWrap{
             "text" : this.utterancesDrinking[Math.floor(Math.random()*this.utterancesDrinking.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 
     videoMotivationSpeech(){
@@ -123,7 +123,7 @@ export class InformHelp extends StateWrap{
             "text" : this.utterancesVideo[Math.floor(Math.random()*this.utterancesVideo.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 
     drinkMotivationOpenForAnswers(duration){
@@ -156,7 +156,7 @@ export class InformHelp extends StateWrap{
                 "mode" : "tts",
                 "text" : "Alles klar. Super!"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");     
         }
     }
@@ -194,8 +194,6 @@ export class InformHelp extends StateWrap{
         this.animationReset();
     }
 
-
-
     containsWords(str, wordsArray) {
         // Create a regular expression pattern from the array of words
         const pattern = new RegExp(wordsArray.join('|'), 'i');
@@ -203,6 +201,4 @@ export class InformHelp extends StateWrap{
         // Test if the string contains any of the words
         return pattern.test(str);
     }
-
-
 }

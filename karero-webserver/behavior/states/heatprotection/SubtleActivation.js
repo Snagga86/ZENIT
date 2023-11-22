@@ -99,7 +99,7 @@ export class SubtleActivation extends StateWrap{
                 "mode" : "tts",
                 "text" : "Alles klar. Kein Problem!"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
             console.log("goto chatBase");
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
         }

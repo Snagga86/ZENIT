@@ -281,6 +281,14 @@ export class Sound{
         }
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadSound)
     }
+
+    speak(text){
+        var payloadTTS = { "mode" : "tts",
+                           "text" : text
+        }
+
+    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
+    }
 }
 
 export class Text{

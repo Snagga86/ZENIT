@@ -32,13 +32,14 @@ export class EmotionProcessor {
     }*/
 
     digest(currentEmotionInput) {
+        console.log(currentEmotionInput);
         if(this.facialExpressionsInterpretation == true){
-            var emotion = this.processValueAsFacialExpression(currentEmotionInput);
+            var emotion = this.processValueAsFacialExpression(currentEmotionInput.toLowerCase());
         }
         if(this.bodyLanguageInterpretation == true){
-            this.processValueAsBodyLanguage(currentEmotionInput);
+            this.processValueAsBodyLanguage(currentEmotionInput.toLowerCase());
         }
-        console.log(emotion);
+        //console.log(emotion);
         this.emotionEvent.emit('EmotionDetection', emotion);
         this.currentEmotion = emotion;
     }
@@ -120,7 +121,7 @@ export class EmotionProcessor {
 }
 
 const NUM_VALENCE_CLASSES = 3.333;
-const EMOTION_BUFFER_LEN = 12;
+const EMOTION_BUFFER_LEN = 9;
 const BEmotion = {
 
     "anger" : ['annoyance','anger', 'rage']

@@ -15,8 +15,6 @@ public class Blink : MonoBehaviour
         this.textField = this.gameObject.GetComponent<TextMeshProUGUI>();
         Debug.Log(this.gameObject);
         Debug.Log(this.textField);
-        // Start the blinking coroutine
-        StartCoroutine(BlinkText());
     }
 
     public void setText(string text)

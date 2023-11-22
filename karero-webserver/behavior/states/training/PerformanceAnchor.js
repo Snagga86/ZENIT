@@ -58,8 +58,6 @@ export class PerformanceAnchor extends StateWrap{
     exitFunction(){
 
         this.squadCounter = 0;
-        process.stdin.removeListener('keypress', this.keyPressHandler);
-        process.stdin.pause();
         /* Turn off event listener if state is exited. */
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
@@ -77,7 +75,7 @@ export class PerformanceAnchor extends StateWrap{
                 "mode" : "tts",
                 "text" : "Alles klar. Kein Problem!"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");     
         }
     }
@@ -97,7 +95,7 @@ export class PerformanceAnchor extends StateWrap{
                 "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
             }
     
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);        
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);        
 
             this.ScreenFace.emotion.sadness();
             
@@ -150,7 +148,7 @@ export class PerformanceAnchor extends StateWrap{
                     "text" : squadNumber
                 }
         
-                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS); 
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS); 
 
                 var nv_face_payload = {
                     "mode" : "setEmotion",

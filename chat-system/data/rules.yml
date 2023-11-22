@@ -7,6 +7,11 @@ rules:
   - intent: ask_introduction
   - action: utter_self_introduction
 
+- rule: Facial Mimicry
+  steps:
+  - intent: facial_mimicry
+  - action: utter_facial_mimicry
+
 - rule: Activate squads
   steps:
   - intent: start_squads

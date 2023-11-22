@@ -97,7 +97,7 @@ export class ExplicitActivation extends StateWrap{
             "text" : this.utterancesDrinking[Math.floor(Math.random()*this.utterancesDrinking.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 
     videoMotivationSpeech(){
@@ -108,7 +108,7 @@ export class ExplicitActivation extends StateWrap{
             "text" : this.utterancesVideo[Math.floor(Math.random()*this.utterancesVideo.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 
     drinkMotivationOpenForAnswers(duration){
@@ -147,7 +147,7 @@ export class ExplicitActivation extends StateWrap{
                 "mode" : "tts",
                 "text" : "Alles klar. Super!"
             }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");     
         }
     }

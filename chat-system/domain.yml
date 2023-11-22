@@ -38,6 +38,10 @@ responses:
     - text: "Ich bin ein sozialer Roboter in der Entwicklung. Ich kann schon etwas sprechen und manche non-verbalen Signale verstehen. Wenn ich groß bin, will ich die Welt erkunden."
     - text: "Ich entwickle mich zu einem sozialen Roboter, der bereits über Sprachfähigkeiten verfügt und einige non-verbale Signale interpretieren kann. Mein Zukunftstraum? Die Welt erkunden, sobald ich ausgereift bin."
 
+  utter_facial_mimicry:
+    - text: "Ich kann deine Emotionen nachmachen. Probier es mal aus. Zum Beispiel lächeln, böse oder erstaunt schauen."
+      image: "{'action': 'facialMimicry', 'face': 'none', 'body': 'none'}"
+
   utter_greet:
     - text: "Hai! Wie kann ich helfen?"
       image: "{'action': 'none', 'face': 'joy', 'body': 'none'}"

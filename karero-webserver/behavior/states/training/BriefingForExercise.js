@@ -54,7 +54,7 @@ export class BriefingForExercise extends StateWrap{
             "text" : this.utterances[Math.floor(Math.random()*this.utterances.length)]
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 
     /* Exit function is executed whenever the state is left. */

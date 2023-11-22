@@ -29,6 +29,8 @@ import { InformHelp } from './states/heatprotection/InformHelp.js';
 import { VideoCall } from './states/heatprotection/VideoCall.js';
 import { EmergencyCall } from './states/heatprotection/EmergencyCall.js';
 
+import { FacialMimicry } from './states/facialmimicry/FacialMimicry.js';
+
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
 2. gestures/postures and Interactor location from Azure Kinetic Space. KARERO Brain is implemented as
@@ -51,7 +53,8 @@ export class Brain{
         ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
         ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
         RASA_ANSWER: 'RASA_ANSWER',
-        TTS_ACTION: 'TTS_ACTION'
+        TEXT_TO_SPEECH_ACTION: 'TEXT_TO_SPEECH_ACTION',
+        SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION'
     }
   
     constructor(){
@@ -70,7 +73,8 @@ export class Brain{
         /* Websocket connections to send signals to KARERO display and body. */
         this.robotBodyWS = null;
         this.robotFaceWS = null;
-        this.ttsService = null;
+        this.speechSynthesisWS = null;
+        this.speechTranscriptionWS = null;
 
         /* Creating all state machine states for every behavior. The start state has to be declated
         seperately. */
@@ -104,8 +108,10 @@ export class Brain{
         const videoCall = new VideoCall(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const emergencyCall = new EmergencyCall(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
+        const facialMimicry = new FacialMimicry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+
         this.stateMachineDefinition = {
-            initialState: "off", off, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
+            initialState: "off", off, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
         };
         
         /* Create the state machine with states required. */
@@ -133,9 +139,15 @@ export class Brain{
         });
 
         /* Whenever a state triggers a new tts action it is transmitted from here. */
-        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, (text) => {
-            if(this.ttsService != null){
-                this.ttsService.send(JSON.stringify(text));
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, (text) => {
+            if(this.speechSynthesisWS != null){
+                this.speechSynthesisWS.send(JSON.stringify(text));
+            }
+        });
+
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, (payload) => {
+            if(this.speechTranscriptionWS = null){
+                this.speechTranscriptionWS.send(JSON.stringify(payload));
             }
         });
 
@@ -160,9 +172,14 @@ export class Brain{
         this.robotFaceWS = ws;
     }
 
-    /* Set the transmission websocket for TTS action connection. */
-    setTTSTransmissionWS(ws){
-        this.ttsService = ws;
+    /* Set the transmission websocket for text to speech action connection. */
+    setSpeechSynthesisWS(ws){
+        this.speechSynthesisWS = ws;
+    }
+
+    /* Set the transmission websocket for speech to text action connection. */
+    setSpeechTranscriptonControlWS(ws){
+        this.speechTranscriptionWS = ws;
     }
 
     /* Process raw data of gestures/postures detection. */

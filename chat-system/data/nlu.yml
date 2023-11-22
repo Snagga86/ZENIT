@@ -39,6 +39,15 @@ nlu:
     - Kannst du etwas berichten
     - Eine nette Geschichte zu hören wäre super
 
+- intent: facial_mimicry
+  examples: |
+    - Kannst du meine Gesichsausdrücke spiegeln
+    - Kannst du mich nachahmen
+    - Kannst du mich aktiv unterhalten
+    - Kannst du meine Emotionen erkennen
+    - Bitte ahme meine Gesichtsausdrücke nach
+    - Mimikry für das Gesicht bitte
+
 - intent: express_gratitude
   examples: |
     - Danke

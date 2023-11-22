@@ -38,6 +38,11 @@ export class ChatBase extends StateWrap{
             console.log('transition action for "ChatBase" in "heatProtectionEntry" state')
         }));
 
+        this.state.transitions.push(new Transition("facialMimicry", "facialMimicry", () => {
+            console.log('transition action for "ChatBase" in "heatProtectionEntry" state')
+        }));
+
+
         /* Temporary transitions to animation demos and speech. */
         this.state.transitions.push(new Transition("angerShow", "angerShow", () => {
             console.log('transition action for "ChatBase" in "angerShow" state')
@@ -55,7 +60,7 @@ export class ChatBase extends StateWrap{
             console.log('transition action for "ChatBase" in "disgustShow" state')
         }));
         
-
+        this.feedbackTimer = null;
         this.chatDuration = 0;
     }
 
@@ -69,6 +74,7 @@ export class ChatBase extends StateWrap{
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
+        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureDetection.bind(this));
 
     }
 
@@ -80,12 +86,27 @@ export class ChatBase extends StateWrap{
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
         this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler);
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
+        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
+        clearTimeout(this.feedbackTimer);
     }
 
     finalResultHandler(result){
         console.log("tts result:" + result);
         if(result.length > 1){
             this.chatProcessor.sendMessage(result);
+        }
+    }
+
+    gesturePostureDetection(gesture){
+        if(gesture == "stop"){
+            this.ScreenFace.sound.stop();
+            var payload = {
+                "mode" : "listen",
+                "status" : "resume",
+                "duration" : "none"
+            }
+            this.feedbackTimer = setTimeout(() => {this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);}, 1500);         
+            this.ScreenFace.sound.speak("Ich bin still.");
         }
     }
 
@@ -119,7 +140,7 @@ export class ChatBase extends StateWrap{
             "text" : payload[0].text
         }
         this.lastRASAPayload = payload;
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TTS_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
 
     }
 

@@ -101,6 +101,9 @@ try:
 
             try:
                 message = controlSignalQueue.get(timeout=0.01)  # Get a message from the queue
+
+                if(message["mode"] == "listen" and message["status"] == "resume"):
+                    agentIsTalking = False
                 
                 if(message["mode"] == "listen" and message["status"] == "stop"):
                     agentStartTalkTime = int(time.time())
