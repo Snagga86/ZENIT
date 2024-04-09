@@ -16,6 +16,22 @@
             "EmotionNetwork" : {
                 "IpAddress" : "192.168.123.182",
                 "Port" : 1337
+            },
+            "SpeechNetwork" : {
+                "IpAddress" : "192.168.123.182",
+                "Port" : 1338
+            },
+            "TTSNetwork" : {
+                "IpAddress" : "192.168.123.182",
+                "Port" : 1339
+            },
+            "STTNetwork" : {
+                "IpAddress" : "192.168.123.182",
+                "Port" : 1341
+            },
+            "RasaNetwork" : {
+                "IpAddress" : "192.168.0.101",
+                "Port" : 5005
             }
         },
         "robotPosition" : {
@@ -23,6 +39,10 @@
             "baseY" : 0.9,
             "baseZ" : 0.01,
             "baseRotation" : 0
+        },
+        "interactionSweetSpot": {
+            "x" : 1.6,
+            "z" : 3
         }
     }
 }

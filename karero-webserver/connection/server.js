@@ -1,5 +1,6 @@
 import dgram from 'node:dgram';
 import pkg from  "osc-js";
+import http from "http";
 import { WebSocketServer } from 'ws';
 import { Brain } from '../behavior/brain.js';
 
@@ -26,17 +27,26 @@ export class KAREROServer {
             ]
         };
 
+        /* Make sure Agent is not talking and listening at the same time. */
+        this.talkingStart = 0;
+        this.talkingEnd = 0;
+
         /* Websocket Server declarations. */
         this.displayControlWSS = null;
         this.robotControlWSS = null;
+        this.textToSpeechWSS = null;
+        this.speechTranscriptionControlWSS = null;
 
-        /* Websocket. */
+        /* Websockets. */
         this.displayControlWS = null;
         this.robotControlWS = null;
+        this.textToSpeechWS = null;
+        this.speechTranscriptionControlWS = null;
 
-        /* UDP sockets */
+        /* UDP sockets. */
         this.osc = new pkg()
         this.emotionDetectionSocket = dgram.createSocket('udp4');
+        this.speechTranscriptionStreamSocket = dgram.createSocket('udp4');
     }
 
     /* Starts all network services for KARERO interaction. 
@@ -53,6 +63,7 @@ export class KAREROServer {
         /* On incoming OSC data from Azure Kinetic Space this data is processed for possible usage
         in the KARERO Brain/business logic. */
         this.osc.on('/data', message => {
+
             var data = JSON.parse(message.args)
             this.tmpOSCPayload = data
             this.KAREROBrain.processKinectRecognition(data);
@@ -80,6 +91,109 @@ export class KAREROServer {
             console.log(`python server listening ${address.address}:${address.port}`);
         });
 
+        /* -------- Speech Recognition -------- */
+        /* Bind the UDP socket to receive recognized basic emotions from the TTS detection
+        network. */
+        this.speechTranscriptionStreamSocket.bind(this.networkConfig.SpeechNetwork.Port);
+
+        /* Incoming data from the TTS detection network is processed in the KARERO brain. */
+        this.speechTranscriptionStreamSocket.on('message', (msg, rinfo) => {
+            this.KAREROBrain.processSpeechRecognition(msg.toString());
+        });
+
+        /* TTS detection error handling. */
+        this.speechTranscriptionStreamSocket.on('error', (err) => {
+            console.log(`server error:\n${err.stack}`);
+            this.speechTranscriptionStreamSocket.close();
+        });
+
+        /* ToDo: Handling */
+        this.speechTranscriptionStreamSocket.on('listening', () => {
+            const address = this.speechTranscriptionStreamSocket.address();
+            console.log(`python server listening ${address.address}:${address.port}`);
+        });
+
+        /* Bind the websocket to stop STT translation while the agent is
+        talking to prevent sound feedback loops. */
+        this.speechTranscriptionControlWSS = new WebSocketServer({host: this.networkConfig.STTNetwork.IpAddress, port: this.networkConfig.STTNetwork.Port}, ()=>{
+            console.log("stt control server start");
+        });
+
+        /* On incoming connection of the KARERO STT in KARERO Brain. */
+        this.speechTranscriptionControlWSS.on('connection', (webSocket) =>{
+            console.log("Speech-To-Text control connection established");
+            this.speechTranscriptionControlWS = webSocket;
+            this.KAREROBrain.setSpeechTranscriptonControlWS(webSocket);
+        });
+
+        /* Handling for STT connection close. */
+        this.speechTranscriptionControlWSS.on('close', (webSocket) =>{
+            console.log("connection disconnected");
+            //this.textToSpeechWS = null;
+        });
+
+        /* Handling for STT connection error. */
+        this.speechTranscriptionControlWSS.on('error', (webSocket) =>{
+            console.log("connection disonnected");
+            //this.textToSpeechWS = null;
+        });
+        
+        /* -------- Speech Synthesis -------- */
+        /* Start the server to communicate with KARERO TTS application. */
+        this.textToSpeechWSS = new WebSocketServer({host: this.networkConfig.TTSNetwork.IpAddress, port: this.networkConfig.TTSNetwork.Port}, ()=>{
+            console.log("tts control server start");
+        });
+
+        /* On incoming connection of the KARERO TTS in KARERO Brain. */
+        this.textToSpeechWSS.on('connection', (webSocket) =>{
+            console.log("Text-To-Speech control connection established");
+            this.textToSpeechWS = webSocket;
+            this.KAREROBrain.setSpeechSynthesisWS(webSocket);
+
+            this.textToSpeechWS.on('message', (data) =>{
+                console.log(data.toString('utf8'))
+                var text = data.toString('utf8').split(';')[0];
+                var textDuration = data.toString('utf8').split(';')[1];
+
+                console.log("emit brain event NEW_CHAT_DURATION");
+                this.KAREROBrain.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, textDuration);
+
+                var payload = {
+                    "mode" : "listen",
+                    "status" : "stop",
+                    "duration" : textDuration
+                }
+
+                this.speechTranscriptionControlWS.send(JSON.stringify(payload));
+
+                var facePayload = {
+                    "mode" : "setSound",
+                    "data" : "speak",
+                    "extra" : text
+                }
+
+                try{
+                    console.log("Sending Text to speak to display device...")
+                    this.displayControlWS.send(JSON.stringify(facePayload));
+                }
+                catch{
+                    console.log("Display device not connected...")
+                }
+            });
+        });
+
+        /* Handling for TTS connection close. */
+        this.textToSpeechWSS.on('close', (webSocket) =>{
+            console.log("connection disconnected");
+            this.textToSpeechWS = null;
+        });
+
+        /* Handling for TTS connection error. */
+        this.textToSpeechWSS.on('error', (webSocket) =>{
+            console.log("connection disonnected");
+            this.textToSpeechWS = null;
+        });
+
         /* -------- Display/Face Communication -------- */
         /* Start the server to communicate with KARERO Face application. */
         this.displayControlWSS = new WebSocketServer({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
@@ -92,7 +206,6 @@ export class KAREROServer {
             console.log("display control connection established");
             this.displayControlWS = webSocket;
             this.KAREROBrain.setBrainRobotFaceTransmissionWS(webSocket);
-            console.log(webSocket.readyState);
         });
 
         /* Handling for display control connection close. */
@@ -138,17 +251,12 @@ export class KAREROServer {
                             Math.pow(yDistance, 2) +
                             Math.pow(zDistance, 2)
                         );
-
-                        console.log("Distance:", distance);
                         
                         if(distance < closestDistance){
                             closestBody = body;
                             closestDistance = distance;
                         }
                     });
-
-                    console.log("Closest Distance:", distance);
-
                     var payload = {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
@@ -167,9 +275,5 @@ export class KAREROServer {
                 }
             });
         });
-
     }
 }
-
-
-

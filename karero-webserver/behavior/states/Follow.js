@@ -1,5 +1,7 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
+import logger from '../../tools/logger.js';
+import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Follow extends StateWrap{
@@ -38,7 +40,7 @@ export class Follow extends StateWrap{
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureRecognition.bind(this));
+        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.GesturePostureDetection.bind(this));
         this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
     }
 
@@ -46,12 +48,12 @@ export class Follow extends StateWrap{
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureRecognition);
+        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.GesturePostureDetection);
         this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
     }
 
     /* Interpretion function of received data coming from Azure Kinectic Space. */
-    gesturePostureRecognition(receivedGesture){
+    GesturePostureDetection(receivedGesture){
 
         /* If the arnold gesture was detected the robot changes its state to attack. */
         if(receivedGesture == "a3" || receivedGesture == "arnold2" || receivedGesture == "arnold"){
@@ -64,7 +66,11 @@ export class Follow extends StateWrap{
     /* Interpretion function of received data coming from Emotion Detection Algorithm. */
     emotionRecognition(receivedEmotion){
         console.log("detect emotion");
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, receivedEmotion);
+        var payload = {
+            "mode" : "setEmotion",
+            "data" : receivedEmotion
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload);
         /* If the ecstasy emotion was detected the robot changes it's state to dance. */
         if(receivedEmotion == "Ecstasy"){
 

@@ -2,8 +2,12 @@
   "type": "module",
   "dependencies": {
     "dgram": "^1.0.1",
+    "keypress": "^0.2.1",
     "osc-js": "^2.3.2",
+    "short-uuid": "^4.2.2",
+    "shortid": "^2.2.16",
     "socket.io": "^4.5.2",
+    "uuid": "^9.0.0",
     "ws": "^8.8.1"
   }
 }

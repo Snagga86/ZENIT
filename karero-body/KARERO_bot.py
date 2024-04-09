@@ -16,7 +16,8 @@ class KAREROBot:
         self.activity = "base"
         self.DIGEST_THRESHOLD = 0.6
 
-        self.personFocusAngle = 0.0
+        self.personFocusAngleHorizontal = 0.0
+        self.personFocusAngleVertical = 0.0
 
         karero_api.power_on();
         time.sleep(2);
@@ -27,8 +28,9 @@ class KAREROBot:
         print("Power on: ", karero_api.is_power_on())
         time.sleep(0.5);
         karero_api.send_angles([0,0,0,0,0,0], 0)
-        time.sleep(0.5);
+        time.sleep(4);
 
+        #self.disgust(karero_api);
 
         self.karero_network.start(self)
     
@@ -47,7 +49,7 @@ class KAREROBot:
 
         angle_v = np.arctan2(z2 - z1, x2 - x1) * 180 / np.pi - 90
         if (angle_v < 0):
-            angle_v = angle_v + 360
+            angle_v = angle_v
 
         angle_v = angle_v + base_rotation
 
@@ -57,44 +59,123 @@ class KAREROBot:
         #if (angle_h < 0):
         #   angle_h = angle_h + 360
 
-        print(angle_h)
+        #print(angle_h)
 
         return [-1 * angle_v, -1 * angle_h]
 
     def follow_head(self, payload):
         angle_v, angle_h = self.rotateBaseToTarget(payload["data"]["baseX"], payload["data"]["baseY"], payload["data"]["baseZ"], payload["data"]["baseRotation"], payload["data"]["personX"], payload["data"]["personY"], payload["data"]["personZ"])
-        print("follow head")
+        print("action: follow head")
+        #print(angle_v, angle_h)
         self.karero_api.send_angles([angle_v, -15, angle_h - 5 , 0, 30, 0], 15)
-        self.personFocusAngle = angle_v
+        self.personFocusAngleHorizontal = angle_v
+        self.personFocusAngleVertical = angle_h
         self.last_action_timestamp = time.time()
-        
-    async def dance(self, karero_api):
+
+    async def neutral(self, karero_api):
         movement_description = [
-            [(self.personFocusAngle - 20), -25, -30, -10, 15, -5],
-            [(self.personFocusAngle), -45, 10, 0, 35, 0],
-            [(self.personFocusAngle + 20), -25, -30, 10, 15, 5]
+            [self.personFocusAngleHorizontal, 0, -10, 0, 5, 0],
+            [self.personFocusAngleHorizontal, 0, -10, 0, 5, 0],
         ]
         print("before send_angles")
-        karero_api.send_angles(movement_description[0], 20)
+        karero_api.send_angles(movement_description[0], 0)
         time.sleep(1.5)
-        karero_api.send_angles(movement_description[1], 55)
+        karero_api.send_angles(movement_description[1], 0)
         time.sleep(1.5)
-        karero_api.send_angles(movement_description[2], 55)
+        
+    async def joy(self, karero_api):
+        movement_description = [
+            [(self.personFocusAngleHorizontal - 20), -25, -30, -10, 15, -5],
+            [(self.personFocusAngleHorizontal), -45, 10, 0, 35, 0],
+            [(self.personFocusAngleHorizontal + 20), -25, -30, 10, 15, 5]
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
         time.sleep(1.5)
-        karero_api.send_angles(movement_description[1], 55)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[2], 0)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[1], 0)
         time.sleep(1.5)
 
-    async def attack(self, karero_api):
+    async def sadness(self, karero_api):
         movement_description = [
-            [(self.personFocusAngle), -45, 40, 0, 0, 0],
-            [(self.personFocusAngle), 55, -75, 0, 0, 0],
-            [(self.personFocusAngle - 3), 55, -75, -10, 0, -5],
-            [(self.personFocusAngle + 3), 55, -70, 10, 0, 5],
-            [(self.personFocusAngle), 55, -75, 0, 0, 0]
+            [self.personFocusAngleHorizontal, 5, 5, 0, 10, 0],
+            [self.personFocusAngleHorizontal, 10, 10, 0, 15, 0],
+            [self.personFocusAngleHorizontal, 20, 22, 0, 27, 0],
+            [self.personFocusAngleHorizontal, 20, 20, 0, -25, 0]
         ]
         print("before send_angles")
-        karero_api.send_angles(movement_description[0], 55)
-        time.sleep(2.0)
+        karero_api.send_angles(movement_description[0], 1)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[1], 1)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[2], 1)
+        time.sleep(4.5)
+        karero_api.send_angles(movement_description[3], 1)
+        time.sleep(1.5)
+
+    async def disgust(self, karero_api):
+        movement_description = [
+            [self.personFocusAngleHorizontal + 25, -55, 40, 90, 70, -90],
+            [self.personFocusAngleHorizontal + 20, -50, 40, 90, 65, -90],
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(3.5)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.5)
+
+    async def surprise(self, karero_api):
+        movement_description = [
+            [self.personFocusAngleHorizontal, -10, -60, 0, 65, 0],
+            [self.personFocusAngleHorizontal + 10, -5, -60, 0, 65, 0],
+            [self.personFocusAngleHorizontal - 10, -5, -60, 0, 65, 0],
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[2], 0)
+        time.sleep(1.5)
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(1.5)
+
+    async def fear(self, karero_api):
+        movement_description = [
+            [self.personFocusAngleHorizontal, -50, 5, 0, 35, 0],
+            [self.personFocusAngleHorizontal, -45, 0, 0, 25, 0],
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(3.5)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.5)
+
+    async def contempt(self, karero_api):
+        movement_description = [
+            [self.personFocusAngleHorizontal + 25, -15, 5, -80, 40, 80],
+            [self.personFocusAngleHorizontal + 20, -15, 10, -70, 35, 70],
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(3.5)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.5)
+
+    async def anger(self, karero_api):
+        movement_description = [
+            [(self.personFocusAngleHorizontal), -45, 40, 0, 0, 0],
+            [(self.personFocusAngleHorizontal), 55, -75, 0, 0, 0],
+            [(self.personFocusAngleHorizontal - 3), 55, -75, -10, 0, -5],
+            [(self.personFocusAngleHorizontal + 3), 55, -70, 10, 0, 5],
+            [(self.personFocusAngleHorizontal), 55, -75, 0, 0, 0]
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(1.0)
         karero_api.send_angles(movement_description[1], 0)
         time.sleep(1.0)
         karero_api.send_angles(movement_description[2], 0)
@@ -104,19 +185,75 @@ class KAREROBot:
         karero_api.send_angles(movement_description[4], 0)
         time.sleep(1.5)
 
+    async def squad(self, karero_api):
+        movement_description = [
+            [(self.personFocusAngleHorizontal), -33, 26, 0, 0, 0],
+            [(self.personFocusAngleHorizontal), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(1.0)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.0)
+
+    async def seekAttention(self, karero_api):
+        movement_description = [
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
+            [(self.personFocusAngleHorizontal),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
+        ]
+        print("before send_angles")
+        karero_api.send_angles(movement_description[0], 0)
+        time.sleep(1.0)
+        karero_api.send_angles(movement_description[1], 0)
+        time.sleep(1.0)
+        karero_api.send_angles(movement_description[2], 0)
+        time.sleep(1.0)
+        karero_api.send_angles(movement_description[3], 0)
+        time.sleep(1.0)
+        karero_api.send_angles(movement_description[4], 0)
+        time.sleep(1.0)
+        karero_api.send_angles(movement_description[2], 0)
+
     def set_activity(self, payload):
-        print(payload)
+        #print(payload)
         if(self.activity != payload['activity']):
             self.activity = payload['activity']
             print("set activity ", self.activity)
-            if(payload['activity'] == 'followHead'):
+            if(payload['activity'] == 'followHead' ):
                 self.karero_network.backsend("getPersonCoordinates")
 
-            if(payload['activity'] == 'dance'):
-                asyncio.run(self.dance(self.karero_api))
+            if(payload['activity'] == 'neutral'):
+                asyncio.run(self.neutral(self.karero_api))
 
-            if(payload['activity'] == 'attack'):
-                asyncio.run(self.attack(self.karero_api))
+            if(payload['activity'] == 'joy'):
+                asyncio.run(self.joy(self.karero_api))
+
+            if(payload['activity'] == 'anger'):
+                asyncio.run(self.anger(self.karero_api))
+
+            if(payload['activity'] == 'sadness'):
+                asyncio.run(self.sadness(self.karero_api))
+
+            if(payload['activity'] == 'disgust'):
+                asyncio.run(self.disgust(self.karero_api))
+
+            if(payload['activity'] == 'contempt'):
+                asyncio.run(self.contempt(self.karero_api))
+
+            if(payload['activity'] == 'fear'):
+                asyncio.run(self.fear(self.karero_api))
+
+            if(payload['activity'] == 'surprise'):
+                asyncio.run(self.surprise(self.karero_api))
+
+            if(payload['activity'] == 'squad'):
+                asyncio.run(self.squad(self.karero_api))
+
+            if(payload['activity'] == 'seekAttention'):
+                asyncio.run(self.seekAttention(self.karero_api))
 
         return True
 
@@ -127,7 +264,7 @@ class KAREROBot:
                 time.sleep(0.1)
                 self.karero_network.backsend("getPersonCoordinates")
                 return False
-            print(self.ready_for_command())
+            #print(self.ready_for_command())
             self.follow_head(payload)
             time.sleep(0.1)
             self.karero_network.backsend("getPersonCoordinates")

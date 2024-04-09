@@ -14,12 +14,3 @@ timeout 2
 cd %KareroWebserver_P%
 start start.bat
 timeout 2
-
-::Activate Facial Recognition Module
-cd %FaceEmotionRecognition_P%
-start start.bat
-timeout 2
-
-::Activate KARERO/Mecharm remotely
-cd %KareroBody_P%
-start remotestart.bat

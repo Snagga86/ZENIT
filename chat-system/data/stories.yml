@@ -1,0 +1,79 @@
+version: "3.1"
+
+stories:
+- story: Vorstellung
+  steps:
+  - intent: close_distance
+  - action: utter_self_introduction
+
+- story: Vorstellung2
+  steps:
+  - intent: ask_introduction
+  - action: utter_self_introduction
+
+- story: Vorstellung3
+  steps:
+  - intent: ask_details_about_bot
+  - action: utter_self_introduction_details
+
+- story: Grüßen, Geschichte erzählen und sich verabschieden
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: tell_story
+  - action: utter_tell_story
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Danke ausdrücken und sich verabschieden
+  steps:
+  - intent: express_gratitude
+  - action: utter_gratitude
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Witz erzählen und nach dem Tag fragen
+  steps:
+  - intent: tell_joke
+  - action: utter_tell_joke
+  - intent: ask_about_day
+  - action: utter_ask_about_day
+  - intent: affirm
+  - action: utter_share_experience
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Ratschlag anfragen, Geschichte erzählen und sich verabschieden
+  steps:
+  - intent: ask_advice
+  - action: utter_ask_advice
+  - intent: share_experience
+  - action: utter_share_experience
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: Roboter nutzlos finden und eventuell Hilfe annehmen
+  steps:
+  - intent: useless_device
+  - action: utter_concrete_usage
+  - intent: more_functionalities
+  - action: utter_concrete_usage_level2
+  - intent: express_gratitude
+  - action: utter_gratitude
+  - intent: goodbye
+  - action: utter_goodbye
+  
+# - story: Benutzer möchste aufhören Squads zu machen
+#   steps:
+#   - intent: start_squads
+#   - action: squad_form
+#   - active_loop: squad_form
+#   - intent: stop_squads
+#   - action: action_deactivate_loop
+#   - active_loop: null
+#   - action: utter_stop_squads
+
+- story: Nicht erkannte Eingabe
+  steps:
+  - intent: default
+  - action: utter_default
