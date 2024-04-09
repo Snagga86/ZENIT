@@ -62,8 +62,9 @@ export class EmotionProcessor {
     }
 
     getEmotionAndValence(emotion, count){
-        var valence = ((count + 1) / EMOTION_BUFFER_LEN) * 10 / NUM_VALENCE_CLASSES;
-        var valenceClass = Math.floor(valence) - 1;
+        //var valence = ((count + 1) / EMOTION_BUFFER_LEN) * 10 / NUM_VALENCE_CLASSES;
+        //var valenceClass = Math.floor(valence) - 1;
+        var valenceClass = 1;
         if(valenceClass < 0)valenceClass = 0;
         //console.log(emotion + ": " + valence);
         //console.log(emotion + ": " + valenceClass);
@@ -121,7 +122,7 @@ export class EmotionProcessor {
 }
 
 const NUM_VALENCE_CLASSES = 3.333;
-const EMOTION_BUFFER_LEN = 9;
+const EMOTION_BUFFER_LEN = 1;
 const BEmotion = {
 
     "anger" : ['annoyance','anger', 'rage']

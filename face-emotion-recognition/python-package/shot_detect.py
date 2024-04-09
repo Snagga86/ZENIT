@@ -6,6 +6,7 @@ import time
 import urllib.request
 
 from hsemotions.facial_emotions import HSEmotionRecognizer
+
 model_name='enet_b0_8_best_afew'
 fer=HSEmotionRecognizer(model_name=model_name,device='cpu')
 

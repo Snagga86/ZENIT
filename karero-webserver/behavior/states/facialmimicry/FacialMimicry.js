@@ -75,6 +75,7 @@ export class FacialMimicry extends StateWrap{
     }
 
     emotionProcessing(emotion){
+        console.log("emotion check:", emotion);
         this.ScreenFace.emotion.setEmotion(emotion.toLowerCase());
     }
 

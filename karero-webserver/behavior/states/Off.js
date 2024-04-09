@@ -25,7 +25,7 @@ export class Off extends StateWrap{
     enterFunction(){
         this.stateChangeInitiated = false;
         this.timeout = setTimeout(() => {
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "chatBase");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
         }, 4000);
         
     }

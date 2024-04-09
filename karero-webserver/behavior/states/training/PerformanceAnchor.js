@@ -133,7 +133,7 @@ export class PerformanceAnchor extends StateWrap{
                     "mode" : "setMode",
                     "activity" : "squad"
                 }
-
+                console.log("Squad triggered");
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, nv_body_payload);
 
                 var squadNumber = "";
