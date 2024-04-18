@@ -1,0 +1,7 @@
+librosa
+numpy
+scipy
+websocket
+vosk
+sounddevice
+datetime

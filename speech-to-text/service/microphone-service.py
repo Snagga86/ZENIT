@@ -21,7 +21,9 @@ sttQueue = queue.Queue()
 controlSignalQueue = queue.Queue()
 
 samplerate = 44100
-model = Model(model_path="../models/src/de-de")
+
+model = Model(model_path="./models/src/de-de")
+
 device_info = sd.query_devices(0, "input")
 
 webservice_ip = 'ws://' + IP_ADDRESS + ':' + str(TCP_PORT)
@@ -34,7 +36,7 @@ safetyDelay = 0.7
 
 # Initialize a flag to track connection status
 IS_CONNECTED = False
-
+print("!")
 def run_websocket_client():
     def on_message(ws, message):
         print("on message:", message)

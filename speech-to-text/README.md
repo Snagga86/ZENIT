@@ -1,4 +1,4 @@
-# Vosk Speech Recognition Toolkit
+This is a Python module for Vosk.
 
 Vosk is an offline open source speech recognition toolkit. It enables
 speech recognition for 20+ languages and dialects - English, Indian
@@ -11,9 +11,6 @@ Vosk models are small (50 Mb) but provide continuous large vocabulary
 transcription, zero-latency response with streaming API, reconfigurable
 vocabulary and speaker identification.
 
-Speech recognition bindings implemented for various programming languages
-like Python, Java, Node.JS, C#, C++, Rust, Go and others.
-
 Vosk supplies speech recognition for chatbots, smart home appliances,
 virtual assistants. It can also create subtitles for movies,
 transcription for lectures and interviews.
@@ -24,4 +21,5 @@ big clusters.
 # Documentation
 
 For installation instructions, examples and documentation visit [Vosk
-Website](https://alphacephei.com/vosk).
+Website](https://alphacephei.com/vosk). See also our project on
+[Github](https://github.com/alphacep/vosk-api).

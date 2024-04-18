@@ -29,7 +29,7 @@ __pycache__
 *.egg-info
 python/dist
 python/build
-python/models/src
+models/src
 python/vosk/*.so
 
 **/logs.txt

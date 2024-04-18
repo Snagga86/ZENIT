@@ -2,7 +2,7 @@ import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
 import keypress from 'keypress';
 import globalStore from '../../../tools/globals.js';
-import { FunctionScheduler } from '../../../tools/functionScheduler.js';
+//import { FunctionScheduler } from '../../../tools/functionScheduler.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class SubtleActivation extends StateWrap{
