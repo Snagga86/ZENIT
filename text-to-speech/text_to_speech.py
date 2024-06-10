@@ -54,7 +54,9 @@ def on_message(ws, message):
             duration = librosa.get_duration(filename=file_path)
             print("File already exists, duration: " + str(duration))
         else:
+            print("before file creation")
             tts.tts_to_file(text=text_to_generate, file_path=file_path)
+            print("after file creation")
             duration = librosa.get_duration(filename=file_path)
             print("File successfully created, duration: " + str(duration))
       

@@ -22,7 +22,7 @@ controlSignalQueue = queue.Queue()
 
 samplerate = 44100
 
-model = Model(model_path="./models/src/de-de")
+model = Model(model_path="../models/src/de-de")
 
 device_info = sd.query_devices(0, "input")
 
