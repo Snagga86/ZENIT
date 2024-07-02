@@ -13,10 +13,12 @@ This repository contains the code and documentation for the ZENIT robot, a mecha
 4. [Software Requirements](#software-requirements)
 5. [Installation](#installation)
 6. [Usage](#usage)
-7. [System Architecture](#system-architecture)
+7. [Components](#components)
 8. [Contributing](#contributing)
-9. [License](#license)
-10. [Contact](#contact)
+9. [Architecture and Editing](#architecture-and-editing)
+10. [Citation Requirement](#citation-requirement)
+11. [License](#license)
+12. [Contact](#contact)
 
 ## Introduction
 ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy use of multimodal communication channels such as body language, spatial behavior, facial expressions, and speech. The system is based on ubiquitous and low-cost hardware, including a smartphone, a stationary robotic arm, an average computer, and a separate camera. ZENIT provides a solid foundation for advancing human-robot interaction studies and can be used as a companion robot for reminders, entertainment, chatting, social activation, and more.
@@ -95,13 +97,13 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    - Use the provided NUI to control and interact with the robot.
    - Test different interaction scenarios by modifying the dialog system and behavior rules.
 
-## System Components
+## Components
 ZENIT's architecture is divided into three main components:
 - **ZENIT Face:** Handles facial expressions and visual output using a smartphone.
 - **ZENIT Body:** Controls the movements of the robotic arm.
 - **ZENIT Brain:** Manages perception, AI processing, and overall behavior logic.
 
-- **Distributed System Architecture**
+- **Distributed System Architecture:**
 
 ![alt text](https://github.com/Snagga86/ZENIT/blob/main/promo/distributed-system.png)
 
@@ -113,7 +115,7 @@ We welcome contributions to ZENIT! If you would like to contribute:
 2. Create a new branch for your feature or bugfix.
 3. Submit a pull request with a detailed description of your changes.
 
-## System Architecture and Editing
+## Architecture and Editing
 In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `/zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `/chat-system` folder following instructions from https://rasa.com/docs/.
 1. **States**
    - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
@@ -216,7 +218,34 @@ In the following section we describe the main components to give ZENIT custom be
     this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
     this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
     this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler);
-    ```
+
+    Here's a suggested text for your Git repository README file, specifying that users must cite the accompanying paper when using the open-source system:
+
+---
+
+## Citation Requirement
+
+If you use this open-source system in your research, projects, or any published work, you must cite the accompanying paper:
+
+```
+[Author(s)], "[Title of the Paper]," [Journal/Conference Name], vol. [Volume], no. [Number], pp. [Page numbers], [Year]. DOI: [DOI link]
+```
+
+Please include the following BibTeX entry in your publications:
+
+```bibtex
+@article{Author2024,
+  author = {Author(s)},
+  title = {Title of the Paper},
+  journal = {Journal/Conference Name},
+  volume = {Volume},
+  number = {Number},
+  pages = {Page numbers},
+  year = {Year},
+  doi = {DOI link}
+}
+```
+
 ## License
 ZENIT is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
