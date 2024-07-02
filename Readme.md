@@ -2,6 +2,8 @@
 
 This repository contains the code and documentation for the ZENIT robot, a mechanical companion designed for studying human-robot interaction. ZENIT utilizes a combination of low-cost hardware and open-source software to deliver a responsive, multimodal interaction experience.
 
+![alt text](https://github.com/Snagga86/ZENIT/edit/main/promo/teaser-img.jpg)
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Features](#features)
