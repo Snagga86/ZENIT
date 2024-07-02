@@ -115,7 +115,7 @@ In the following section we describe the main components to give ZENIT custom be
       /* Construct object of class and provide the required processors that are required for the respective following code.
       Processors are made to handle operations of speech, gesture, or chat inputs and maybe extended for further application.*/
       constructor(ProcessorA, ProcessorB, ..., brainEvents){
-          /* Call the super constructor and set the identification name for the state class and basic functionalities. */
+          /* Call the super constructor and set the identification name for the state class and basic functionalities, such as auto cleanup state and facades to easily trigger actions. */
           super("stateOne", ProcessorA, ProcessorB, ..., brainEvents);
 
           /* Bind concrete implementation functions for enter and exit of the current state. */
@@ -163,6 +163,21 @@ static ROBOT_BRAIN_EVENTS = {
         SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION'
     }
 ```
+To change the state machine state you can use:
+```js
+his.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "stateOne");
+```
+
+To trigger a robotic arm movement you can use (this is uasually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
+```js
+var payload = {
+            "mode" : "setMode",
+            "activity" : actionString
+        }
+
+this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+```
+
 
 ## License
 ZENIT is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
