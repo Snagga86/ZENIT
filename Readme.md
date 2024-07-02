@@ -87,7 +87,7 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    - Use the provided NUI to control and interact with the robot.
    - Test different interaction scenarios by modifying the dialog system and behavior rules.
 
-## System Architecture
+## System Components
 ZENIT's architecture is divided into three main components:
 - **ZENIT Face:** Handles facial expressions and visual output using a smartphone.
 - **ZENIT Body:** Controls the movements of the robotic arm.
@@ -101,7 +101,7 @@ We welcome contributions to ZENIT! If you would like to contribute:
 2. Create a new branch for your feature or bugfix.
 3. Submit a pull request with a detailed description of your changes.
 
-## System Architecture
+## System Architecture and Editing
 In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `chat-system` folder following instructions from https://rasa.com/docs/.
 1. **States**
    - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
@@ -146,6 +146,13 @@ In the following section we describe the main components to give ZENIT custom be
    ```js
    const follow = new StateOne(this.ProcessorA, this.ProcessorB, ..., this.brainEvents).getState();
    ```
+Additionally, the declared state must be added to the state machine definition.
+```js
+
+this.stateMachineDefinition = {
+            initialState: "off", off, ..., stateOne};
+```
+
 ## License
 ZENIT is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
