@@ -38,6 +38,9 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
   - Smartphone Car Holder
   - Router
   - Ethernet and USB-C cables
+ 
+![alt text](https://github.com/Snagga86/ZENIT/blob/main/promo/suitcase-num.jpg)
+
 - **Main Computation Unit:** A laptop or desktop computer with at least:
   - Windows 11
   - AMD Ryzen 7 5800H
@@ -55,6 +58,7 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    Kinetic Space is a self-developed tool to enable training, analysis, and recognition of individual gestures with a depth camera like Microsoft’s Kinect family.
    To run the Project you will require this tool. There is not repsitory available at current times so please don't hesitate to contact us directly ([christian.felix.purps@h-ka.de](mailto:christian.felix.purps@h-ka.de))
    so we can provide you the software.
+
 
 ## Installation
 1. **Clone the Repository:**
@@ -96,6 +100,9 @@ ZENIT's architecture is divided into three main components:
 - **ZENIT Face:** Handles facial expressions and visual output using a smartphone.
 - **ZENIT Body:** Controls the movements of the robotic arm.
 - **ZENIT Brain:** Manages perception, AI processing, and overall behavior logic.
+
+- **Distributed System Architecture**
+  ![alt text](https://github.com/Snagga86/ZENIT/blob/main/promo/distributed-system.png)
 
 These components communicate through a network of APIs and protocols, ensuring modularity and ease of extension.
 
