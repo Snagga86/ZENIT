@@ -1,0 +1,21 @@
+# Mycobot control library
+pymycobot
+
+# Asyncio for asynchronous programming
+asyncio
+
+# Basic libraries
+time
+json
+numpy
+threading  # For _thread
+rel
+websocket-client  # For websocket
+
+# TTS and audio processing (from the previous script)
+torch
+TTS
+librosa
+
+# Logging (optional, since it's a built-in library)
+logging

@@ -1,0 +1,5 @@
+torch
+TTS
+websocket-client
+numpy
+librosa
