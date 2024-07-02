@@ -181,10 +181,11 @@ var payload = {
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
 ```
 
-To deal with answerts from RASA you can use:
+To deal with answerts from RASA you can use. As RASA is a little detached from the rest of the state machine consider checking `ChatBase.js` class:
 
 ```js
 this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
+
 RASAAnswerHandler(rasaAnswer){
   console.log("Answer:" + rasaAnswer);
 }
