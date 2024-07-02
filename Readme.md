@@ -146,11 +146,11 @@ In the following section we describe the main components to give ZENIT custom be
    ```js
    const follow = new StateOne(this.ProcessorA, this.ProcessorB, ..., this.brainEvents).getState();
    ```
-- Additionally, the declared state must be added to the state machine definition.
-
-```js
-this.stateMachineDefinition = {initialState: "off", off, ..., stateOne};
-```
+  - Additionally, the declared state must be added to the state machine definition.
+  
+  ```js
+  this.stateMachineDefinition = {initialState: "off", off, ..., stateOne};
+  ```
 2. **Events**
   - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
 ```js
