@@ -166,7 +166,7 @@ To trigger a robotic arm movement you can use (this is uasually not necessary be
 var payload = {
             "mode" : "setMode",
             "activity" : actionString
-        }
+}
 
 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
 ```
@@ -177,8 +177,17 @@ var payload = {
             "mode" : theMode,
             "data" : data,
             "extra" : extra
-        }
+}
 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
+```
+
+For letting the robot speak any text you can use the follwing event:
+```js
+var payload = {
+                "mode" : "tts",
+                "text" : "Test to speak."
+}
+this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payload);
 ```
 
 To deal with answerts from RASA you can use. As RASA is a little detached from the rest of the state machine consider checking `ChatBase.js` class:
@@ -190,16 +199,6 @@ RASAAnswerHandler(rasaAnswer){
   console.log("Answer:" + rasaAnswer);
 }
 ```
-
-For letting the robot speak any text you can use the follwing event:
-```js
-var payload = {
-                "mode" : "tts",
-                "text" : "Test to speak."
-            }
-this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payload);
-```
-
 Whenever you setup an event listener in a state always make sure to remove it properly in `stateExit()` function.
 
 ## License
