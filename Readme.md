@@ -112,7 +112,7 @@ In the following section we describe the main components to give ZENIT custom be
 
   /* Robot state class defining the robot behavior within this state. */
   export class StateOne extends StateWrap{
-      /* Construct object of class and provide the required processors that are required for the respective following code. Processors are made to handle operations of speech, gesture, or chat inputs and maybe extended for further application.*
+      /* Construct object of class and provide the required processors that are required for the respective following code. Processors are made to handle operations of speech, gesture, or chat inputs and maybe extended for further application.*/
       constructor(ProcessorA, ProcessorB, ..., brainEvents){
           /* Call the super constructor and set the identification name for the state class and basic functionalities. */
           super("stateOne", ProcessorA, ProcessorB, ..., brainEvents);
