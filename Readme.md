@@ -105,9 +105,9 @@ We welcome contributions to ZENIT! If you would like to contribute:
 In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `chat-system` folder following instructions from https://rasa.com/docs/.
 1. **States**
    - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`.
-   '''js
+   ```js
    const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-   '''
+   ```
 ## License
 ZENIT is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
