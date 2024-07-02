@@ -106,7 +106,7 @@ In the following section we describe the main components to give ZENIT custom be
 1. **States**
    - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
      
-  ```
+  ```js
   import { State, Actions, Transition, StateWrap } from './BaseState.js';
   import { Brain } from '../brain.js';
 
@@ -130,13 +130,13 @@ In the following section we describe the main components to give ZENIT custom be
               console.log('transition action for "stateOne" in "stateThree" state')
           }));  
       }
-  
+
+      /* Concrete implementation for the state enter function.*/
       enterFunction(){
-          this.stateChangeInitiated = false;
-          this.timeout = setTimeout(() => {
-              this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
-          }, 4000);
-          
+      }
+
+      /* Concrete implementation for the state exit function.*/
+      enterFunction(){
       }
   }
   ```  
