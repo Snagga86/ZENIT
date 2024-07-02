@@ -78,9 +78,9 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    - Start AudioRelay on your smartphone to stream audio data to your main computation unit.
    - Start IPCamera on your smartphone if you want to use emotion recognition.
    - Run the main control script to initialize the distributed system `start-zenit-brain.bat`.
-   - Start Kinetic Space Application
+   - Start Kinetic Space Application.
    - Start the Robot control script `KARERO_control.py`.
-   - Run all required services using `start-services.bat`
+   - Run all required services using `start-services.bat`.
    - Launch the Unity application on the smartphone to display the robot face.
 
 2. **Interacting with ZENIT:**
@@ -101,6 +101,13 @@ We welcome contributions to ZENIT! If you would like to contribute:
 2. Create a new branch for your feature or bugfix.
 3. Submit a pull request with a detailed description of your changes.
 
+## System Architecture
+In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `chat-system` folder following instructions from https://rasa.com/docs/.
+1. **States**
+   - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`.
+   '''js
+   const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+   '''
 ## License
 ZENIT is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
