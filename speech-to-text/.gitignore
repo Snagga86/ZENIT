@@ -1,0 +1,35 @@
+# Object files
+*.o
+
+# Temp files
+nohup.out
+
+# Gradle files
+.gradle/
+gradlew
+gradlew.bat
+gradle
+local.properties
+gradle.properties
+
+# Android
+android/build
+android/lib/build
+android/model-en/build
+android/model-en/src/main/assets/model-en-us
+android/repo
+*.apk
+*.ap_
+
+# Cmake
+.cxx
+cmake_install.cmake
+
+__pycache__
+*.egg-info
+python/dist
+python/build
+models/src
+python/vosk/*.so
+
+**/logs.txt

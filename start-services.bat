@@ -1,12 +1,12 @@
 
 
 ::Start transcription
-cd ./vosk-api/python/example
+cd ./speech-to-text/service
 start start.bat
 timeout 2
 
 ::Start file service and speech synthesis
-cd ../../../tts
+cd ../../text-to-speech
 start startFileService.bat
 start startTTS.bat
 
