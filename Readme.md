@@ -148,13 +148,13 @@ In the following section we describe the main components to give ZENIT custom be
    - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
 ```js
 static ROBOT_BRAIN_EVENTS = {
-        ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
-        ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
-        ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
-        RASA_ANSWER: 'RASA_ANSWER',
-        TEXT_TO_SPEECH_ACTION: 'TEXT_TO_SPEECH_ACTION',
-        SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION'
-    }
+    ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
+    ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
+    ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
+    RASA_ANSWER: 'RASA_ANSWER',
+    TEXT_TO_SPEECH_ACTION: 'TEXT_TO_SPEECH_ACTION',
+    SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION'
+}
 ```
 To change the state machine state you can use:
 ```js
@@ -164,8 +164,8 @@ his.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "stateOne");
 To trigger a robotic arm movement you can use (this is uasually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
 ```js
 var payload = {
-            "mode" : "setMode",
-            "activity" : actionString
+  "mode" : "setMode",
+  "activity" : actionString
 }
 
 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
@@ -174,9 +174,9 @@ this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
 To trigger a screen face action you can use (this is uasually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
 ```js
 var payload = {
-            "mode" : theMode,
-            "data" : data,
-            "extra" : extra
+  "mode" : theMode,
+  "data" : data,
+  "extra" : extra
 }
 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
 ```
@@ -184,8 +184,8 @@ this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
 For letting the robot speak any text you can use the follwing event:
 ```js
 var payload = {
-                "mode" : "tts",
-                "text" : "Test to speak."
+  "mode" : "tts",
+  "text" : "Test to speak."
 }
 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payload);
 ```
