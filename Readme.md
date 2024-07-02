@@ -123,22 +123,15 @@ In the following section we describe the main components to give ZENIT custom be
           this.state.actions.onExit = this.exitFunction.bind(this);
 
           /* Set up connections between related states of the state machine. */
-          this.state.transitions.push(new Transition("stateTwo", "stateTwo", () => {
-              console.log('transition action for "stateOne" in "stateTwo" state')
-          }));
-          
-          this.state.transitions.push(new Transition("stateThree", "stateThree", () => {
-              console.log('transition action for "stateOne" in "stateThree" state')
-          }));  
+          this.state.transitions.push(new Transition("stateTwo", "stateTwo", () => {}));   
+          this.state.transitions.push(new Transition("stateThree", "stateThree", () => {}));  
       }
 
       /* Concrete implementation for the state enter function.*/
-      enterFunction(){
-      }
+      enterFunction(){}
 
       /* Concrete implementation for the state exit function.*/
-      enterFunction(){
-      }
+      enterFunction(){}
   }
   ```
   - Once the state has been defined it must be added to the `brain.js` file.
@@ -188,6 +181,14 @@ var payload = {
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
 ```
 
+To deal with answerts from RASA you can use:
+
+```js
+this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
+RASAAnswerHandler(rasaAnswer){
+  console.log("Answer:" + rasaAnswer);
+}
+```
 
 ## License
 ZENIT is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
