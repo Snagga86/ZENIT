@@ -29,15 +29,15 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
 - **Responsive User Experience:** Provides fast sensory processing and AI models for interaction.
 
 ## Hardware Requirements
-- **Robotic Arm:** Elephant Robotics MechArm 270-Pi or similar.
-- **Display Device:** Samsung Galaxy A41 or similar smartphone/tablet.
-- **Depth Camera:** Microsoft Azure Kinect.
+- **Robotic Arm:** Elephant Robotics MechArm 270-Pi or similar (1).
+- **Display Device:** Samsung Galaxy A41 or similar smartphone/tablet (5).
+- **Depth Camera:** Microsoft Azure Kinect (6).
 - **Additional Components:**
-  - Power Supply
-  - Table Clamp
-  - Smartphone Car Holder
-  - Router
-  - Ethernet and USB-C cables
+  - Power Supply (2)
+  - Table Clamp (3)
+  - Smartphone Car Holder (4)
+  - Router (8)
+  - Ethernet and USB-C cables (not incuded in the pic.)
  
 ![alt text](https://github.com/Snagga86/ZENIT/blob/main/promo/suitcase-num.jpg)
 
@@ -102,7 +102,8 @@ ZENIT's architecture is divided into three main components:
 - **ZENIT Brain:** Manages perception, AI processing, and overall behavior logic.
 
 - **Distributed System Architecture**
-  ![alt text](https://github.com/Snagga86/ZENIT/blob/main/promo/distributed-system.png)
+
+![alt text](https://github.com/Snagga86/ZENIT/blob/main/promo/distributed-system.png)
 
 These components communicate through a network of APIs and protocols, ensuring modularity and ease of extension.
 
@@ -159,7 +160,7 @@ In the following section we describe the main components to give ZENIT custom be
      
     - To change the state machine state you can use:
     ```js
-    This.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "stateOne");
+    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "stateOne");
     ```
     
     - To trigger a robotic arm movement you can use the following event (this is usually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
@@ -172,7 +173,7 @@ In the following section we describe the main components to give ZENIT custom be
     this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
     ```
     
-    - To trigger a screen face action you can use the following event (this is usually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
+    - To trigger a screen face action you can use the following event (this is usually not necessary because there exists a facade for screen face actions in `BaseState.js` that lets you trigger the action easily.):
     ```js
     var payload = {
       "mode" : theMode,
@@ -191,7 +192,7 @@ In the following section we describe the main components to give ZENIT custom be
     this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payload);
     ```
     
-    - To deal with answerts from RASA you can use. As RASA is a little detached from the rest of the state machine consider checking `ChatBase.js` class:
+    - To deal with answers from RASA you can use the following event. As RASA is a little detached from the rest of the state machine consider checking `ChatBase.js` class:
     
     ```js
     this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
@@ -203,7 +204,7 @@ In the following section we describe the main components to give ZENIT custom be
     - Whenever you setup an event listener in a state always make sure to remove it properly in the states `exitFunction()` function.
 
 3. **Processors**
-   - Processors are made to collect a number of redundant functionalities that are required often and thus injected to the respective state that uses it. At the moment these include the `chat-processor`, `emotion-processor`, `gesture-posture-processor`, and `speech-processor`. These processors are designed to emit specific events that can be listened to, such as e.g..
+   - Processors are made to collect a number of redundant functionalities that are required often and thus injected to the respective state that uses it. At the moment these include the `chat-processor`, `emotion-processor`, `gesture-posture-processor`, and `speech-processor`. These processors are designed to emit specific events that can be listened to, such as e.g.:
    ```js
     this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
     this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
