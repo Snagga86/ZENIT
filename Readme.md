@@ -104,7 +104,42 @@ We welcome contributions to ZENIT! If you would like to contribute:
 ## System Architecture
 In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `chat-system` folder following instructions from https://rasa.com/docs/.
 1. **States**
-   - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`.
+   - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
+     
+  ```
+  import { State, Actions, Transition, StateWrap } from './BaseState.js';
+  import { Brain } from '../brain.js';
+
+  /* Robot state class defining the robot behavior within this state. */
+  export class StateOne extends StateWrap{
+      /* Construct object of class and provide the required processors that are required for the respective following code. Processors are made to handle operations of speech, gesture, or chat inputs and maybe extended for further application.*
+      constructor(ProcessorA, ProcessorB, ..., brainEvents){
+          /* Call the super constructor and set the identification name for the state class and basic functionalities. */
+          super("stateOne", ProcessorA, ProcessorB, ..., brainEvents);
+
+          /* Bind concrete implementation functions for enter and exit of the current state. */
+          this.state.actions.onEnter = this.enterFunction.bind(this);
+          this.state.actions.onExit = this.exitFunction.bind(this);
+
+          /* Set up connections between related states of the state machine. */
+          this.state.transitions.push(new Transition("stateTwo", "stateTwo", () => {
+              console.log('transition action for "stateOne" in "stateTwo" state')
+          }));
+          
+          this.state.transitions.push(new Transition("stateThree", "stateThree", () => {
+              console.log('transition action for "stateOne" in "stateThree" state')
+          }));  
+      }
+  
+      enterFunction(){
+          this.stateChangeInitiated = false;
+          this.timeout = setTimeout(() => {
+              this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
+          }, 4000);
+          
+      }
+  }
+  ```  
    ```js
    const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
    ```
