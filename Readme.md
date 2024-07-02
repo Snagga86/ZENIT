@@ -152,7 +152,7 @@ In the following section we describe the main components to give ZENIT custom be
   this.stateMachineDefinition = {initialState: "off", off, ..., stateOne};
   ```
 2. **Events**
-  - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
+   - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
 ```js
 static ROBOT_BRAIN_EVENTS = {
         ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
@@ -176,6 +176,16 @@ var payload = {
         }
 
 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
+```
+
+To trigger a screen face action you can use (this is uasually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
+```js
+var payload = {
+            "mode" : theMode,
+            "data" : data,
+            "extra" : extra
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
 ```
 
 
