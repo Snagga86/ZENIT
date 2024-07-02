@@ -141,16 +141,27 @@ In the following section we describe the main components to give ZENIT custom be
       }
   }
   ```
-  Once the state has been defined it must be added to the `brain.js` file.
+  - Once the state has been defined it must be added to the `brain.js` file.
 
    ```js
    const follow = new StateOne(this.ProcessorA, this.ProcessorB, ..., this.brainEvents).getState();
    ```
-Additionally, the declared state must be added to the state machine definition.
-```js
+- Additionally, the declared state must be added to the state machine definition.
 
-this.stateMachineDefinition = {
-            initialState: "off", off, ..., stateOne};
+```js
+this.stateMachineDefinition = {initialState: "off", off, ..., stateOne};
+```
+2. **Events**
+  - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
+```js
+static ROBOT_BRAIN_EVENTS = {
+        ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
+        ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
+        ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
+        RASA_ANSWER: 'RASA_ANSWER',
+        TEXT_TO_SPEECH_ACTION: 'TEXT_TO_SPEECH_ACTION',
+        SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION'
+    }
 ```
 
 ## License
