@@ -31,6 +31,14 @@ import { EmergencyCall } from './states/heatprotection/EmergencyCall.js';
 
 import { FacialMimicry } from './states/facialmimicry/FacialMimicry.js';
 
+import { IdleAnchor } from './states/idling/IdleAnchor.js';
+import { Jawn } from './states/idling/Jawn.js';
+import { Look } from './states/idling/Look.js';
+import { Nap } from './states/idling/Nap.js';
+import { NapWake } from './states/idling/NapWake.js';
+import { Relax } from './states/idling/Relax.js';
+import { Stretch } from './states/idling/Stretch.js';
+
 /* KARERO Brain is the busieness logic for the KARERO robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
 2. gestures/postures and Interactor location from Azure Kinetic Space. KARERO Brain is implemented as
@@ -94,6 +102,14 @@ export class Brain{
         const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
+        const idleAnchor = new IdleAnchor( this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const jawn = new Jawn(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const look = new Look(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const nap = new Nap(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const napWake = new NapWake(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const relax = new Relax(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const stretch = new Stretch(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+
         const contemptShow = new ContemptShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const angerShow = new AngerShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const disgustShow = new DisgustShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
@@ -111,7 +127,7 @@ export class Brain{
         const facialMimicry = new FacialMimicry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
-            initialState: "off", off, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
+            initialState: "off", off, idleAnchor, jawn, look, nap, napWake, relax, stretch, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
         };
         
         /* Create the state machine with states required. */

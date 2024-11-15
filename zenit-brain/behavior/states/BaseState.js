@@ -72,6 +72,30 @@ export class RoboticArm{
         this.bodyAction("surprise");
     }
 
+    jawn(){
+        this.bodyAction("jawn");
+    }
+
+    look(){
+        this.bodyAction("look");
+    }
+
+    nap(){
+        this.bodyAction("nap");
+    }
+
+    napWake(){
+        this.bodyAction("napWake");
+    }
+
+    relax(){
+        this.bodyAction("relax");
+    }
+
+    stretch(){
+        this.bodyAction("stretch");
+    }
+
     bodyAction(action){
         var payload = {
             "mode" : "setMode",

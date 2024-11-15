@@ -5,10 +5,10 @@ import globalStore from '../../tools/globals.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Follow extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, brainEvents){
+    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("follow", emotionProcessor, gesturePostureProcessor, brainEvents);
+        super("follow", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
