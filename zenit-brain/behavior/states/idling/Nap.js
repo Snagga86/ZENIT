@@ -38,6 +38,7 @@ export class Nap extends StateWrap{
 
         //this.ScreenFace.emotion.rage();
         this.RoboticBody.nap();
+        this.ScreenFace.emotion.sleepy();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {

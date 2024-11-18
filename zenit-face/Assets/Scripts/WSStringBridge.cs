@@ -22,6 +22,6 @@ public class WSStringBridge : MonoBehaviour
     public void connectToWebsocket()
     {
         string wsDescription = GameObject.Find("Canvas/ShowDebug/DetailPanel/IPPanel/TextArea/Text").GetComponent<TMP_Text>().text;
-        GameObject.Find("Face").GetComponent<NetworkController>().connectToWebsocket(wsDescription);
+        GameObject.Find("ZENITFace").GetComponent<NetworkController>().connectToWebsocket(wsDescription);
     }
 }

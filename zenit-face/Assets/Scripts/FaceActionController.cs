@@ -15,11 +15,16 @@ public class FaceActionController : MonoBehaviour
 {
     public FaceEmotion faceEmotion;
 
+    public GameObject confirmationPanel;
+    public GameObject canvas;
+
     public GameObject infoText;
 
     public GameObject particleSystem;
     public GameObject drops1;
     public GameObject drops2;
+
+    public GameObject sleepZz;
 
     public GameObject water;
     public GameObject glass;
@@ -59,9 +64,21 @@ public class FaceActionController : MonoBehaviour
 
     void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        Screen.brightness = 1.0f;
         faceEmotion = new FaceEmotion();
         InvokeRepeating("EyeBreath", 0f, 0.035f);
 
+    }
+
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (!pauseStatus)
+        {
+            // Restore screen settings when app resumes
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            Screen.brightness = 1.0f;
+        }
     }
 
     // Update is called once per frame
@@ -110,6 +127,19 @@ public class FaceActionController : MonoBehaviour
                 this.particleSystem.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
             }
 
+            if (displayEmotion == "sleepy")
+            {
+                this.targetFace = faceEmotion.getEyeShapeValuesByEmotion("Sleepy");
+                //this.targetBgColor = new Color(255f / 255f, 220f / 255f, 115f / 255f);
+                //this.targetEyeColor = new Color(255f / 255f, 107f / 255f, 1f);
+                this.sleepZz.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Play();
+                this.targetEyeColor = new Color(115f / 255f, 115f / 255f, 115f / 255f);
+            }
+            else
+            {
+                this.sleepZz.GetComponent<ParticleSystem>().GetComponent<ParticleSystem>().Stop();
+            }
+
         }
 
 
@@ -118,6 +148,18 @@ public class FaceActionController : MonoBehaviour
         this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
         lastEmotion = displayEmotion;
+    }
+
+    internal void showConfirmationPanel()
+    {
+        //this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
+        this.confirmationPanel.SetActive(true);
+    }
+
+    internal void hideConfirmationPanel()
+    {
+        //this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+        this.confirmationPanel.SetActive(false);
     }
 
     internal void showVideo()
@@ -178,6 +220,8 @@ public class FaceActionController : MonoBehaviour
 
     internal void setInfoText(string text)
     {
+        Debug.Log("setInfoText");
+        Debug.Log(this.infoText.GetComponent<Blink>());
         this.infoText.GetComponent<Blink>().setText(text);
     }
 
@@ -224,6 +268,7 @@ public class FaceActionController : MonoBehaviour
         tmpLeftEye.kreis = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis);
         tmpLeftEye.sad = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad);
         tmpLeftEye.happy = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy);
+        tmpLeftEye.sleepy = leftEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sleepy);
 
         tmpRightEye.angry = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry);
         tmpRightEye.disgusted = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted);
@@ -231,6 +276,7 @@ public class FaceActionController : MonoBehaviour
         tmpRightEye.kreis = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Kreis);
         tmpRightEye.sad = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sad);
         tmpRightEye.happy = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy);
+        tmpRightEye.sleepy = rightEye.GetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sleepy);
 
         return new Face(tmpLeftEye, tmpRightEye);
     }
@@ -264,6 +310,7 @@ public class FaceActionController : MonoBehaviour
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(eyeBlendshapeDataStart.disgusted, eyeBlendshapeDataEnd.disgusted * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Happy, Mathf.Lerp(eyeBlendshapeDataStart.happy, eyeBlendshapeDataEnd.happy * 100, t));
         eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Angry, Mathf.Lerp(eyeBlendshapeDataStart.angry, eyeBlendshapeDataEnd.angry * 100, t));
+        eye.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Sleepy, Mathf.Lerp(eyeBlendshapeDataStart.sleepy, eyeBlendshapeDataEnd.sleepy * 100, t));
 
         t += tMulti * Time.deltaTime;
     }
@@ -281,6 +328,7 @@ public class FaceEmotion
     public Sadness sadness;
     public Disgust disgust;
     public Contempt contempt;
+    public Sleepy sleepy;
     public Neutral neutral;
 
 
@@ -295,6 +343,7 @@ public class FaceEmotion
         this.sadness = new Sadness();
         this.disgust = new Disgust();
         this.contempt = new Contempt();
+        this.sleepy = new Sleepy();
         this.neutral = new Neutral();
     }
 
@@ -385,6 +434,9 @@ public class FaceEmotion
                 break;
             case "idle2":
                 return this.neutral.idle2;
+                break;
+            case "sleepy":
+                return this.sleepy.sleepy;
                 break;
             default:
                 return this.neutral.neutral;
@@ -754,6 +806,20 @@ public class Contempt
     }
 }
 
+public class Sleepy
+{
+    public Face sleepy;
+
+    public Sleepy()
+    {
+        EmotionShapes lShape = new EmotionShapes();
+        EmotionShapes rShape = new EmotionShapes();
+        lShape.sleepy = 1f;
+        rShape.sleepy = 1f;
+        sleepy = new Face(lShape, rShape);
+    }
+}
+
 public class Neutral
 {
     public Face neutral;
@@ -795,7 +861,7 @@ public class Face
 
 public class EmotionShapes
 {
-    public enum blendshapeNumbers { Kreis, Sad, Full, Happy, Angry, Disgusted }
+    public enum blendshapeNumbers { Kreis, Sad, Full, Happy, Angry, Disgusted, Sleepy }
 
     public float kreis = 0;
     public float sad = 0;
@@ -803,4 +869,5 @@ public class EmotionShapes
     public float happy = 0;
     public float angry = 0;
     public float disgusted = 0;
+    public float sleepy = 0;
 }

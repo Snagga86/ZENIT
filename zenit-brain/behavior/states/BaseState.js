@@ -267,6 +267,10 @@ export class Emotion{
         this.setEmotion("hot");
     }
 
+    sleepy() {
+        this.setEmotion("sleepy");
+    }
+
     setEmotion(emotion){
         var payloadEmotion = {
             "mode" : "setEmotion",

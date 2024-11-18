@@ -28,8 +28,8 @@ public class NetworkController : MonoBehaviour
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint from = new IPEndPoint(0, 0);
 
-    private string nv_action = "";
-    private string v_action = "";
+    private string nonverbalAction = "";
+    private string verbalAction = "";
 
 
     void Start()
@@ -51,14 +51,14 @@ public class NetworkController : MonoBehaviour
 
             if (jsonControlObject.mode == "setEmotion")
             {
-                this.nv_action = "\nMode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
+                this.nonverbalAction = "\nMode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
             }
             if (jsonControlObject.mode == "setSound")
             {
                 Debug.Log("VERBAL ACTION TRACE");
-                this.v_action = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
+                this.verbalAction = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
             }
-            this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.v_action + this.nv_action;
+            this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.verbalAction + this.nonverbalAction;
             
             if (jsonControlObject.mode == "setEmotion")
             {

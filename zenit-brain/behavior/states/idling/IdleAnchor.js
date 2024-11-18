@@ -51,6 +51,7 @@ export class IdleAnchor extends StateWrap{
         console.log( this.idlingStyles[0]);
 
         this.RoboticBody.neutral();
+        this.ScreenFace.emotion.neutral();
 
         var action = this.getRandomInt(0, 4);
         this.timeout = setTimeout(() => {

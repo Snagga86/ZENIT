@@ -36,7 +36,7 @@ export class NapWake extends StateWrap{
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
 
-        this.ScreenFace.emotion.rage();
+        this.ScreenFace.emotion.neutral();
         this.RoboticBody.napWake();
 
         /* Go back to follow state after the anticipated execution time of attack. */
