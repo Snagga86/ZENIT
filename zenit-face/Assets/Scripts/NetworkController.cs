@@ -59,7 +59,7 @@ public class NetworkController : MonoBehaviour
                 this.verbalAction = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
             }
             this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.verbalAction + this.nonverbalAction;
-            
+
             if (jsonControlObject.mode == "setEmotion")
             {
                 Debug.Log(jsonControlObject.data);
@@ -140,6 +140,19 @@ public class NetworkController : MonoBehaviour
                         this.faceActionController.showInfoText(false);
                         break;
                 }
+            }
+
+            if (jsonControlObject.mode == "setState")
+            {
+                switch (jsonControlObject.data)
+                {
+                    case "calculate":
+                        this.faceActionController.blink();
+                        break;
+                    case "stopCalculate":
+                        
+                        break;
+                };
             }
         };
 

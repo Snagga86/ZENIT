@@ -17036,6 +17036,18 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 7730286491976931618, guid: df6bc66518795fa42a34c78be59c70ea, type: 3}
+    - target: {fileID: 3781360819306326461, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[2]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781360819306326461, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[4]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3781360819306326461, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[5]
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6304355968724499752, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
       propertyPath: DebugTrace
       value: 

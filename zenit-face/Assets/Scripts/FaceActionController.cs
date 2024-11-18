@@ -62,6 +62,11 @@ public class FaceActionController : MonoBehaviour
     private float breathPulse = 0;
     private bool breathUp = true;
 
+    private bool isBlinking = false;
+    public float animationDuration = 0.3f; // duration in seconds
+    private float elapsedTime = 0f;
+    private bool goingUp = true;
+
     void Start()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -147,6 +152,33 @@ public class FaceActionController : MonoBehaviour
         this.UpdateEyeColor(this.eyeMaterial, this.startEyeColor, this.targetEyeColor);
         this.UpdateEyeColor(this.bgMaterial, this.startBgColor, this.targetBgColor);
 
+        if (isBlinking)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / animationDuration;
+
+            if (goingUp)
+            {
+                this.eyeLeft.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(0, 100, t));
+                this.eyeRight.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(0, 100, t));
+
+                if (t >= 1f)
+                {
+                    goingUp = false;
+                    elapsedTime = 0f; // reset timer for the downward animation
+                }
+            }
+            else
+            {
+                this.eyeLeft.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(100, 0, t));
+                this.eyeRight.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Full, Mathf.Lerp(100, 0, t));
+                if (t >= 1f)
+                {
+                    isBlinking = false; // stop the animation
+                }
+            }
+        }
+
         lastEmotion = displayEmotion;
     }
 
@@ -228,6 +260,11 @@ public class FaceActionController : MonoBehaviour
     internal void showInfoText(bool show)
     {
         this.infoText.SetActive(show);
+    }
+
+    internal void blink()
+    {
+        this.isBlinking = true;
     }
 
     private void EyeBreath()

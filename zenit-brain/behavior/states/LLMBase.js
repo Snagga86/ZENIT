@@ -71,6 +71,7 @@ export class LLMBase extends StateWrap{
         console.log("tts result:" + result);
         if(result.length > 1){
             this.chatProcessor.LLMSendMessage(result);
+            this.ScreenFace.calculate();
         }
     }
 

@@ -354,6 +354,22 @@ export class DisplayDevice{
         this.sound = new Sound(this.brainEvents);
         this.text = new Text(this.brainEvents);
     }
+
+    calculate(){
+        var payloadState = {
+            "mode" : "setState",
+            "data" : "calculate"
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
+    }
+
+    stopCalculate(){
+        var payloadState = {
+            "mode" : "setState",
+            "data" : "stopCalculate"
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
+    }
 }
 
 export class StateWrap{
