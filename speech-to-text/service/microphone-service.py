@@ -20,6 +20,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 sttQueue = queue.Queue()
 controlSignalQueue = queue.Queue()
 
+partialResultBuffer = ["","","","","","","","","","","","","","","","","","","",""]
+
 samplerate = 44100
 
 model = Model(model_path="../models/src/de-de")
@@ -37,6 +39,17 @@ safetyDelay = 0.7
 # Initialize a flag to track connection status
 IS_CONNECTED = False
 print("!")
+
+def all_partials_equal(new_string):
+    # Remove the first element and add the new string at the end
+    #print(partialResultBuffer);
+    partialResultBuffer.pop(0)
+    partialResultBuffer.append(new_string)
+
+    if all(element == partialResultBuffer[0] for element in partialResultBuffer) and partialResultBuffer[0] != "":
+        return True
+    return False
+        
 def run_websocket_client():
     def on_message(ws, message):
         print("on message:", message)
@@ -130,15 +143,23 @@ try:
                     print("final result:\n")
                     finalRes = rec.FinalResult()
                     finalResult = finalRes
+                    print("finalResult:")
                     print(finalResult)
                     sock.sendto(bytes(finalResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
                 else:
-                    print("partial result:\n")
+                    print("partial result drop:\n")
                     print(rec.PartialResult())
                     partialResult = rec.PartialResult()
-                    if 'zenith' in partialResult or 'zenit' in partialResult:
-                        sock.sendto(bytes(partialResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
+                    equalPartials = all_partials_equal(partialResult)
+                    if equalPartials == True:
+                        partialResultBuffer = ["","","","","","","","","","","","","","","","","","","",""]
+                        print("partialResult:")
+                        print(partialResult)
                         rec.Reset()
+                        sock.sendto(bytes(partialResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
+                    #if 'zenith' in partialResult or 'zenit' in partialResult:
+                    #    sock.sendto(bytes(partialResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
+                    #    rec.Reset()
 
 except KeyboardInterrupt:
     print("\nDone")

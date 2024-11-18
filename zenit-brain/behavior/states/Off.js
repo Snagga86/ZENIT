@@ -14,6 +14,10 @@ export class Off extends StateWrap{
         this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
             console.log('transition action for "off" in "idleAnchor" state')
         }));
+
+        this.state.transitions.push(new Transition("llmBase", "llmBase", () => {
+            console.log('transition action for "off" in "llmBase"')
+        }));
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -45,7 +49,7 @@ export class Off extends StateWrap{
         console.log("pressed");
         if (key.name === 's') {
             console.log("s pressed");
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "llmBase");
         }
 
         // Exit on Ctrl+C or Ctrl+D

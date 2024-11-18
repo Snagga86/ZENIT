@@ -28,18 +28,18 @@ export class SpeechProcessor {
     }
 
     digest(textInput) {
-
         var splitText = textInput.split(' : ');
-        if(splitText[0].includes("partial") && this.wakeUpAttentive == false){
+        /*if(splitText[0].includes("partial") && this.wakeUpAttentive == false){
             console.log("partial" + this.wakeUpAttentive);
             if(splitText[1].includes("zenit") || splitText[1].includes("zenith")){
                 this.wakeUpAttentive = true;
                 this.speechEvent.emit("WakeUp");
                 console.log("WakeUpEmission");
             }
-        }
-        else if(splitText[0].includes("text")){
+        }*/
+        if(splitText[0].includes("text") || splitText[0].includes("partial")){
             {
+                console.log("TEXT:", splitText[1].substring(1, splitText[1].length-3))
                 this.speechEvent.emit("FinalResult", splitText[1].substring(1, splitText[1].length-3));
                 this.wakeUpAttentive = false;
             }
