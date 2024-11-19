@@ -70,7 +70,6 @@ export class LLMBase extends StateWrap{
     }
 
     finalResultHandler(result){
-        console.log("tts result:" + result);
         if(result.length > 1){
             this.chatProcessor.LLMSendMessage(result);
             this.ScreenFace.calculate();
@@ -79,8 +78,6 @@ export class LLMBase extends StateWrap{
     }
 
     LLMAnswerHandler(llmReply){
-
-        console.log(llmReply);
         if (this.isValidJSON(llmReply)) {
             console.log("The content is valid JSON.");
             var payloadTTS = {
@@ -97,82 +94,22 @@ export class LLMBase extends StateWrap{
     }
 
     isValidJSON(payload) {
-        // Check if the input is an object and not null
         return payload && typeof payload === 'object' && !Array.isArray(payload);
       }
 
     /* Exit function is executed whenever the state is left. */
     exitFunction(){
-
         /* Turn off event listener if state is exited. */
-        /*this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
-        this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler);
+        this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler);
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
-        clearTimeout(this.feedbackTimer); */
     }
 
-    
-
-    /*
-    gesturePostureDetection(gesture){
-        if(gesture == "stop"){
-            this.ScreenFace.sound.stop();
-            var payload = {
-                "mode" : "listen",
-                "status" : "resume",
-                "duration" : "none"
-            }
-            this.feedbackTimer = setTimeout(() => {this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);}, 1500);         
-            this.ScreenFace.sound.speak("Ich bin still.");
-        }
-    }*/
-
-    
-
-    /*setNonverbalSignals(action){
-        console.log(action.face)
-        if(action.face != "none"){
-
-            this.ScreenFace.emotion.setEmotion(action.face);
-    
-            this.chatEmotionTimeout = setTimeout(() => {
-                console.log(this.chatDuration);
-                this.ScreenFace.emotion.neutral();
-    
-                clearTimeout(this.chatEmotionTimeout);
-            }, this.chatDuration);
-        }
-    } */
-        
     newChatDurationCalculatedHandler(duration){
         this.chatDuration = duration * 1000;
         this.chatEmotionTimeout = setTimeout(() => {
-            console.log(this.chatDuration);
             this.ScreenFace.emotion.neutral();
-
             clearTimeout(this.chatEmotionTimeout);
         }, this.chatDuration);
     }
-/*
-    RASAAnswerHandler(payload){
-        console.log("res:");      
-        var payloadTTS = {
-            "mode" : "tts",
-            "text" : payload[0].text
-        }
-        this.lastRASAPayload = payload;
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
-
-    }
-
-    closestBodyRecognition(distance){
-        if(distance > globalStore.welcomeDistance){
-
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
-        }
-    }*/
-
-    
 }
