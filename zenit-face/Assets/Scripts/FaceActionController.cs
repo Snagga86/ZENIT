@@ -63,7 +63,7 @@ public class FaceActionController : MonoBehaviour
     private bool breathUp = true;
 
     private bool isBlinking = false;
-    public float animationDuration = 0.3f; // duration in seconds
+    public float animationDuration = 0.2f; // duration in seconds
     private float elapsedTime = 0f;
     private bool goingUp = true;
 
@@ -175,7 +175,9 @@ public class FaceActionController : MonoBehaviour
                 if (t >= 1f)
                 {
                     isBlinking = false; // stop the animation
-                }
+                    elapsedTime = 0f;
+                    goingUp = true;
+}
             }
         }
 

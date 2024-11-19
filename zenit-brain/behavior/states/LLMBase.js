@@ -38,6 +38,8 @@ export class LLMBase extends StateWrap{
         this.lastLLMPayload = null;
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler.bind(this));
+        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
+        //this.ScreenFace.calculate();
 
         /*this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         
@@ -72,42 +74,31 @@ export class LLMBase extends StateWrap{
         if(result.length > 1){
             this.chatProcessor.LLMSendMessage(result);
             this.ScreenFace.calculate();
+            this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
         }
     }
 
     LLMAnswerHandler(llmReply){
-        console.log("res:");
-        console.log(llmReply.response); 
 
-        if (this.isValidJSON(llmReply.response)) {
+        console.log(llmReply);
+        if (this.isValidJSON(llmReply)) {
             console.log("The content is valid JSON.");
-            const llmReplyJSON = JSON.parse(llmReply.response);
             var payloadTTS = {
                 "mode" : "tts",
-                "text" : llmReplyJSON.answer
+                "text" : llmReply.answer
             }
             this.lastLLMPayload = llmReply;
     
-            console.log(llmReplyJSON.answer);
+            console.log(llmReply.answer);
+            console.log(llmReply.emotion);
+            this.ScreenFace.emotion.setEmotion(llmReply.emotion);
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
-
-          } else {
-            console.log("The content is not valid JSON.");
-            var payloadTTS = {
-                "mode" : "tts",
-                "text" : "Ups, da hat mein Sprachmodel eine invalide Antwort geliefert. Das kommt leider vor."
-            }
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
-        }
+          }
     }
 
     isValidJSON(payload) {
-        try {
-          JSON.parse(payload);
-          return true;
-        } catch (e) {
-          return false;
-        }
+        // Check if the input is an object and not null
+        return payload && typeof payload === 'object' && !Array.isArray(payload);
       }
 
     /* Exit function is executed whenever the state is left. */
@@ -136,31 +127,35 @@ export class LLMBase extends StateWrap{
             this.feedbackTimer = setTimeout(() => {this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);}, 1500);         
             this.ScreenFace.sound.speak("Ich bin still.");
         }
-    }
+    }*/
 
-    newChatDurationCalculatedHandler(duration){
-        if(this.lastRASAPayload != null){
-            if(this.lastRASAPayload.length > 1){
-                this.nextNonverbalSignals = JSON.parse(this.lastRASAPayload[1].image.toString().replace(/'/g, '"'));
-                        
-                if(this.nextNonverbalSignals.action != "none"){
-                    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, this.nextNonverbalSignals.action);
-                }
-            }
-            else{
-                this.nextNonverbalSignals = null;
-            }
+    
 
-            if(this.nextNonverbalSignals != null){
-                this.chatDuration = duration * 1000;
-                this.setNonverbalSignals(this.nextNonverbalSignals);
-                console.log(this.nextNonverbalSignals);
-                console.log(this.nextNonverbalSignals);
-                console.log(this.nextNonverbalSignals);
-            }
+    /*setNonverbalSignals(action){
+        console.log(action.face)
+        if(action.face != "none"){
+
+            this.ScreenFace.emotion.setEmotion(action.face);
+    
+            this.chatEmotionTimeout = setTimeout(() => {
+                console.log(this.chatDuration);
+                this.ScreenFace.emotion.neutral();
+    
+                clearTimeout(this.chatEmotionTimeout);
+            }, this.chatDuration);
         }
-    }
+    } */
+        
+    newChatDurationCalculatedHandler(duration){
+        this.chatDuration = duration * 1000;
+        this.chatEmotionTimeout = setTimeout(() => {
+            console.log(this.chatDuration);
+            this.ScreenFace.emotion.neutral();
 
+            clearTimeout(this.chatEmotionTimeout);
+        }, this.chatDuration);
+    }
+/*
     RASAAnswerHandler(payload){
         console.log("res:");      
         var payloadTTS = {
@@ -177,20 +172,7 @@ export class LLMBase extends StateWrap{
 
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "callToAction");
         }
-    }
+    }*/
 
-    setNonverbalSignals(action){
-        console.log(action.face)
-        if(action.face != "none"){
-
-            this.ScreenFace.emotion.setEmotion(action.face);
     
-            this.chatEmotionTimeout = setTimeout(() => {
-                console.log(this.chatDuration);
-                this.ScreenFace.emotion.neutral();
-    
-                clearTimeout(this.chatEmotionTimeout);
-            }, this.chatDuration);
-        }
-    } */
 }

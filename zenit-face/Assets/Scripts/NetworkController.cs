@@ -147,6 +147,7 @@ public class NetworkController : MonoBehaviour
                 switch (jsonControlObject.data)
                 {
                     case "calculate":
+                        Debug.Log("Blink");
                         this.faceActionController.blink();
                         break;
                     case "stopCalculate":

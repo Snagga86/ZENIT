@@ -6,6 +6,9 @@ export class ChatProcessor {
 
     constructor() {
         this.chatEvents = new EventEmitter();
+        this.defaultLLMReply = new Object();
+        this.defaultLLMReply.answer = "Uups, da hat mein Sprachmodel eine invalide Antwort geliefert. Das kommt leider vor.";
+        this.defaultLLMReply.emotion = "sadness";
     }
 
     NLUSendMessage(text){
@@ -68,7 +71,8 @@ export class ChatProcessor {
         var req = http.request(options, (res) => {
             console.log('statusCode:', res.statusCode);
             res.on('data', (d) => {
-                result = JSON.parse(d.toString());
+                res = JSON.parse(d.toString());
+                result = this.repairLLMAnswerJSON(res.response);
                 this.chatEvents.emit(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, result);
             });
         });
@@ -80,4 +84,61 @@ export class ChatProcessor {
         req.write(data);
         req.end();
     }
+
+    repairLLMAnswerJSON(result){
+        // Use a regular expression to extract the JSON object from the string
+        const jsonMatch = result.match(/{.*}$/);
+        if (!jsonMatch) {
+            return this.defaultLLMReply;
+        }
+      
+        // Extract the text before the JSON
+        const textBeforeJson = result.slice(0, jsonMatch.index).trim();
+        const jsonString = jsonMatch[0];
+      
+        // Parse the JSON string into an object
+        let jsonObject;
+        try {
+          jsonObject = JSON.parse(jsonString);
+        } catch (e) {
+            return this.defaultLLMReply;
+        }
+      
+        // Ensure the "answer" parameter exists and is a string before appending
+        if (typeof jsonObject.answer === 'string') {
+          jsonObject.answer = `${textBeforeJson} ${jsonObject.answer}`.trim();
+        } else {
+          jsonObject.answer = textBeforeJson; // If "answer" is not a string, set it to the textBeforeJson
+        }
+
+        jsonObject.emotion = this.repairLLMEmotion(jsonObject.emotion);
+      
+        return jsonObject;
+      }
+
+      repairLLMEmotion(guessedEmotion){
+        console.log(guessedEmotion);
+        var emotion = "neutral";
+
+        switch (guessedEmotion){
+            case "joy": emotion = "joy";
+            break;
+            case "surprise": emotion = "surprise";
+            break;
+            case "anger": emotion = "anger";
+            break;
+            case "contempt": emotion = "contempt";
+            break;
+            case "fear": emotion = "fear";
+            break;
+            case "disgust": emotion = "disgust";
+            break;
+            case "sadness": emotion = "sadness";
+            break;
+            case "neutral": emotion = "neutral";
+            default: emotion = "neutral";
+        }
+
+        return emotion;
+      }
 }
