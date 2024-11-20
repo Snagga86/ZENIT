@@ -11638,7 +11638,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: b9be8a5ea63e65940a14c295c1e9de3e, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
-  m_Pitch: 1
+  m_Pitch: 1.08
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -11874,7 +11874,7 @@ AudioChorusFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1111824175}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryMix: 0.5
   m_WetMix1: 0.5
   m_WetMix2: 0.5
@@ -11891,9 +11891,9 @@ AudioEchoFilter:
   m_GameObject: {fileID: 1111824175}
   m_Enabled: 1
   m_Delay: 10
-  m_DecayRatio: 0.3
-  m_WetMix: 0.7
-  m_DryMix: 0.6
+  m_DecayRatio: 0.2
+  m_WetMix: 0.5
+  m_DryMix: 0.3
 --- !u!165 &1111824184
 AudioHighPassFilter:
   m_ObjectHideFlags: 0

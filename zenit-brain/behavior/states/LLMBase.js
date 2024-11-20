@@ -30,6 +30,8 @@ export class LLMBase extends StateWrap{
         
         this.feedbackTimer = null;
         this.chatDuration = 0;
+
+        this.SOUND_PITCH = 1.08;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -102,7 +104,7 @@ export class LLMBase extends StateWrap{
     }
 
     newChatDurationCalculatedHandler(duration){
-        this.chatDuration = duration * 1000;
+        this.chatDuration = duration * 1000 * (1/this.SOUND_PITCH);
         this.ScreenFace.stopCalculate();
         this.ScreenFace.emotion.setEmotion(this.lastLLMPayload.emotion);
         this.chatEmotionTimeout = setTimeout(() => {

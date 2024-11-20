@@ -1,0 +1,1 @@
+ollama create mario -f ./Modelfile
