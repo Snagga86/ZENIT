@@ -71,8 +71,13 @@ export class ChatProcessor {
         var req = http.request(options, (res) => {
             console.log('statusCode:', res.statusCode);
             res.on('data', (d) => {
-                res = JSON.parse(d.toString());
-                result = this.repairLLMAnswerJSON(res.response);
+                try{
+                    res = JSON.parse(d.toString());
+                    result = this.repairLLMAnswerJSON(res.response);
+                }catch (e) {
+                    result = this.defaultLLMReply;
+                }
+                
                 this.chatEvents.emit(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, result);
             });
         });
@@ -120,7 +125,7 @@ export class ChatProcessor {
         console.log(guessedEmotion);
         var emotion = "neutral";
 
-        switch (guessedEmotion){
+        switch (guessedEmotion.toLowerCase()){
             case "joy": emotion = "joy";
             break;
             case "surprise": emotion = "surprise";
@@ -136,6 +141,20 @@ export class ChatProcessor {
             case "sadness": emotion = "sadness";
             break;
             case "neutral": emotion = "neutral";
+            break;
+            case "unangemessen": emotion = "contempt";
+            break;
+            case "enttäuschung": emotion = "sadness";
+            break;
+            case "mitgefühl": emotion = "sadness";
+            break;
+            case "besorgnis": emotion = "fear";
+            break;
+            case "neugier": emotion = "neutral";
+            break;
+            case "unangemessen": emotion = "anger";
+            break;
+            case "curiosity": emotion = "neutral";
             default: emotion = "neutral";
         }
 
