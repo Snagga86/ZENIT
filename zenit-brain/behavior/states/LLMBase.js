@@ -85,10 +85,6 @@ export class LLMBase extends StateWrap{
                 "text" : llmReply.answer
             }
             this.lastLLMPayload = llmReply;
-    
-            console.log(llmReply.answer);
-            console.log(llmReply.emotion);
-            this.ScreenFace.emotion.setEmotion(llmReply.emotion);
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
           }
     }
@@ -107,6 +103,8 @@ export class LLMBase extends StateWrap{
 
     newChatDurationCalculatedHandler(duration){
         this.chatDuration = duration * 1000;
+        this.ScreenFace.stopCalculate();
+        this.ScreenFace.emotion.setEmotion(this.lastLLMPayload.emotion);
         this.chatEmotionTimeout = setTimeout(() => {
             this.ScreenFace.emotion.neutral();
             clearTimeout(this.chatEmotionTimeout);

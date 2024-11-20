@@ -18,6 +18,8 @@ public class FaceActionController : MonoBehaviour
     public GameObject confirmationPanel;
     public GameObject canvas;
 
+    public GameObject rotatingGears;
+
     public GameObject infoText;
 
     public GameObject particleSystem;
@@ -74,6 +76,7 @@ public class FaceActionController : MonoBehaviour
         faceEmotion = new FaceEmotion();
         InvokeRepeating("EyeBreath", 0f, 0.035f);
 
+        this.hideRotatingGears();
     }
 
     void OnApplicationPause(bool pauseStatus)
@@ -182,6 +185,18 @@ public class FaceActionController : MonoBehaviour
         }
 
         lastEmotion = displayEmotion;
+    }
+
+    internal void showRotatingGears()
+    {
+        Debug.Log("showRotatingGears");
+        this.rotatingGears.SetActive(true);
+    }
+
+    internal void hideRotatingGears()
+    {
+        Debug.Log("hideRotatingGears");
+        this.rotatingGears.SetActive(false);
     }
 
     internal void showConfirmationPanel()

@@ -149,9 +149,10 @@ public class NetworkController : MonoBehaviour
                     case "calculate":
                         Debug.Log("Blink");
                         this.faceActionController.blink();
+                        this.faceActionController.showRotatingGears();
                         break;
                     case "stopCalculate":
-                        
+                        this.faceActionController.hideRotatingGears();
                         break;
                 };
             }
