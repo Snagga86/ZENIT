@@ -10,6 +10,7 @@ export class GesturePostureProcessor {
         this.currentGesture = "";
         this.closestBody;
         this.closestBodyDistance = 100000000;
+        this.INTERACTION_DISTANCE = 1500;
 
         this.rawdata = fs.readFileSync('./server-conf.json');
         this.serverConf = JSON.parse(this.rawdata);
@@ -29,6 +30,14 @@ export class GesturePostureProcessor {
             }
             this.debounceGesture();
             this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
+            if(this.closestBodyDistance < this.INTERACTION_DISTANCE && this.bodyIsInInteractionZone == false){
+                this.bodyIsInInteractionZone = true;
+                this.gesturePostureEvent.emit('BodiesEnteredInteractionZone', this.closestBodyDistance);
+            }
+            if(this.closestBodyDistance >= this.INTERACTION_DISTANCE && this.bodyIsInInteractionZone == true){
+                this.bodyIsInInteractionZone = false;
+                this.gesturePostureEvent.emit('BodiesLeftInteractionZone', this.closestBodyDistance);
+            }
             //this.currentGesture = this.closestBody.trackedGesture;
         }
     }

@@ -7,11 +7,11 @@ import readline from 'readline';
 
 
 /* Robot state class defining the robot behavior within this state */
-export class LLMBase extends StateWrap{
+export class Talkative extends StateWrap{
     constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("llmBase", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("talkative", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
         this.chatProcessor = chatProcessor;
 
@@ -41,6 +41,9 @@ export class LLMBase extends StateWrap{
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
+
+        this.RoboticBody.followHead();
+
         //this.ScreenFace.calculate();
 
         /*this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
