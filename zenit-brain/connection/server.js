@@ -151,11 +151,11 @@ export class KAREROServer {
             this.KAREROBrain.setSpeechSynthesisWS(webSocket);
 
             this.textToSpeechWS.on('message', (data) =>{
-                console.log(data.toString('utf8'))
+                //console.log(data.toString('utf8'))
                 var text = data.toString('utf8').split(';')[0];
                 var textDuration = data.toString('utf8').split(';')[1];
 
-                console.log("emit brain event NEW_CHAT_DURATION");
+                //console.log("emit brain event NEW_CHAT_DURATION");
                 this.KAREROBrain.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, textDuration);
 
                 var payload = {

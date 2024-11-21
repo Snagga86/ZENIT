@@ -14,9 +14,8 @@ export class Off extends StateWrap{
         this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
             console.log('transition action for "off" in "idleAnchor" state')
         }));
-
         this.state.transitions.push(new Transition("talkative", "talkative", () => {
-            console.log('transition action for "off" in "talkative"')
+            console.log('transition action for "off" in "talkative" state')
         }));
     }
 
@@ -49,7 +48,7 @@ export class Off extends StateWrap{
         console.log("pressed");
         if (key.name === 's') {
             console.log("s pressed");
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "talkative");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
         }
 
         // Exit on Ctrl+C or Ctrl+D

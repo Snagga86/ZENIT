@@ -45,7 +45,7 @@ public class NetworkController : MonoBehaviour
 
         webSocket.OnMessage += (data) =>
         {
-            Debug.Log("onMessage");
+            //Debug.Log("onMessage");
             var message = System.Text.Encoding.UTF8.GetString(data);
             FaceControlDescription jsonControlObject = JsonConvert.DeserializeObject<FaceControlDescription>(message);
 
@@ -55,14 +55,14 @@ public class NetworkController : MonoBehaviour
             }
             if (jsonControlObject.mode == "setSound")
             {
-                Debug.Log("VERBAL ACTION TRACE");
+                //Debug.Log("VERBAL ACTION TRACE");
                 this.verbalAction = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
             }
             this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.verbalAction + this.nonverbalAction;
 
             if (jsonControlObject.mode == "setEmotion")
             {
-                Debug.Log(jsonControlObject.data);
+                //Debug.Log(jsonControlObject.data);
                 this.faceActionController.setEmotion(jsonControlObject.data);
             }
 
@@ -153,6 +153,9 @@ public class NetworkController : MonoBehaviour
                         break;
                     case "stopCalculate":
                         this.faceActionController.hideRotatingGears();
+                        break;
+                    case "speechVisual":
+                        this.faceActionController.addSpeechVisual(int.Parse(jsonControlObject.extra));
                         break;
                 };
             }

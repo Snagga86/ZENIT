@@ -10,7 +10,8 @@ export class GesturePostureProcessor {
         this.currentGesture = "";
         this.closestBody;
         this.closestBodyDistance = 100000000;
-        this.INTERACTION_DISTANCE = 1500;
+        this.INTERACTION_DISTANCE = 2.00;
+        this.bodyIsInInteractionZone = false;
 
         this.rawdata = fs.readFileSync('./server-conf.json');
         this.serverConf = JSON.parse(this.rawdata);
@@ -18,9 +19,27 @@ export class GesturePostureProcessor {
         this.TIME_THRESHHOLD = 2600;
         this.timeDetected = 0;
         this.recentlyDetected = false;
+
+        this.lastKinectUpdateTime = null;
+
+        setInterval(() => {
+            this.checkLastKinectData();
+        }, 1000);
+    }
+
+    checkLastKinectData(){
+        if(Date.now() - this.lastKinectUpdateTime >= 1000 && this.bodiesAbsent == false){
+            this.closestBodyDistance = 100000000;
+            console.log("All bodies left interaction zone.");
+            this.bodiesAbsent = true;
+            this.bodyIsInInteractionZone = false;
+            this.gesturePostureEvent.emit('BodiesLeftInteractionZone', this.closestBodyDistance);
+        }
     }
 
     digest(kinectData) {
+        this.lastKinectUpdateTime = Date.now();
+        this.bodiesAbsent = false;
         if(this.ONLY_SWEETSPOT_BODY == true){
             this.getClosestBody(kinectData.translatedBodies);
             if(this.recentlyDetected == false && this.closestBody.trackedGesture != ""){
@@ -29,6 +48,8 @@ export class GesturePostureProcessor {
                 this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);
             }
             this.debounceGesture();
+            //console.log(this.closestBodyDistance);
+            //console.log(kinectData.translatedBodies);
             this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
             if(this.closestBodyDistance < this.INTERACTION_DISTANCE && this.bodyIsInInteractionZone == false){
                 this.bodyIsInInteractionZone = true;

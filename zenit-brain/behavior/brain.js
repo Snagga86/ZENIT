@@ -155,7 +155,7 @@ export class Brain{
         /* Whenever a state triggers a new face action on the robot display it is transmitted from here. */
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, (payload) => {
             if(this.robotFaceWS != null){
-                console.log("send " + JSON.stringify(payload));
+                //console.log("send " + JSON.stringify(payload));
                 this.robotFaceWS.send(JSON.stringify(payload));
             }
         });

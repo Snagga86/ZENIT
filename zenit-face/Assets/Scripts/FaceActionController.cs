@@ -187,6 +187,11 @@ public class FaceActionController : MonoBehaviour
         lastEmotion = displayEmotion;
     }
 
+    internal void addSpeechVisual(int length)
+    {
+        Debug.Log("Length: " + length);
+    }
+
     internal void showRotatingGears()
     {
         Debug.Log("showRotatingGears");

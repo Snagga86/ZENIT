@@ -43,10 +43,12 @@ print("!")
 def all_partials_equal(new_string):
     # Remove the first element and add the new string at the end
     #print(partialResultBuffer);
+    data = json.loads(new_string)
+    partial_value = data["partial"]
     partialResultBuffer.pop(0)
-    partialResultBuffer.append(new_string)
+    partialResultBuffer.append(partial_value)
 
-    if all(element == partialResultBuffer[0] for element in partialResultBuffer) and partialResultBuffer[0] != "":
+    if partialResultBuffer[0] != "" and all(element == partialResultBuffer[0] for element in partialResultBuffer):
         return True
     return False
         
@@ -145,16 +147,23 @@ try:
                     finalResult = finalRes
                     print("finalResult:")
                     print(finalResult)
-                    sock.sendto(bytes(finalResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
+                    data = json.loads(finalResult)
+                    text = data["text"]
+                    if text != "":
+                        sock.sendto(bytes(finalResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
                 else:
                     print("partial result drop:\n")
                     print(rec.PartialResult())
                     partialResult = rec.PartialResult()
+                    data = json.loads(partialResult)
+                    partial = data["partial"]
+                    streamVisual = "length : " + str(len(partial))
+                    sock.sendto(bytes(streamVisual, "utf-8"), (IP_ADDRESS, UDP_PORT))
                     equalPartials = all_partials_equal(partialResult)
                     if equalPartials == True:
-                        partialResultBuffer = ["","","","","","","","","","","","","","","","","","","",""]
-                        print("partialResult:")
+                        print("partialResult is beeing sent...:")
                         print(partialResult)
+                        partialResultBuffer = ["","","","","","","","","","","","","","","","","","","",""]
                         rec.Reset()
                         sock.sendto(bytes(partialResult, "utf-8"), (IP_ADDRESS, UDP_PORT))
                     #if 'zenith' in partialResult or 'zenit' in partialResult:

@@ -76,8 +76,16 @@ export class RoboticArm{
         this.bodyAction("jawn");
     }
 
-    look(){
-        this.bodyAction("look");
+    look1(){
+        this.bodyAction("look1");
+    }
+
+    look2(){
+        this.bodyAction("look2");
+    }
+
+    look3(){
+        this.bodyAction("look3");
     }
 
     nap(){
@@ -353,6 +361,16 @@ export class DisplayDevice{
         this.video = new Video(this.brainEvents);
         this.sound = new Sound(this.brainEvents);
         this.text = new Text(this.brainEvents);
+    }
+
+    addSpeechVisual(length){
+        var payloadState = {
+            "mode" : "setState",
+            "data" : "speechVisual",
+            "extra" : length.toString()
+        }
+        console.log("addSPeechVis" + payloadState);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
     }
 
     calculate(){

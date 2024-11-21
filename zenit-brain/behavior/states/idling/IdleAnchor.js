@@ -14,9 +14,10 @@ export class IdleAnchor extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 2100; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 1000; /* Time duration in milliseconds. */
 
-        this.idlingStyles = ["jawn", "look", "nap", "relax", "stretch"];
+        this.idlingStyles = ["jawn", "look", "nap"];
+        this.lastState = "";
 
         this.timeout = null;
 
@@ -25,41 +26,43 @@ export class IdleAnchor extends StateWrap{
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("off", "off", () => {
-            console.log('transition action for "idlingBase" in "off" state');
-        }));
         this.state.transitions.push(new Transition("jawn", "jawn", () => {
-            console.log('transition action for "idlingBase" in "jawn" state');
+            console.log('transition action for "idleAnchor" in "jawn" state');
         }));
         this.state.transitions.push(new Transition("look", "look", () => {
-            console.log('transition action for "idlingBase" in "look" state');
+            console.log('transition action for "idleAnchor" in "look" state');
         }));
         this.state.transitions.push(new Transition("nap", "nap", () => {
-            console.log('transition action for "idlingBase" in "nap" state');
-        }));
-        this.state.transitions.push(new Transition("relax", "relax", () => {
-            console.log('transition action for "idlingBase" in "relax" state');
-        }));
-        this.state.transitions.push(new Transition("stretch", "stretch", () => {
-            console.log('transition action for "idlingBase" in "stretch" state');
+            console.log('transition action for "idleAnchor" in "nap" state');
         }));
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
         console.log("Enter indleAnchor!");
-        console.log( this.idlingStyles[0]);
 
         this.RoboticBody.neutral();
         this.ScreenFace.emotion.neutral();
 
-        var action = this.getRandomInt(0, 4);
+        var action = this.getRandomInt(0, this.idlingStyles.length - 1);
+
+        console.log("Randomly chosen state:" + this.idlingStyles[action].toString());
+        var state = this.idlingStyles[action].toString();
+        if(state == "jawn" && this.lastState == "jawn"){
+            var state = this.idlingStyles[action].toString();
+        }
+        this.lastState = state;
+
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "nap");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, state);
             clearTimeout(this.timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
         
+    }
+
+    exitFunction(){
+        clearTimeout(this.timeout);
     }
 
     getRandomInt(min, max) {

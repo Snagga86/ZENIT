@@ -7,7 +7,7 @@ export class Look extends StateWrap{
     constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("look", emotionProcessor, gesturePostureProcessor,speechProcessor, brainEvents);
+        super("look", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -15,17 +15,22 @@ export class Look extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 32000; /* Time duration in milliseconds. */
+        this.LOOK1_ANTICIPATED_ANIMATION_DURATION = 7500; /* Time duration in milliseconds. */
+        this.LOOK2_ANTICIPATED_ANIMATION_DURATION = 10500; /* Time duration in milliseconds. */
+        this.LOOK3_ANTICIPATED_ANIMATION_DURATION = 9500; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
-
+        this.state.actions.onExit = this.exitFunction.bind(this);
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
-            console.log('transition action for "stretch" in "idlingBase" state');
+            console.log('transition action for "look" in "idleAnchor" state');
+        }));
+        this.state.transitions.push(new Transition("talkative", "talkative", () => {
+            console.log('transition action for "look" in "talkative" state');
         }));
     }
 
@@ -36,14 +41,73 @@ export class Look extends StateWrap{
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
 
-        this.ScreenFace.emotion.rage();
-        this.RoboticBody.look();
+        this.ScreenFace.emotion.neutral();
 
-        /* Go back to follow state after the anticipated execution time of attack. */
+        console.log("in look state");
         this.timeout = setTimeout(() => {
-            /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
             clearTimeout(this.timeout);
-        }, this.ANTICIPATED_ANIMATION_DURATION);
+            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+                this.progressToTalkative();
+            }
+            else{
+                this.look1Procedure();
+            }
+        },200);
+    }
+
+    exitFunction(){
+        clearTimeout(this.timeout);
+    }
+
+    progressToTalkative(){
+        clearTimeout(this.timeout);
+        var payloadTTS = {
+            "mode" : "tts",
+            "text" : "Moin!"
+        }
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "talkative");
+    }
+
+    look1Procedure(){
+        console.log("look procedure 1");
+        this.RoboticBody.look1();
+        this.timeout = setTimeout(() => {
+            clearTimeout(this.timeout);
+            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+                this.progressToTalkative();
+            }
+            else{
+                this.look2Procedure();
+            }
+        }, this.LOOK1_ANTICIPATED_ANIMATION_DURATION);
+    }
+
+    look2Procedure(){
+        console.log("look procedure 2");
+        this.RoboticBody.look2();
+        this.timeout = setTimeout(() => {
+            clearTimeout(this.timeout);
+            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+                this.progressToTalkative();
+            }
+            else{
+                this.look3Procedure();
+            }
+        }, this.LOOK2_ANTICIPATED_ANIMATION_DURATION);
+    }
+
+    look3Procedure(){
+        console.log("look procedure 3");
+        this.RoboticBody.look3();
+        this.timeout = setTimeout(() => {
+            clearTimeout(this.timeout);
+            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+                this.progressToTalkative();
+            }
+            else{
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
+            }
+        }, this.LOOK3_ANTICIPATED_ANIMATION_DURATION);
     }
 }

@@ -9,6 +9,7 @@ export class Nap extends StateWrap{
         /* Call the super constructor and set the identification name for the state class */
         super("nap", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
+        this.breakWords = ["zenit", "hopp", "hop", "aufwachen","zenith"];
 
         /* ToDo: This implementation has to be improved in the future. */
         /* We cannot make sure how long the animation duration of the robot arm lasts.
@@ -21,11 +22,15 @@ export class Nap extends StateWrap{
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
+        this.state.actions.onExit = this.exitFunction.bind(this);
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
+        this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
+            console.log('transition action for "nap" in "idleAnchor"');
+        }));
         this.state.transitions.push(new Transition("napWake", "napWake", () => {
-            console.log('transition action for "stretch" in "napWake" state');
+            console.log('transition action for "nap" in "napWake"');
         }));
     }
 
@@ -40,11 +45,29 @@ export class Nap extends StateWrap{
         this.RoboticBody.nap();
         this.ScreenFace.emotion.sleepy();
 
+        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
+
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "napWake");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
             clearTimeout(this.timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
+    }
+
+    exitFunction(){
+        clearTimeout(this.timeout);
+        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
+    }
+
+    finalResultHandler(result){
+        if(this.containsWords(result, this.breakWords)){
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "napWake");     
+        }
+    }
+
+    containsWords(str, wordsArray) {
+        const pattern = new RegExp(wordsArray.join('|'), 'i');
+        return pattern.test(str);
     }
 }

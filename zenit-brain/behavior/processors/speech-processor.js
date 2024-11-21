@@ -9,6 +9,7 @@ export class SpeechProcessor {
         this.talkingStart = 0;
         this.talkingEnd = 0;
 
+        this.lastWordLength = 0;
     }
 
     wakeUpDebouncer(duration){
@@ -39,10 +40,23 @@ export class SpeechProcessor {
         }*/
         if(splitText[0].includes("text") || splitText[0].includes("partial")){
             {
-                console.log("TEXT:", splitText[1].substring(1, splitText[1].length-3))
+                console.log("Transcribed text input:", splitText[1].substring(1, splitText[1].length-3))
                 this.speechEvent.emit("FinalResult", splitText[1].substring(1, splitText[1].length-3));
                 this.wakeUpAttentive = false;
             }
+        }
+        else if(splitText[0].includes("length")){
+            console.log("len: " + splitText[1]);
+            var currentLength = parseInt(splitText[1]);
+            if(currentLength > 0 && currentLength != this.lastWordLength){
+                var tmpLength = currentLength - this.lastWordLength;
+                if(tmpLength <0){
+                    tmpLength = tmpLength *-1;
+                }
+                console.log(tmpLength);
+                this.speechEvent.emit("RecognizedWordLength", tmpLength);
+            }
+            this.lastWordLength = currentLength;
         }
 
     }

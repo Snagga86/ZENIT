@@ -15,17 +15,18 @@ export class NapWake extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 3000; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 4500; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
+        this.state.actions.onExit = this.exitFunction.bind(this);
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
-            console.log('transition action for "stretch" in "idleAnchor" state');
+        this.state.transitions.push(new Transition("look", "look", () => {
+            console.log('transition action for "napWake" in "look" state');
         }));
     }
 
@@ -36,14 +37,21 @@ export class NapWake extends StateWrap{
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
 
+        console.log("Enter nap Wake!");
+
         this.ScreenFace.emotion.neutral();
         this.RoboticBody.napWake();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
             clearTimeout(this.timeout);
+            console.log("Try go look!");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "look");
         }, this.ANTICIPATED_ANIMATION_DURATION);
+    }
+
+    exitFunction(){
+        clearTimeout(this.timeout);
     }
 }

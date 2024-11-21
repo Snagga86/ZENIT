@@ -69,7 +69,7 @@ export class ChatProcessor {
         var result;
     
         var req = http.request(options, (res) => {
-            console.log('statusCode:', res.statusCode);
+            //console.log('statusCode:', res.statusCode);
             res.on('data', (d) => {
                 try{
                     res = JSON.parse(d.toString());
@@ -122,7 +122,7 @@ export class ChatProcessor {
       }
 
       repairLLMEmotion(guessedEmotion){
-        console.log(guessedEmotion);
+        console.log("Guessed emotion:" + guessedEmotion);
         var emotion = "neutral";
 
         switch (guessedEmotion.toLowerCase()){

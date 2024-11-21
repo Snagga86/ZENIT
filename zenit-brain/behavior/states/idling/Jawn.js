@@ -21,7 +21,7 @@ export class Jawn extends StateWrap{
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
-
+        this.state.actions.onExit = this.exitFunction.bind(this);
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
         this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
@@ -47,5 +47,9 @@ export class Jawn extends StateWrap{
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
             clearTimeout(this.timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
+    }
+
+    exitFunction(){
+        clearTimeout(this.timeout);
     }
 }
