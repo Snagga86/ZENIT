@@ -48,8 +48,15 @@ export class IdleAnchor extends StateWrap{
 
         console.log("Randomly chosen state:" + this.idlingStyles[action].toString());
         var state = this.idlingStyles[action].toString();
-        if(state == "jawn" && this.lastState == "jawn"){
-            var state = this.idlingStyles[action].toString();
+
+        
+        console.log("jawn");
+        if(this.lastState == "jawn"){
+            while(state == "jawn"){
+                var action = this.getRandomInt(0, this.idlingStyles.length - 1);
+                state = this.idlingStyles[action].toString();
+                console.log("state chosen:" + state);
+            }
         }
         this.lastState = state;
 

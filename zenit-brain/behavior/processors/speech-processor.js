@@ -46,7 +46,6 @@ export class SpeechProcessor {
             }
         }
         else if(splitText[0].includes("length")){
-            console.log("len: " + splitText[1]);
             var currentLength = parseInt(splitText[1]);
             if(currentLength > 0 && currentLength != this.lastWordLength){
                 var tmpLength = currentLength - this.lastWordLength;

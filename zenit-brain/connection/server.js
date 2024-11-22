@@ -157,11 +157,11 @@ export class KAREROServer {
 
                 //console.log("emit brain event NEW_CHAT_DURATION");
                 this.KAREROBrain.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, textDuration);
-
+                var duration = parseFloat(textDuration) * (1/1.04);
                 var payload = {
                     "mode" : "listen",
                     "status" : "stop",
-                    "duration" : textDuration
+                    "duration" : duration.toString()
                 }
 
                 this.speechTranscriptionControlWS.send(JSON.stringify(payload));

@@ -16,7 +16,7 @@ export class Nap extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 40000; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 4000000; /* Time duration in milliseconds. */
 
         this.timeout = null;
 

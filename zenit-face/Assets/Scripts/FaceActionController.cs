@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 using UnityEngine.Video;
 using System.Collections;
 using UnityEngine.Networking;
+using UnityEngine.UIElements;
+using Unity.VisualScripting;
+using static UnityEngine.ParticleSystem;
 
 public class FaceActionController : MonoBehaviour
 {
@@ -22,6 +25,7 @@ public class FaceActionController : MonoBehaviour
 
     public GameObject infoText;
 
+    public GameObject speechFlow;
     public GameObject particleSystem;
     public GameObject drops1;
     public GameObject drops2;
@@ -187,9 +191,33 @@ public class FaceActionController : MonoBehaviour
         lastEmotion = displayEmotion;
     }
 
-    internal void addSpeechVisual(int length)
+    internal void addSpeechVisual(int lengthWord)
     {
-        Debug.Log("Length: " + length);
+        Debug.Log("Length: " + lengthWord);
+        if (lengthWord <= 0) return;
+        if (lengthWord > 10) lengthWord = 10;
+
+        ParticleSystem speechFlow = this.speechFlow.GetComponent<ParticleSystem>();
+        var mainModule = speechFlow.main;
+        mainModule.startSize3D = true;
+
+        float scale = 1f / (11f - (float)lengthWord);
+        Debug.Log(scale);
+        var emitParams = new ParticleSystem.EmitParams
+        {
+            startSize3D = new Vector3(scale, 1f, 1f) // Set scale for this particle
+        };
+
+        speechFlow.Emit(emitParams, 1);
+
+        // Scale only the X-axis of the particle
+        /*var particles = new ParticleSystem.Particle[1];
+        int numParticles = speechFlow.GetParticles(particles);
+        if (numParticles > 0)
+        {
+            particles[0].startSize3D = new Vector3((1/(11-length)), particles[0].startSize3D.y, particles[0].startSize3D.z);
+            speechFlow.SetParticles(particles, numParticles);
+        }*/
     }
 
     internal void showRotatingGears()

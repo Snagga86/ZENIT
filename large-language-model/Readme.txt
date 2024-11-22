@@ -1,1 +1,1 @@
-ollama create mario -f ./Modelfile
+ollama create ZENIT -f ./Modelfile
