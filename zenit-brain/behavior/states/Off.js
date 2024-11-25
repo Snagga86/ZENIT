@@ -48,7 +48,7 @@ export class Off extends StateWrap{
         console.log("pressed");
         if (key.name === 's') {
             console.log("s pressed");
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "talkative");
         }
 
         // Exit on Ctrl+C or Ctrl+D

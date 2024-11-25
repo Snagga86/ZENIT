@@ -48,17 +48,19 @@ export class ChatProcessor {
     }
 
     LLMSendMessage(text){
-        const data = JSON.stringify({
+        /*const data = JSON.stringify({
             model: "ZENIT",
             prompt: text,
             stream: false
-          });
+          }); */
+
+        const data = JSON.stringify({ prompt: text });
           
           // Options for the HTTP request
         const options = {
             hostname: '127.0.0.1',
             port: 12345,
-            path: '/api/generate',
+            path: '/ask',
             method: 'POST',
             headers: {
               'Content-Type': 'application/json; charset=utf-8', // Ensure UTF-8 encoding
@@ -71,9 +73,12 @@ export class ChatProcessor {
         var req = http.request(options, (res) => {
             //console.log('statusCode:', res.statusCode);
             res.on('data', (d) => {
+                var utf8Content = Buffer.from(d, 'utf-8').toString('utf-8');
+                console.log(utf8Content)
                 try{
-                    res = JSON.parse(d.toString());
-                    result = this.repairLLMAnswerJSON(res.response);
+                    res = JSON.parse(utf8Content);
+                    console.log(res);
+                    result = res;
                 }catch (e) {
                     result = this.defaultLLMReply;
                 }

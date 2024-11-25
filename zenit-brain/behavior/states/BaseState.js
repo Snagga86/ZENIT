@@ -369,7 +369,7 @@ export class DisplayDevice{
             "data" : "speechVisual",
             "extra" : length.toString()
         }
-        console.log("addSPeechVis" + payloadState);
+        //console.log("addSPeechVis" + payloadState);
         this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
     }
 

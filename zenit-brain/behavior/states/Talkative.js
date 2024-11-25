@@ -66,7 +66,7 @@ export class Talkative extends StateWrap{
     }
 
     bodiesLeftHandler(){
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
+        //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
     }
 
     recognizedWordLengthHandler(wordLength){
@@ -95,6 +95,7 @@ export class Talkative extends StateWrap{
                 "mode" : "tts",
                 "text" : llmReply.answer
             }
+            console.log(llmReply.answer);
             this.lastLLMPayload = llmReply;
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
           }
