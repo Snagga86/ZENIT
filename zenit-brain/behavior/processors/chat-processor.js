@@ -77,10 +77,11 @@ export class ChatProcessor {
                 console.log(utf8Content)
                 try{
                     res = JSON.parse(utf8Content);
+                    res.emotion = this.repairLLMEmotion(res.emotion);
                     console.log(res);
                     result = res;
                 }catch (e) {
-                    result = this.defaultLLMReply;
+                    result = this.xx;
                 }
                 
                 this.chatEvents.emit(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, result);
@@ -160,6 +161,25 @@ export class ChatProcessor {
             case "unangemessen": emotion = "anger";
             break;
             case "curiosity": emotion = "neutral";
+            break;
+            case "frustration": emotion = "sadness";
+            break;
+            case "verachtung": emotion = "contempt";
+            break;
+            case "angst": emotion = "fear";
+            break;
+            case "wütend": emotion = "anger";
+            break;
+            case "angry": emotion = "anger";
+            break;
+            case "wut": emotion = "anger";
+            break;
+            case "überraschung": emotion = "surprise";
+            break;
+            case "stolz": emotion = "joy";
+            break;
+            case "lust": emotion = "joy";
+            break;
             default: emotion = "neutral";
         }
 

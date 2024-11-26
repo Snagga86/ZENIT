@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { Brain } from '../brain.js';
 
 export class SpeechProcessor {
 
@@ -28,6 +29,7 @@ export class SpeechProcessor {
         this.talkingEnd = Math.floor(newUnixTimestampSeconds * 1000);
     }
 
+
     digest(textInput) {
         var splitText = textInput.split(' : ');
         /*if(splitText[0].includes("partial") && this.wakeUpAttentive == false){
@@ -52,7 +54,6 @@ export class SpeechProcessor {
                 if(tmpLength <0){
                     tmpLength = tmpLength *-1;
                 }
-                console.log(tmpLength);
                 this.speechEvent.emit("RecognizedWordLength", tmpLength);
             }
             this.lastWordLength = currentLength;

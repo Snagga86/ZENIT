@@ -18,6 +18,8 @@ public class FaceActionController : MonoBehaviour
 {
     public FaceEmotion faceEmotion;
 
+    public NetworkController networkController;
+
     public GameObject confirmationPanel;
     public GameObject canvas;
 
@@ -37,6 +39,7 @@ public class FaceActionController : MonoBehaviour
 
     public GameObject videoPlayer;
     public GameObject soundPlayer;
+    private bool isPlaying = false;
 
     public GameObject videoObj;
 
@@ -69,6 +72,7 @@ public class FaceActionController : MonoBehaviour
     private bool breathUp = true;
 
     private bool isBlinking = false;
+    private bool isBlinkingDisgusted = false;
     public float animationDuration = 0.2f; // duration in seconds
     private float elapsedTime = 0f;
     private bool goingUp = true;
@@ -93,9 +97,25 @@ public class FaceActionController : MonoBehaviour
         }
     }
 
+    private void OnAudioPlaybackComplete()
+    {
+        Debug.Log("Audio playback has finished!");
+        var payload = "{\"action\": \"speechEnded\" }";
+        this.networkController.sendMessage(payload);
+        // Add your custom logic here
+    }
     // Update is called once per frame
     void Update()
     {
+        if (isPlaying && !this.soundPlayer.GetComponent<AudioSource>().isPlaying)
+        {
+            isPlaying = false;
+            if(this.soundPlayer.GetComponent<AudioSource>().clip.name != "confirmSpeechInput")
+            {
+                OnAudioPlaybackComplete();
+            }
+        }
+
         if (lastEmotion != displayEmotion)
         {
             Debug.Log("change face: " + displayEmotion);
@@ -187,6 +207,35 @@ public class FaceActionController : MonoBehaviour
 }
             }
         }
+        if (isBlinkingDisgusted)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / animationDuration;
+
+            if (goingUp)
+            {
+                this.eyeLeft.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(0, 40, t));
+                this.eyeRight.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(0, 40, t));
+
+                if (t >= 1f)
+                {
+                    goingUp = false;
+                    elapsedTime = 0f; // reset timer for the downward animation
+                }
+            }
+            else
+            {
+                this.eyeLeft.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(40, 0, t));
+                this.eyeRight.SetBlendShapeWeight((int)EmotionShapes.blendshapeNumbers.Disgusted, Mathf.Lerp(40, 0, t));
+                if (t >= 1f)
+                {
+                    isBlinkingDisgusted = false; // stop the animation
+                    elapsedTime = 0f;
+                    goingUp = true;
+                }
+            }
+        }
+
 
         lastEmotion = displayEmotion;
     }
@@ -274,8 +323,16 @@ public class FaceActionController : MonoBehaviour
     }
 
     internal void playSound()
-    {
-        this.soundPlayer.GetComponent<AudioSource>().Play();
+    {  
+        if (this.soundPlayer.GetComponent<AudioSource>() != null)
+        {
+            this.soundPlayer.GetComponent<AudioSource>().Play();
+            isPlaying = true;
+        }
+        else
+        {
+            Debug.LogError("AudioSource is not assigned.");
+        }
     }
 
     internal void stopSound()
@@ -316,6 +373,11 @@ public class FaceActionController : MonoBehaviour
     {
         this.isBlinking = true;
     }
+    internal void blinkDisgusted()
+    {
+        this.isBlinkingDisgusted = true;
+    }
+
 
     private void EyeBreath()
     {

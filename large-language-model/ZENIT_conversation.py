@@ -24,7 +24,7 @@ def build_conversation_prompt(history, max_messages=5):
         if isinstance(message, HumanMessage):
             messages.append(f"Human: {message.content}")
         elif isinstance(message, AIMessage):
-            messages.append(f"AI: {message.content}")
+            messages.append(f"ZENIT: {message.content}")
 
     print(messages)
     return "\n".join(messages)
@@ -52,68 +52,60 @@ def ask():
 
         full_prompt = build_conversation_prompt(conversation_history)
 
-        #print("full_prompt")
-        #print(full_prompt)
-
-        # Invoke the Ollama model with the full conversation context
         response = ollama_model.invoke(full_prompt)
         print(type(response))
-        print(response.content)
-        content = process_string(response.content)
-        print(content)
-        try:
-            print("try decode JSON")
-            # Step 2: Attempt to parse as JSON
-            content_json = json.loads(content)
-            print("Extracted JSON Object:", content)
-        except json.JSONDecodeError:
-            # Step 3: If not JSON, transform it into the desired JSON structure
-            content_json = {
-                "answer": content_json,
-                "emotion": "neutral"
-            }
-            print("Transformed JSON Object:", content_json)
+        content_json = repair_json(response.content)
+        print(type(content_json))
+        print(content_json)
 
         # Add the model's response to the conversation history
-        conversation_history.add_message(AIMessage(content=str(response.content)))
+        conversation_history.add_message(AIMessage(content=str(content_json['answer'])))
 
-        print("hier unten")
-        # Return the model's response as JSON
-        #response_utf8 = str(response).encode("utf-8").decode("utf-8")
-        #print(response_utf8)
         return content_json
 
     except Exception as e:
         # Handle errors gracefully
         app.logger.error(f"Error processing request: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"answer": "uuups, da ist mir ein Fehler passoert", "emotion": "sadness"}), 500
 
-def process_string(input_string):
-    # Find the first occurrence of '{' and '}'
-    start_index = input_string.find('{')
-    end_index = input_string.find('}', start_index)
-    
-    if start_index == -1:  # No '{' in the string
-        return input_string
-    
-    # Extract all characters before the first '{'
-    prefix = input_string[:start_index].strip()
-    
-    # If there are more than 15 characters before '{', include them in '{}'
-    if len(prefix) > 15:
-        if end_index != -1:  # Both '{' and '}' exist
-            return f"{{{prefix}}}" + input_string[start_index:end_index + 1]
-        else:  # Only '{' exists
-            return f"{{{prefix}}}" + input_string[start_index:]
-    else:
-        # Original behavior for cases with <= 15 characters before '{'
-        if end_index != -1:
-            return input_string[start_index:end_index + 1]
-        else:
-            return input_string[start_index:]  # Only '{' exists, no '}'
+def repair_json(input_string):
+    # Ensure the string is in UTF-8
+    if isinstance(input_string, bytes):
+        input_string = input_string.decode('utf-8')
 
-# Return the input string unchanged if none of the conditions are met
-    return input_string
+    # Extract potential JSON objects from the string
+    json_pattern = re.compile(r'{\s*"answer"\s*:\s*".*?",\s*"emotion"\s*:\s*".*?"\s*}')
+    match = json_pattern.search(input_string)
+    if not match:
+        return None  # Return None if no valid JSON object is found
+
+    json_str = match.group()
+    
+    # Parse the JSON object
+    try:
+        json_obj = json.loads(json_str)
+    except json.JSONDecodeError:
+        return None
+
+    # Check if the "text" field is itself a JSON object
+    text_content = json_obj.get("answer", "")
+    try:
+        nested_json = json.loads(text_content)
+        return nested_json  # Return the nested JSON if it exists
+    except json.JSONDecodeError:
+        pass
+
+    # Handle string parts before the JSON
+    pre_json_part = input_string[:match.start()].strip()
+    if pre_json_part:
+        # Check if the prefix is not content:, content=, zenit:, or zenit= and is longer than 15 chars
+        pre_json_part_lower = pre_json_part.lower()
+        if not (pre_json_part_lower.startswith(('content:', 'content=', 'zenit:', 'zenit=')) and len(pre_json_part) <= 15):
+            text_content = pre_json_part + ' ' + text_content
+
+    # Update the "text" field and return the modified JSON object
+    json_obj["answer"] = text_content.strip()
+    return json_obj
 
 def getValidJSONAnswer(raw_answer):
     match = re.search(r"content='({.*?})'", raw_answer)

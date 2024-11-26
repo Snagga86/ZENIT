@@ -233,6 +233,7 @@ GameObject:
   - component: {fileID: 55752852}
   - component: {fileID: 55752851}
   - component: {fileID: 55752850}
+  - component: {fileID: 55752854}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -324,6 +325,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &55752854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55752849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f41c7addfb4655341ae3a72561b5944c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &56127716
 GameObject:
   m_ObjectHideFlags: 0
@@ -17374,6 +17387,10 @@ PrefabInstance:
       propertyPath: particleSystem
       value: 
       objectReference: {fileID: 921323146}
+    - target: {fileID: 6304355968724499757, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
+      propertyPath: networkController
+      value: 
+      objectReference: {fileID: 1999345727}
     - target: {fileID: 6304355968724499759, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
       propertyPath: m_RootOrder
       value: 11
@@ -22604,6 +22621,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2f2b10106a087404e9fa06f338677444, type: 3}
+--- !u!114 &1999345727 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6304355968724499752, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
+  m_PrefabInstance: {fileID: 1825695383}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c81b541114605d4191e033af0d650f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2003422378
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using UnityEngine.Video;
 using System.Collections;
 using UnityEngine.Networking;
+using Unity.VisualScripting;
 
 public class NetworkController : MonoBehaviour
 {
@@ -36,14 +37,82 @@ public class NetworkController : MonoBehaviour
     {
 
     }
+    void Update()
+    {
+
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if (this.webSocket != null)
+        {
+            this.webSocket.DispatchMessageQueue();
+        }
+
+#endif
+
+        // Check for screen touch on Android
+        if (Input.touchCount > 0)
+        {
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                Touch touch = Input.GetTouch(i);
+
+                if (touch.phase == TouchPhase.Began)
+                {
+                    HandleTouch(touch.position);
+                }
+            }
+        }
+
+        // Fallback: Check for key press (X key)
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            HandleKeyPress();
+        }
+    }
+
+    /// <summary>
+    /// Handles the touch event and performs an action.
+    /// </summary>
+    /// <param name="touchPosition">The position of the touch.</param>
+    private void HandleTouch(Vector2 touchPosition)
+    {
+        //var payload = "{\"action\": \"screenTouch\" }";
+        this.faceActionController.blinkDisgusted();
+        this.faceActionController.nameSound("breakSpeech");
+        this.faceActionController.playSound();
+    }
+
+    /// <summary>
+    /// Handles the fallback key press event (X key).
+    /// </summary>
+    private void HandleKeyPress()
+    {
+        //var payload = "{\"action\": \"screenTouch\" }";
+        this.faceActionController.blinkDisgusted();
+        this.faceActionController.nameSound("breakSpeech");
+        this.faceActionController.playSound();
+    }
+
+
+    public void sendMessage(string message)
+    {
+        if (webSocket != null && webSocket.State == WebSocketState.Open)
+        {
+            Debug.Log($"Sending message: {message}");
+            webSocket.SendText(message);
+        }
+        else
+        {
+            Debug.LogWarning("WebSocket is not connected. Unable to send message.");
+        }
+    }
 
     public void connectToWebsocket(string websocketDescription)
     {
 
         this.websocketUrl = websocketDescription;
-        webSocket = new WebSocket(this.websocketUrl.Substring(0, this.websocketUrl.Length - 1));
+        this.webSocket = new WebSocket(this.websocketUrl.Substring(0, this.websocketUrl.Length - 1));
 
-        webSocket.OnMessage += (data) =>
+        this.webSocket.OnMessage += (data) =>
         {
             //Debug.Log("onMessage");
             var message = System.Text.Encoding.UTF8.GetString(data);
@@ -161,39 +230,27 @@ public class NetworkController : MonoBehaviour
             }
         };
 
-        webSocket.OnOpen += () =>
+        this.webSocket.OnOpen += () =>
         {
             Debug.Log("ws connect");
         };
 
-        webSocket.OnError += (error) =>
+        this.webSocket.OnError += (error) =>
         {
             Debug.Log("ws error " + error);
         };
 
-        webSocket.OnClose += (e) =>
+        this.webSocket.OnClose += (e) =>
         {
             Debug.Log("Connection closed! Try reconnection...");
             StartCoroutine(this.reconnect(4f));
         };
-        webSocket.Connect();
+        this.webSocket.Connect();
     }
     IEnumerator reconnect(float waitTime)
     {
         yield return new WaitForSeconds(waitTime);
-        webSocket.Connect();
-    }
-
-    void Update()
-    {
-
-#if !UNITY_WEBGL || UNITY_EDITOR
-        if (this.webSocket != null)
-        {
-            webSocket.DispatchMessageQueue();
-        }
-
-#endif
+        this.webSocket.Connect();
     }
 
     private IEnumerator RequestAudio(string filename)

@@ -46,7 +46,7 @@ def on_message(ws, message):
         #file = text_to_generate.replace(' ', '').replace('.','').replace(',','').replace(';','')
         #First parameter is the replacement, second parameter is your input string
         file = regex.sub('', text_to_generate)
-        file = file[:50]
+        file = file[:100]
         file = file + ".wav"
         file_path = "./generatedSoundFiles/" + file
 

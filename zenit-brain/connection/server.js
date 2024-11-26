@@ -164,7 +164,7 @@ export class KAREROServer {
                     "duration" : duration.toString()
                 }
 
-                this.speechTranscriptionControlWS.send(JSON.stringify(payload));
+                //this.speechTranscriptionControlWS.send(JSON.stringify(payload));
 
                 var facePayload = {
                     "mode" : "setSound",
@@ -206,6 +206,10 @@ export class KAREROServer {
             console.log("display control connection established");
             this.displayControlWS = webSocket;
             this.KAREROBrain.setBrainRobotFaceTransmissionWS(webSocket);
+
+            this.displayControlWS.on('message', (data) =>{
+                this.KAREROBrain.processBrainRobotFaceInput(data.toString('utf8'));
+            });
         });
 
         /* Handling for display control connection close. */

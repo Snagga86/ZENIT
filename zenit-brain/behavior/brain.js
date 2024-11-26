@@ -1,6 +1,7 @@
 import { EmotionProcessor } from './processors/emotion-processor.js'
 import { SpeechProcessor } from './processors/speech-processor.js'
 import { GesturePostureProcessor } from './processors/gesture-posture-processor.js'
+import { RobotFaceProcessor } from './processors/robot-face-processor.js';
 import EventEmitter from 'events';
 import { Off } from './states/Off.js'
 import { Follow } from './states/Follow.js'
@@ -78,6 +79,8 @@ export class Brain{
         this.speechProcessor = new SpeechProcessor();
         /* Crerate process for chatting with rasa bot. */
         this.chatProcessor = new ChatProcessor();
+        /* Crerate process for messages from robotic face. */
+        this.robotFaceProcessor = new RobotFaceProcessor();
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
 
@@ -104,7 +107,7 @@ export class Brain{
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const talkative = new Talkative(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const talkative = new Talkative(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.robotFaceProcessor, this.brainEvents).getState();
         
         const idleAnchor = new IdleAnchor( this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
         const jawn = new Jawn(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
@@ -168,7 +171,7 @@ export class Brain{
         });
 
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, (payload) => {
-            if(this.speechTranscriptionWS = null){
+            if(this.speechTranscriptionWS != null){
                 this.speechTranscriptionWS.send(JSON.stringify(payload));
             }
         });
@@ -212,6 +215,10 @@ export class Brain{
     /* Process raw data of facial emotion detection. */
     processEmotionRecognition(data){
         this.emotionProcessor.digest(data);
+    }
+
+    processBrainRobotFaceInput(data){
+        this.robotFaceProcessor.digest(data);
     }
 
     /* Process raw data of speech detection. */

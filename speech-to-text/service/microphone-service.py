@@ -31,6 +31,8 @@ device_info = sd.query_devices(0, "input")
 webservice_ip = 'ws://' + IP_ADDRESS + ':' + str(TCP_PORT)
 websocket.enableTrace(False)
 
+recordTempPause = False
+recordTempPauseTimeStart = 0
 agentIsTalking = False
 agentStartTalkTime = 0
 agentEndTalkTime = 0
@@ -118,31 +120,36 @@ try:
 
             try:
                 message = controlSignalQueue.get(timeout=0.01)  # Get a message from the queue
-
+                print(message)
                 if(message["mode"] == "listen" and message["status"] == "resume"):
+                    print("resume listening...")
                     agentIsTalking = False
                 
                 if(message["mode"] == "listen" and message["status"] == "stop"):
-                    agentStartTalkTime = int(time.time())
-                    delay = float(message["duration"])  + safetyDelay
-                    current_datetime = datetime.fromtimestamp(agentStartTalkTime)
-                    new_datetime = current_datetime + timedelta(seconds=delay)
-                    agentEndTalkTime = int(new_datetime.timestamp())
-
-                if(int(time.time()) > agentEndTalkTime):
-                    agentIsTalking = False
-                else:
+                    #agentStartTalkTime = int(time.time())
+                    #delay = float(message["duration"])  + safetyDelay
+                    #current_datetime = datetime.fromtimestamp(agentStartTalkTime)
+                    #new_datetime = current_datetime + timedelta(seconds=delay)
+                    #agentEndTalkTime = int(new_datetime.timestamp())
+                    print("suspend listening...")
                     agentIsTalking = True
+
+                #if(int(time.time()) > agentEndTalkTime):
+                #    agentIsTalking = False
+                #else:
+                #    agentIsTalking = True
 
             except queue.Empty:
-                if(int(time.time()) > agentEndTalkTime):
-                    agentIsTalking = False
-                else:
-                    agentIsTalking = True
+                print("Queue empty")
+                #if(int(time.time()) > agentEndTalkTime):
+                #    agentIsTalking = False
+                #else:
+                #    agentIsTalking = True
             
-            if(agentIsTalking == False):
+            if(agentIsTalking == False and recordTempPause == False):
                 if rec.AcceptWaveform(data):
-                    print("final result:\n")
+                    #recordTempPauseTimeStart = int(time.time())
+                    #print(recordTempPauseTimeStart)
                     finalRes = rec.FinalResult()
                     finalResult = finalRes
                     print("finalResult:")

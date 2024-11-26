@@ -8,14 +8,17 @@ import readline from 'readline';
 
 /* Robot state class defining the robot behavior within this state */
 export class Talkative extends StateWrap{
-    constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+    constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, robotFaceProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
         super("talkative", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
 
+        console.log(robotFaceProcessor);
+
         this.sleepWords = ["geschlafen", "Geh schlafen", "Gute Nacht", "Zenit aus", "Zenith aus", "wir schlafen"];
 
         this.chatProcessor = chatProcessor;
+        this.robotFaceProcessor = robotFaceProcessor;
 
         this.chatEmotionTimeout = null;
 
@@ -48,6 +51,7 @@ export class Talkative extends StateWrap{
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.speechProcessor.speechEvent.on('RecognizedWordLength', this.recognizedWordLengthHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler.bind(this));
+        this.robotFaceProcessor.robotFaceEvents.on("robotSpeechEnded", this.robotSpeechEndedHandler.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
         this.gesturePostureProcessor.gesturePostureEvent.on('BodiesLeftInteractionZone', this.bodiesLeftHandler.bind(this));
 
@@ -63,10 +67,27 @@ export class Talkative extends StateWrap{
         this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler);
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('BodiesLeftInteractionZone', this.bodiesLeftHandler);
+        this.robotFaceProcessor.robotFaceEvents.removeAllListeners(this.robotSpeechEndedHandler);
+    }
+    
+    suspendSpeechTranscription(){
+        var payload = {
+            "mode" : "listen",
+            "status" : "stop",
+            "duration" : "0"
+        }
+        console.log("suspendSpeechTranscription");
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);
     }
 
-    bodiesLeftHandler(){
-        //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
+    resumeSpeechTranscription(){
+        var payload = {
+            "mode" : "listen",
+            "status" : "resume",
+            "duration" : "0"
+        }
+        console.log("resumeSpeechTranscription");
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);
     }
 
     recognizedWordLengthHandler(wordLength){
@@ -84,6 +105,7 @@ export class Talkative extends StateWrap{
                 this.chatProcessor.LLMSendMessage(result);
                 this.ScreenFace.calculate();
                 this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
+                this.suspendSpeechTranscription();
             }
         }
     }
@@ -107,6 +129,16 @@ export class Talkative extends StateWrap{
 
     isSleepWord(input) {
         return this.sleepWords.some(word => word.toLowerCase() === input.toLowerCase());
+    }
+
+    robotSpeechEndedHandler(){
+        this.ScreenFace.emotion.neutral();
+        console.log("robotSpeechEndedHandler");
+        this.resumeSpeechTranscription();
+    }
+
+    bodiesLeftHandler(){
+        //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
     }
 
     newChatDurationCalculatedHandler(duration){
