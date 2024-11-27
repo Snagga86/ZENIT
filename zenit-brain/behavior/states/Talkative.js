@@ -23,7 +23,10 @@ export class Talkative extends StateWrap{
         this.chatEmotionTimeout = null;
 
         this.nextNonverbalSignals = null;
-        this.lastLLMPayload = null;
+        this.lastLLMPayload = {
+            answer : "",
+            emotion : "neutral"
+        };
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -47,7 +50,10 @@ export class Talkative extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
         this.nextNonverbalSignals = null;
-        this.lastLLMPayload = null;
+        this.lastLLMPayload = {
+            answer : "",
+            emotion : "neutral"
+        };
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         this.speechProcessor.speechEvent.on('RecognizedWordLength', this.recognizedWordLengthHandler.bind(this));
         this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler.bind(this));
@@ -67,7 +73,7 @@ export class Talkative extends StateWrap{
         this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler);
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
         this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('BodiesLeftInteractionZone', this.bodiesLeftHandler);
-        this.robotFaceProcessor.robotFaceEvents.removeAllListeners(this.robotSpeechEndedHandler);
+        this.robotFaceProcessor.robotFaceEvents.removeAllListeners("robotSpeechEnded", this.robotSpeechEndedHandler);
     }
     
     suspendSpeechTranscription(){
@@ -112,7 +118,7 @@ export class Talkative extends StateWrap{
 
     LLMAnswerHandler(llmReply){
         if (this.isValidJSON(llmReply)) {
-            //console.log("The content is valid JSON.");
+            console.log("The content is valid JSON.");
             var payloadTTS = {
                 "mode" : "tts",
                 "text" : llmReply.answer
@@ -132,8 +138,9 @@ export class Talkative extends StateWrap{
     }
 
     robotSpeechEndedHandler(){
+        console.log("robot speech ended handler");
         this.ScreenFace.emotion.neutral();
-        console.log("robotSpeechEndedHandler");
+        this.RoboticBody.followHead();
         this.resumeSpeechTranscription();
     }
 
@@ -142,14 +149,31 @@ export class Talkative extends StateWrap{
     }
 
     newChatDurationCalculatedHandler(duration){
-        this.chatDuration = duration * 1000 * (1/this.SOUND_PITCH);
         this.ScreenFace.stopCalculate();
-        if(this.lastLLMPayload != null){
-            this.ScreenFace.emotion.setEmotion(this.lastLLMPayload.emotion);
+        this.ScreenFace.emotion.setEmotion(this.lastLLMPayload.emotion);
+
+        var robotAnimationDuration = 0;
+        switch(this.lastLLMPayload.emotion){
+            case "joy": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.JOY;
+            break;
+            case "anger": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.ANGER;
+            break;
+            case "contempt": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.CONTEMPT;
+            break;
+            case "sadness": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.SADNESS;
+            break;
+            case "fear": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.FEAR;
+            break;
+            case "disgust": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.DISGUST;
+            break;
+            case "surprise": robotAnimationDuration = Brain.ROBOT_MOTION_DURATIONS.SURPRISE;
+            break;
         }
-        this.chatEmotionTimeout = setTimeout(() => {
-            this.ScreenFace.emotion.neutral();
-            clearTimeout(this.chatEmotionTimeout);
-        }, this.chatDuration);
+
+        if(duration * 1000 >= robotAnimationDuration + Brain.ROBOT_MOTION_DURATIONS.BUFFER_DURATION){
+            if(this.lastLLMPayload.emotion != "neutral"){
+                this.RoboticBody.bodyAction(this.lastLLMPayload.emotion);
+            }
+        }
     }
 }

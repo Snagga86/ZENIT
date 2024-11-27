@@ -68,6 +68,18 @@ export class Brain{
         SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION',
         NEW_CHAT_DURATION: 'NEW_CHAT_DURATION'
     }
+
+    /* Estimated excecution times for robot emotional movements. */
+    static ROBOT_MOTION_DURATIONS = {
+        JOY: 6000,
+        SADNESS: 9000,
+        DISGUST: 5000,
+        CONTEMPT: 5000,
+        FEAR: 5000,
+        SURPRISE: 6000,
+        ANGER: 5500,
+        BUFFER_DURATION: 2000
+    }
   
     constructor(){
 

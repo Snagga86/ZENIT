@@ -53,9 +53,10 @@ def ask():
         full_prompt = build_conversation_prompt(conversation_history)
 
         response = ollama_model.invoke(full_prompt)
-        print(type(response))
+        print("response: ")
+        print(response)
         content_json = repair_json(response.content)
-        print(type(content_json))
+        print("repaired JSON: ")
         print(content_json)
 
         # Add the model's response to the conversation history
@@ -66,7 +67,7 @@ def ask():
     except Exception as e:
         # Handle errors gracefully
         app.logger.error(f"Error processing request: {e}")
-        return jsonify({"answer": "uuups, da ist mir ein Fehler passoert", "emotion": "sadness"}), 500
+        return jsonify({"answer": "uuups, da ist mir ein Fehler passiert", "emotion": "sadness"}), 500
 
 def repair_json(input_string):
     # Ensure the string is in UTF-8

@@ -158,8 +158,6 @@ export class ChatProcessor {
             break;
             case "neugier": emotion = "neutral";
             break;
-            case "unangemessen": emotion = "anger";
-            break;
             case "curiosity": emotion = "neutral";
             break;
             case "frustration": emotion = "sadness";
@@ -179,6 +177,12 @@ export class ChatProcessor {
             case "stolz": emotion = "joy";
             break;
             case "lust": emotion = "joy";
+            break;
+            case "lustig": emotion = "joy";
+            break;
+            case "ängstlich": emotion = "fear";
+            break;
+            case "arrogance": emotion = "contempt";
             break;
             default: emotion = "neutral";
         }
