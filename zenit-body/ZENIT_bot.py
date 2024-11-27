@@ -21,6 +21,8 @@ class ZENITBot:
         self.activity = "base"
         self.DIGEST_THRESHOLD = 0.6
 
+        self.auto_follow = True
+
         self.personFocusAngleHorizontal = 0.0
         self.personFocusAngleVertical = 0.0
 
@@ -28,6 +30,8 @@ class ZENITBot:
         self.ringbuffer_length = 5
         self.neural_net_path = '/home/ubuntu/ZENIT_Dev/best_model_2.json'
         self.use_nn = True
+
+        self.look_direction = 0;
 
         zenit_api.power_on();
         time.sleep(2);
@@ -67,8 +71,11 @@ class ZENITBot:
         predictions = self.forward(X_new, weights)
         return predictions
 
-    
-    
+    def activity_ended(self):
+        if self.auto_follow == True:
+            payload = {}
+            payload['activity'] = "followHead"
+            self.set_activity(payload)
     
     def rotateBaseToTarget(self, base_x, base_y, base_z, base_rotation, person_x, person_y, person_z):
 
@@ -106,6 +113,7 @@ class ZENITBot:
         self.zenit_api.send_angles([angle_v, -15, angle_h - 5 , 0, 30, 0], 15)
         self.personFocusAngleHorizontal = angle_v
         self.personFocusAngleVertical = angle_h
+        print("Vangle:" + str(self.personFocusAngleHorizontal))
         self.last_action_timestamp = time.time()
 
     def follow_head_vertical(self, payload):
@@ -118,11 +126,10 @@ class ZENITBot:
         self.last_action_timestamp = time.time()
 
     async def jawn(self, zenit_api):
-        look_direction = random.randint(-10, 10)
         movement_description = [
-            [look_direction, -25, -25, 0, -20, 0],
-            [look_direction, -25, -25, 0, -35, 0],
-            [look_direction, -25, -25, 0, 10, 0]
+            [self.personFocusAngleHorizontal, -25, -25, 0, -20, 10],
+            [self.personFocusAngleHorizontal, -25, -25, 0, -35, 10],
+            [self.personFocusAngleHorizontal, -25, -25, 0, 10, 10]
         ]
         zenit_api.send_angles(movement_description[0], 10)
         time.sleep(3.2)
@@ -131,46 +138,46 @@ class ZENITBot:
         zenit_api.send_angles(movement_description[2], 0)
         time.sleep(2)
 
-    async def look(self, zenit_api):
-        look_direction = random.randint(-90, 90)
+    async def look1(self, zenit_api, payload):
+        angle_v, angle_h = self.rotateBaseToTarget(payload["data"]["baseX"], payload["data"]["baseY"], payload["data"]["baseZ"], payload["data"]["baseRotation"], payload["data"]["personX"], payload["data"]["personY"], payload["data"]["personZ"])
+        self.personFocusAngleHorizontal = angle_v
+        self.personFocusAngleVertical = angle_h
         movement_description = [
-            [(look_direction - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
-            [(look_direction - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
-            [(look_direction),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
-            [(look_direction + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
-            [(look_direction + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
+            [(self.personFocusAngleHorizontal),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
         ]
 
         zenit_api.send_angles(movement_description[0], 0)
-        time.sleep(1.0)
+        time.sleep(2.0)
         zenit_api.send_angles(movement_description[1], 0)
         time.sleep(1.0)
         zenit_api.send_angles(movement_description[2], 0)
-        time.sleep(3.0)
+        time.sleep(1.0)
         zenit_api.send_angles(movement_description[3], 0)
         time.sleep(1.0)
         zenit_api.send_angles(movement_description[4], 0)
         time.sleep(1.0)
         zenit_api.send_angles(movement_description[2], 0)
-        time.sleep(2.5)
-        look_direction_two = random.randint(-25, 25)
-        if (look_direction - look_direction_two) > 90:
-            look_direction = 70
-        if (look_direction - look_direction_two) < -90:
-            look_direction = -70
-        else:
-            look_direction = look_direction + look_direction_two
+        time.sleep(1.5)
+
+    async def look2(self, zenit_api, payload):
+        angle_v, angle_h = self.rotateBaseToTarget(payload["data"]["baseX"], payload["data"]["baseY"], payload["data"]["baseZ"], payload["data"]["baseRotation"], payload["data"]["personX"], payload["data"]["personY"], payload["data"]["personZ"])
+        self.personFocusAngleHorizontal = angle_v
+        self.personFocusAngleVertical = angle_h
 
         movement_description = [
-            [(look_direction - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
-            [(look_direction - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
-            [(look_direction),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
-            [(look_direction + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
-            [(look_direction + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
+            [(self.personFocusAngleHorizontal),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
         ]
 
         zenit_api.send_angles(movement_description[0], 0)
-        time.sleep(1.0)
+        time.sleep(1.5)
         zenit_api.send_angles(movement_description[1], 0)
         time.sleep(1.0)
         zenit_api.send_angles(movement_description[2], 0)
@@ -180,22 +187,19 @@ class ZENITBot:
         zenit_api.send_angles(movement_description[4], 0)
         time.sleep(2.0)
         zenit_api.send_angles(movement_description[2], 0)
-
         time.sleep(3.5)
-        look_direction_two = random.randint(-25, 25)
-        if (look_direction - look_direction_two) > 90:
-            look_direction = 70
-        if (look_direction - look_direction_two) < -90:
-            look_direction = -70
-        else:
-            look_direction = look_direction + look_direction_two
+
+    async def look3(self, zenit_api, payload):
+        angle_v, angle_h = self.rotateBaseToTarget(payload["data"]["baseX"], payload["data"]["baseY"], payload["data"]["baseZ"], payload["data"]["baseRotation"], payload["data"]["personX"], payload["data"]["personY"], payload["data"]["personZ"])
+        self.personFocusAngleHorizontal = angle_v
+        self.personFocusAngleVertical = angle_h
 
         movement_description = [
-            [(look_direction - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
-            [(look_direction - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
-            [(look_direction),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
-            [(look_direction + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
-            [(look_direction + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal - 3), -15, self.personFocusAngleVertical - 5, 0, 25, -15],
+            [(self.personFocusAngleHorizontal),     -15, self.personFocusAngleVertical - 5, -10, 25, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 30, 0],
+            [(self.personFocusAngleHorizontal + 3), -15, self.personFocusAngleVertical - 5, 0, 25, 15]
         ]
 
         zenit_api.send_angles(movement_description[0], 0)
@@ -214,22 +218,29 @@ class ZENITBot:
     async def nap(self, zenit_api):
         look_direction = random.randint(-35, 35)
         movement_description = [
-            [look_direction, -55, 45, -65, 75, 65],
+            [120, -55, 45, -85, 75, 65],
         ]
 
-        zenit_api.send_angles(movement_description[0], 10)
-        time.sleep(15.5)
+        zenit_api.send_angles(movement_description[0], 20)
+        time.sleep(6.5)
 
-    async def napWake(self, zenit_api):
-        look_direction = random.randint(-15, 15)
+    async def napWake(self, zenit_api, payload):
+        angle_v, angle_h = self.rotateBaseToTarget(payload["data"]["baseX"], payload["data"]["baseY"], payload["data"]["baseZ"], payload["data"]["baseRotation"], payload["data"]["personX"], payload["data"]["personY"], payload["data"]["personZ"])
+        self.personFocusAngleHorizontal = angle_v
+        self.personFocusAngleVertical = angle_h
+        #look_direction = random.randint(-15, 15)
+        print(angle_h)
         movement_description = [
-            [look_direction, -35, 35, -65, 45, 70],
-            [look_direction, 0, -10, 0, 5, 0],
+            [angle_v, (angle_h - 9), -10, 0, 25, 20],
+            [angle_v, (angle_h - 9), 0, 0, 20, -20],
+            [angle_v, (angle_h - 9), 0, 0, 25, 20]
         ]
 
-        zenit_api.send_angles(movement_description[0], 10)
+        zenit_api.send_angles(movement_description[0], 0)
         time.sleep(1.5)
-        zenit_api.send_angles(movement_description[1], 10)
+        zenit_api.send_angles(movement_description[1], 0)
+        time.sleep(1.5)
+        zenit_api.send_angles(movement_description[2], 0)
         time.sleep(1.5)
 
     async def relax(self, zenit_api):
@@ -279,6 +290,7 @@ class ZENITBot:
         time.sleep(1.5)
         zenit_api.send_angles(movement_description[1], 0)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def sadness(self, zenit_api):
         movement_description = [
@@ -296,6 +308,7 @@ class ZENITBot:
         time.sleep(4.5)
         zenit_api.send_angles(movement_description[3], 1)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def disgust(self, zenit_api):
         movement_description = [
@@ -309,10 +322,14 @@ class ZENITBot:
         time.sleep(1.5)
 
     async def surprise(self, zenit_api):
+        print("Original Angle:" + str(self.personFocusAngleVertical))
+        lookAngle = self.personFocusAngleVertical*0.8 + 85
+        print("Modified Angle:" + str(lookAngle))
+        
         movement_description = [
-            [self.personFocusAngleHorizontal, -10, -60, 0, 65, 0],
-            [self.personFocusAngleHorizontal + 10, -5, -60, 0, 65, 0],
-            [self.personFocusAngleHorizontal - 10, -5, -60, 0, 65, 0],
+            [self.personFocusAngleHorizontal, -13, self.personFocusAngleVertical - 15, 0, 45, 0],
+            [self.personFocusAngleHorizontal + 13, -5, self.personFocusAngleVertical - 15, 0, 45, 0],
+            [self.personFocusAngleHorizontal - 13, -5, self.personFocusAngleVertical - 15, 0, 45, 0],
         ]
         print("before send_angles")
         zenit_api.send_angles(movement_description[0], 0)
@@ -323,6 +340,7 @@ class ZENITBot:
         time.sleep(1.5)
         zenit_api.send_angles(movement_description[0], 0)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def fear(self, zenit_api):
         movement_description = [
@@ -337,22 +355,23 @@ class ZENITBot:
 
     async def contempt(self, zenit_api):
         movement_description = [
-            [self.personFocusAngleHorizontal + 25, -15, 5, -80, 40, 80],
-            [self.personFocusAngleHorizontal + 20, -15, 10, -70, 35, 70],
+            [self.personFocusAngleHorizontal + 25, (self.personFocusAngleVertical + 15), 5, -80, 40, 80],
+            [self.personFocusAngleHorizontal + 20, (self.personFocusAngleVertical + 15), 10, -70, 35, 70],
         ]
         print("before send_angles")
         zenit_api.send_angles(movement_description[0], 0)
         time.sleep(3.5)
         zenit_api.send_angles(movement_description[1], 0)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def anger(self, zenit_api):
         movement_description = [
             [(self.personFocusAngleHorizontal), -45, 40, 0, 0, 0],
-            [(self.personFocusAngleHorizontal), 55, -75, 0, 0, 0],
-            [(self.personFocusAngleHorizontal - 3), 55, -75, -10, 0, -5],
-            [(self.personFocusAngleHorizontal + 3), 55, -70, 10, 0, 5],
-            [(self.personFocusAngleHorizontal), 55, -75, 0, 0, 0]
+            [(self.personFocusAngleHorizontal), 55, (self.personFocusAngleVertical - 50), 0, 0, 0],
+            [(self.personFocusAngleHorizontal - 3), 55, (self.personFocusAngleVertical - 50), -10, 0, -5],
+            [(self.personFocusAngleHorizontal + 3), 55, (self.personFocusAngleVertical - 40), 10, 0, 5],
+            [(self.personFocusAngleHorizontal), 55, (self.personFocusAngleVertical - 50), 0, 0, 0]
         ]
         print("before send_angles")
         zenit_api.send_angles(movement_description[0], 0)
@@ -365,6 +384,7 @@ class ZENITBot:
         time.sleep(1.0)
         zenit_api.send_angles(movement_description[4], 0)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def squad(self, zenit_api):
         movement_description = [
@@ -722,8 +742,14 @@ class ZENITBot:
             if(payload['activity'] == 'jawn'):
                 asyncio.run(self.jawn(self.zenit_api))
 
-            if(payload['activity'] == 'look'):
-                asyncio.run(self.look(self.zenit_api))
+            if(payload['activity'] == 'look1'):
+                self.zenit_network.backsend("getPersonCoordinates")
+
+            if(payload['activity'] == 'look2'):
+                self.zenit_network.backsend("getPersonCoordinates")
+
+            if(payload['activity'] == 'look3'):
+                self.zenit_network.backsend("getPersonCoordinates")
 
             if(payload['activity'] == 'relax'):
                 asyncio.run(self.relax(self.zenit_api))
@@ -732,7 +758,8 @@ class ZENITBot:
                 asyncio.run(self.nap(self.zenit_api))
 
             if(payload['activity'] == 'napWake'):
-                asyncio.run(self.napWake(self.zenit_api))
+                self.zenit_network.backsend("getPersonCoordinates")
+                ##asyncio.run(self.napWake(self.zenit_api))
 
             if(payload['activity'] == 'stretch'):
                 asyncio.run(self.stretch(self.zenit_api))
@@ -743,6 +770,18 @@ class ZENITBot:
         return True
 
     def digest_activity_data(self, payload):
+
+        if(self.activity == 'napWake'):
+            asyncio.run(self.napWake(self.zenit_api, payload))
+
+        if(self.activity == 'look1'):
+            asyncio.run(self.look1(self.zenit_api, payload))
+
+        if(self.activity == 'look2'):
+            asyncio.run(self.look2(self.zenit_api, payload))
+
+        if(self.activity == 'look3'):
+            asyncio.run(self.look3(self.zenit_api, payload))
         
         if(self.activity == 'followHead'):
             if(self.ready_for_command() == False):

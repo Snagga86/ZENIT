@@ -37,7 +37,7 @@ class RobotNetwork:
                 time.sleep(5)  # Wait for 10 seconds before retrying
 
     def on_message(self, ws, message):
-        print("on message:", message)
+        #print("on message:", message)
         io = StringIO(message)
         json_obj = json.load(io)
         if json_obj['mode'] == "setMode":
