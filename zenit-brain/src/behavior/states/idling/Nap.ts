@@ -1,13 +1,21 @@
 import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
-
+import { EventEmitter } from 'stream';
+import { EmotionProcessor } from '../../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../../processors/body-language-processor.js';
+import { SpeechProcessor } from '../../processors/speech-processor.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Nap extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+
+    ANTICIPATED_ANIMATION_DURATION : number;
+    breakWords : Array<String>;
+    timeout : NodeJS.Timeout | null;
+
+    constructor(emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("nap", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("nap", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
         this.breakWords = ["zenit", "hopp", "hop", "aufwachen","zenith"];
 
@@ -45,28 +53,28 @@ export class Nap extends StateWrap{
         this.RoboticBody.nap();
         this.ScreenFace.emotion.sleepy();
 
-        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
+        this.speechProcessor.speechEvents.on('FinalResult', this.finalResultHandler.bind(this));
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
     }
 
     exitFunction(){
-        clearTimeout(this.timeout);
-        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
+        clearTimeout(this.timeout as NodeJS.Timeout);
+        this.speechProcessor.speechEvents.removeAllListeners('FinalResult');
     }
 
-    finalResultHandler(result){
+    finalResultHandler(result : any){
         if(this.containsWords(result, this.breakWords)){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "napWake");     
         }
     }
 
-    containsWords(str, wordsArray) {
+    containsWords(str : string, wordsArray : any) {
         const pattern = new RegExp(wordsArray.join('|'), 'i');
         return pattern.test(str);
     }

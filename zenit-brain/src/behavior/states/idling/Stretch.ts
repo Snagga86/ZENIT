@@ -1,13 +1,21 @@
 import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
+import { EventEmitter } from 'stream';
+import { EmotionProcessor } from '../../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../../processors/body-language-processor.js';
+import { SpeechProcessor } from '../../processors/speech-processor.js';
 
 
 /* Robot state class defining the robot behavior within this state */
-export class Relax extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+export class Stretch extends StateWrap{
+
+    ANTICIPATED_ANIMATION_DURATION : number;
+    timeout : NodeJS.Timeout | null;
+
+    constructor(emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("relax", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("stretch", emotionProcessor, bodyLanguageProcessor,speechProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -43,7 +51,7 @@ export class Relax extends StateWrap{
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idlingBase");
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
     }
 }

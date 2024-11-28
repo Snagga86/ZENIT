@@ -9,7 +9,25 @@ export class BodyLanguageProcessor {
         GESTURE_OR_POSTURE_DETECTED: 'GESTURE_OR_POSTURE_DETECTED'
     }
 
-    constructor() {
+    ONLY_SWEETSPOT_BODY : Boolean;
+    bodyLanguageEvent : EventEmitter;
+    currentGesture : String;
+    closestBody : any;
+    closestBodyDistance : number;
+    bodyIsInInteractionZone : Boolean;
+
+    rawdata : any;
+    serverConf : any;
+
+    TIME_THRESHHOLD : number;
+    timeDetected : number;
+    recentlyDetected : Boolean;
+
+    lastKinectUpdateTime : any;
+
+    bodiesAbsent : Boolean;
+
+    constructor(configPath : string) {
         this.ONLY_SWEETSPOT_BODY = true;
         this.bodyLanguageEvent = new EventEmitter();
         this.currentGesture = "";
@@ -17,14 +35,15 @@ export class BodyLanguageProcessor {
         this.closestBodyDistance = 100000000;
         this.bodyIsInInteractionZone = false;
 
-        this.rawdata = fs.readFileSync('./server-conf.json');
-        this.serverConf = JSON.parse(this.rawdata);
+        const rawdata = fs.readFileSync(configPath);
+        this.serverConf = JSON.parse(rawdata.toString());
 
         this.TIME_THRESHHOLD = 2600;
         this.timeDetected = 0;
         this.recentlyDetected = false;
 
         this.lastKinectUpdateTime = null;
+        this.bodiesAbsent = true;
 
         setInterval(() => {
             this.checkLastKinectData();
@@ -42,7 +61,7 @@ export class BodyLanguageProcessor {
         }
     }
 
-    digest(kinectData) {
+    digest(kinectData : any) {
         this.lastKinectUpdateTime = Date.now();
         this.bodiesAbsent = false;
         if(this.ONLY_SWEETSPOT_BODY == true){
@@ -74,11 +93,11 @@ export class BodyLanguageProcessor {
         }
     }
 
-    getClosestBody(bodies){
+    getClosestBody(bodies : any){
         /* Only target closest body */
         this.closestBodyDistance = 1000000;
         var distance = 0;
-        bodies.forEach(body => {
+        bodies.forEach((body : any) => {
             var xDistance = this.serverConf.config.robotPosition.baseX - body.x;
             var yDistance = this.serverConf.config.robotPosition.baseY - body.y;
             var zDistance = this.serverConf.config.robotPosition.baseZ - body.z;

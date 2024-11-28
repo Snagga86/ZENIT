@@ -1,13 +1,22 @@
 import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
-
+import { EventEmitter } from 'stream';
+import { EmotionProcessor } from '../../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../../processors/body-language-processor.js';
+import { SpeechProcessor } from '../../processors/speech-processor.js';
 
 /* Robot state class defining the robot behavior within this state */
 export class Look extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+
+    private LOOK1_ANTICIPATED_ANIMATION_DURATION : number;
+    private LOOK2_ANTICIPATED_ANIMATION_DURATION : number;
+    private LOOK3_ANTICIPATED_ANIMATION_DURATION : number;
+    private timeout : NodeJS.Timeout | null;
+
+    constructor(emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("look", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("look", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -45,7 +54,7 @@ export class Look extends StateWrap{
 
         console.log("in look state");
         this.timeout = setTimeout(() => {
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
             if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
@@ -56,11 +65,11 @@ export class Look extends StateWrap{
     }
 
     exitFunction(){
-        clearTimeout(this.timeout);
+        clearTimeout(this.timeout as NodeJS.Timeout);
     }
 
     progressToTalkative(){
-        clearTimeout(this.timeout);
+        clearTimeout(this.timeout as NodeJS.Timeout);
         var payloadTTS = {
             "mode" : "tts",
             "text" : "Moin!"
@@ -73,7 +82,7 @@ export class Look extends StateWrap{
         console.log("look procedure 1");
         this.RoboticBody.look1();
         this.timeout = setTimeout(() => {
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
             if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
@@ -87,7 +96,7 @@ export class Look extends StateWrap{
         console.log("look procedure 2");
         this.RoboticBody.look2();
         this.timeout = setTimeout(() => {
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
             if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
@@ -101,7 +110,7 @@ export class Look extends StateWrap{
         console.log("look procedure 3");
         this.RoboticBody.look3();
         this.timeout = setTimeout(() => {
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
             if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }

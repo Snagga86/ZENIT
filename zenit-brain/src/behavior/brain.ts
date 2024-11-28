@@ -2,8 +2,10 @@ import { EmotionProcessor } from './processors/emotion-processor.js'
 import { SpeechProcessor } from './processors/speech-processor.js'
 import { BodyLanguageProcessor } from './processors/body-language-processor.js'
 import { DisplayProcessor } from './processors/display-processor.js';
+import { ChatProcessor } from './processors/chat-processor.js';
+
 import EventEmitter from 'events';
-import { Off } from './states/Off.js'
+/*
 import { Follow } from './states/Follow.js'
 import { Joy } from './states/emotions/Joy.js'
 import { Anger } from './states/emotions/Anger.js'
@@ -15,7 +17,7 @@ import { ExerciseEntry } from './states/training/ExerciseEntry.js'
 import { IntermediateAward } from './states/training/IntermediateAward.js'
 import { PerformanceAnchor } from './states/training/PerformanceAnchor.js'
 import { EmotionCascade } from './states/emotions/EmotionCascade.js'
-import { ChatProcessor } from './processors/chat-processor.js';
+
 import { ChatBase } from './states/ChatBase.js';
 
 import { DisgustShow } from './states/DisgustShow.js'
@@ -30,15 +32,16 @@ import { InformHelp } from './states/heatprotection/InformHelp.js';
 import { VideoCall } from './states/heatprotection/VideoCall.js';
 import { EmergencyCall } from './states/heatprotection/EmergencyCall.js';
 
-import { FacialMimicry } from './states/facialmimicry/FacialMimicry.js';
+import { FacialMimicry } from './states/facialmimicry/FacialMimicry.js'; */
 
+import { Off } from './states/Off.js'
 import { IdleAnchor } from './states/idling/IdleAnchor.js';
 import { Jawn } from './states/idling/Jawn.js';
 import { Look } from './states/idling/Look.js';
 import { Nap } from './states/idling/Nap.js';
 import { NapWake } from './states/idling/NapWake.js';
-import { Relax } from './states/idling/Relax.js';
-import { Stretch } from './states/idling/Stretch.js';
+//import { Relax } from './states/idling/Relax.js';
+//import { Stretch } from './states/idling/Stretch.js';
 import { Talkative } from './states/Talkative.js';
 
 /* ZENIT Brain is the busieness logic for the ZENIT robot interaction. It receives data
@@ -57,7 +60,7 @@ export class Brain{
         SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION',
     }
 
-    static payload_TEXT_TO_SPEECH(text){
+    static payload_TEXT_TO_SPEECH(text : String){
         return {
             "mode" : "tts",
             "text" : text
@@ -75,15 +78,32 @@ export class Brain{
         ANGER: 5500,
         BUFFER_DURATION: 2000
     }
-  
-    constructor(){
+
+    brainEvents : EventEmitter;
+    emotionProcessor : EmotionProcessor;
+    bodyLanguageProcessor : BodyLanguageProcessor;
+    speechProcessor : SpeechProcessor;
+    chatProcessor : ChatProcessor;
+    displayProcessor : DisplayProcessor;
+
+    start : Off;
+    robotBodyWS : WebSocket | null;
+    robotFaceWS : WebSocket | null;
+    speechSynthesisWS : WebSocket | null;
+    speechTranscriptionWS : WebSocket | null;
+
+    stateMachineDefinition : any | null;
+    machine : any | null;
+    state : any | null;
+
+    constructor(configPath: string){
 
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
         /* Create emotion processor for emotion processing. */
         this.emotionProcessor = new EmotionProcessor();
         /* Create posture/gesture processor. */
-        this.bodyLanguageProcessor = new BodyLanguageProcessor();
+        this.bodyLanguageProcessor = new BodyLanguageProcessor(configPath);
         /* Create speech to text processor. */
         this.speechProcessor = new SpeechProcessor(this.brainEvents);
         /* Crerate process for chatting with rasa bot. */
@@ -99,9 +119,9 @@ export class Brain{
 
         /* Creating all state machine states for every behavior. The start state has to be declated
         seperately. */
-        this.start = new Off(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents)
+        this.start = new Off(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents);
         const off = this.start.getState();
-        const follow = new Follow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        /*const follow = new Follow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const joy = new Joy(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const anger = new Anger(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
@@ -113,7 +133,7 @@ export class Brain{
         const intermediateAward = new IntermediateAward(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
-        const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState(); */
         const talkative = new Talkative(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.displayProcessor, this.brainEvents).getState();
         
         const idleAnchor = new IdleAnchor( this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
@@ -121,17 +141,17 @@ export class Brain{
         const look = new Look(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const nap = new Nap(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const napWake = new NapWake(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
-        const relax = new Relax(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        /*const relax = new Relax(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const stretch = new Stretch(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
         const contemptShow = new ContemptShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const angerShow = new AngerShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const disgustShow = new DisgustShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const sadnessShow = new SadnessShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
-        const danceShow = new DanceShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const danceShow = new DanceShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState(); */
 
         /* Heat Protection State declaration. */
-        const heatProtectionEntry = new HeatProtectionEntry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        /*const heatProtectionEntry = new HeatProtectionEntry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const subtleActivation = new SubtleActivation(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const explicitActivation = new ExplicitActivation(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const informHelp = new InformHelp(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
@@ -140,10 +160,10 @@ export class Brain{
 
 
 
-        const facialMimicry = new FacialMimicry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const facialMimicry = new FacialMimicry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();*/
 
         this.stateMachineDefinition = {
-            initialState: "off", off, talkative, idleAnchor, jawn, look, nap, napWake, relax, stretch, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
+            initialState: "off", off, talkative, idleAnchor, jawn, look, nap, napWake /*, relax, stretch, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall */
         };
         
         /* Create the state machine with states required. */
@@ -189,7 +209,7 @@ export class Brain{
     }
 
     /* Set the transmission websocket for robot arm action connection. */
-    setBrainRobotBodyTransmissionWS(ws){
+    setBrainRobotBodyTransmissionWS(ws : any){
         this.robotBodyWS = ws;
          
         /* Fire enter on off state when robot arm is connected. */
@@ -200,56 +220,56 @@ export class Brain{
     }
 
     /* Set the transmission websocket for robot face action connection. */
-    setBrainRobotFaceTransmissionWS(ws){
+    setBrainRobotFaceTransmissionWS(ws : any){
         this.robotFaceWS = ws;
     }
 
     /* Set the transmission websocket for text to speech action connection. */
-    setSpeechSynthesisWS(ws){
+    setSpeechSynthesisWS(ws : any){
         this.speechSynthesisWS = ws;
     }
 
     /* Set the transmission websocket for speech to text action connection. */
-    setSpeechTranscriptonControlWS(ws){
+    setSpeechTranscriptonControlWS(ws : any){
         this.speechTranscriptionWS = ws;
     }
 
     /* Process raw data of gestures/postures detection. */
-    processKinectRecognition(data){
+    processKinectRecognition(data : any){
         this.bodyLanguageProcessor.digest(data);
     }
 
     /* Process raw data of facial emotion detection. */
-    processEmotionRecognition(data){
+    processEmotionRecognition(data : any){
         this.emotionProcessor.digest(data);
     }
 
-    processBrainRobotFaceInput(data){
+    processBrainRobotFaceInput(data : any){
         this.displayProcessor.digest(data);
     }
 
     /* Process raw data of speech detection. */
-    processSpeechRecognition(data){
+    processSpeechRecognition(data : any){
             this.speechProcessor.digest(data);
     }
 
-    getStateDefinition(state, stateMachineDefinition){
+    getStateDefinition(state : any, stateMachineDefinition : any){
         return stateMachineDefinition[state];
     };
 
     /* Create the base state machine. */
-    createMachine(stateMachineDefinition) {
+    createMachine(stateMachineDefinition : any) {
         const machine = {
             value: stateMachineDefinition.initialState, /* Initial State [String] */
 
             /* This is called when transitioning to another state. */
-            transition(currentState, event) {
+            transition(currentState : any, event : any) {
 
                 const currentStateDefinition = stateMachineDefinition[currentState]
-                var destinationTransition = null;
+                var destinationTransition : any = null;
 
                 /* Look for a transition whithin the current state that matches the event name. */
-                currentStateDefinition.transitions.forEach((transition) => {
+                currentStateDefinition.transitions.forEach((transition : any) => {
                     if(transition.name == event){
                         destinationTransition = transition;
                     }

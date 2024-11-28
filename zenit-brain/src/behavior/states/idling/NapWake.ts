@@ -1,13 +1,20 @@
 import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
-
+import { EventEmitter } from 'stream';
+import { EmotionProcessor } from '../../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../../processors/body-language-processor.js';
+import { SpeechProcessor } from '../../processors/speech-processor.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Jawn extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+export class NapWake extends StateWrap{
+
+    ANTICIPATED_ANIMATION_DURATION : number;
+    timeout : NodeJS.Timeout | null;
+
+    constructor(emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("jawn", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("napWake", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
 
         /* ToDo: This implementation has to be improved in the future. */
@@ -15,17 +22,18 @@ export class Jawn extends StateWrap{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 9500; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 4500; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
         this.state.actions.onExit = this.exitFunction.bind(this);
+
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
-        this.state.transitions.push(new Transition("idleAnchor", "idleAnchor", () => {
-            console.log('transition action for "stretch" in "idleAnchor" state');
+        this.state.transitions.push(new Transition("look", "look", () => {
+            console.log('transition action for "napWake" in "look" state');
         }));
     }
 
@@ -36,20 +44,21 @@ export class Jawn extends StateWrap{
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
 
-        console.log("enter jawn");
+        console.log("Enter nap Wake!");
 
         this.ScreenFace.emotion.neutral();
-        this.RoboticBody.jawn();
+        this.RoboticBody.napWake();
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
+            console.log("Try go look!");
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "look");
         }, this.ANTICIPATED_ANIMATION_DURATION);
     }
 
     exitFunction(){
-        clearTimeout(this.timeout);
+        clearTimeout(this.timeout as NodeJS.Timeout);
     }
 }

@@ -2,13 +2,20 @@ import EventEmitter from 'events';
 
 export class EmotionProcessor {
 
+    emotionEvent : EventEmitter;
+    facialExpressionsInterpretation : Boolean;
+    bodyLanguageInterpretation : Boolean;
+    facialEmotionInputBuffer : Array<string>;
+    emotionCounter : Record<string, number>;
+    currentEmotion : String;
+
     constructor(facialExpressionsInterpretation=true, bodyLanguageInterpretation=false) {
 
         this.facialExpressionsInterpretation = facialExpressionsInterpretation;
         this.bodyLanguageInterpretation = bodyLanguageInterpretation;
 
-        this.facialEmotionInputBuffer = new Array();
-        this.emotionCounter = new Array();
+        this.facialEmotionInputBuffer = [];
+        this.emotionCounter = {};
 
         this.emotionEvent = new EventEmitter();
 
@@ -30,8 +37,9 @@ export class EmotionProcessor {
         return emotion;
     }*/
 
-    digest(currentEmotionInput) {
+    digest(currentEmotionInput : any) {
         console.log(currentEmotionInput);
+        var emotion : string = "";
         if(this.facialExpressionsInterpretation == true){
             var emotion = this.processValueAsFacialExpression(currentEmotionInput.toLowerCase());
         }
@@ -43,7 +51,7 @@ export class EmotionProcessor {
         this.currentEmotion = emotion;
     }
 
-    processValueAsFacialExpression(value){
+    processValueAsFacialExpression(value : any){
         this.facialEmotionInputBuffer.push(value);
         if(this.facialEmotionInputBuffer.length > EMOTION_BUFFER_LEN){
             this.facialEmotionInputBuffer.shift();
@@ -54,13 +62,13 @@ export class EmotionProcessor {
 
         var currentEmotion = this.maxKeyValue(this.emotionCounter);
         //console.log("currentEmotion: " + currentEmotion[0]);
-        var emotionAndValenceClass = this.getEmotionAndValence(currentEmotion[0],currentEmotion[1]);
-        this.emotionCounter = new Array();
+        var emotionAndValenceClass = this.getEmotionAndValence(currentEmotion[0] as string, currentEmotion[1]);
+        this.emotionCounter = {};
 
         return emotionAndValenceClass;
     }
 
-    getEmotionAndValence(emotion, count){
+    getEmotionAndValence(emotion : string, count : any){
         //var valence = ((count + 1) / EMOTION_BUFFER_LEN) * 10 / NUM_VALENCE_CLASSES;
         //var valenceClass = Math.floor(valence) - 1;
         var valenceClass = 1;
@@ -102,20 +110,21 @@ export class EmotionProcessor {
         return emotion;
     }
 
-    maxKeyValue(data){
-        var lastValue = 0;
-        var lastKey = "";
-
+    maxKeyValue(data: Record<string, number>): [string, number] {
+        let lastValue: number = 0;
+        let lastKey: string = "";
+    
         for (const [key, value] of Object.entries(data)) {
-            if(value > lastValue){
+            if (value > lastValue) {
                 lastValue = value;
                 lastKey = key;
             }
         }
+    
         return [lastKey, lastValue];
     }
 
-    processValueAsBodyLanguage(value){
+    processValueAsBodyLanguage(value : any){
 
     }
 }

@@ -1,13 +1,23 @@
 import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
+import { EmotionProcessor } from '../../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../../processors/body-language-processor.js';
+import { SpeechProcessor } from '../../processors/speech-processor.js';
+import { EventEmitter } from 'stream';
 
 
 /* Robot state class defining the robot behavior within this state */
 export class IdleAnchor extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+
+    ANTICIPATED_ANIMATION_DURATION : number;
+    idlingStyles : Array<String>;
+    lastState : String;
+    timeout : NodeJS.Timeout | null;
+
+    constructor(emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("idleAnchor", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("idleAnchor", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
         /* ToDo: This implementation has to be improved in the future. */
         /* We cannot make sure how long the animation duration of the robot arm lasts.
@@ -63,16 +73,16 @@ export class IdleAnchor extends StateWrap{
         this.timeout = setTimeout(() => {
             /* Emit the attack state change event. */
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, state);
-            clearTimeout(this.timeout);
+            clearTimeout(this.timeout as NodeJS.Timeout);
         }, this.ANTICIPATED_ANIMATION_DURATION);
         
     }
 
     exitFunction(){
-        clearTimeout(this.timeout);
+        clearTimeout(this.timeout as NodeJS.Timeout);
     }
 
-    getRandomInt(min, max) {
+    getRandomInt(min : number, max : number) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 }

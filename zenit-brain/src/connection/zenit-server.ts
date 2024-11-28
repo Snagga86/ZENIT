@@ -1,50 +1,65 @@
 import dgram from 'node:dgram';
 import pkg from  "osc-js";
 import http from "http";
-import { WebSocketServer } from 'ws';
+import WebSocket from "ws";
 import { Brain } from '../behavior/brain.js';
 
 export class ZENITServer {
 
-    constructor(config) {
-        /* Store network configuration and stationary robot position. */
+    networkConfig: any; // Replace with the actual type if available
+    robotPosition: any; // Replace with a proper type
+    soundPitch: number;
+
+    ZENITBrain: Brain;
+
+    tmpOSCPayload: { translatedBodies: { x: number, y: number, z: number }[] };
+
+    talkingStart: number;
+    talkingEnd: number;
+
+    displayControlWSS: WebSocket.Server | null;
+    robotControlWSS: WebSocket.Server | null;
+    textToSpeechWSS: WebSocket.Server | null;
+    speechTranscriptionControlWSS: WebSocket.Server | null;
+
+    displayControlWS: any | null;
+    robotControlWS: any | null;
+    textToSpeechWS: any | null;
+    speechTranscriptionControlWS: any | null;
+
+    osc: any; // `osc-js` might not have proper type declarations
+    emotionDetectionSocket: dgram.Socket;
+    speechTranscriptionStreamSocket: dgram.Socket;
+
+    constructor(config: {
+        networkConfig: any; // Replace with a proper type
+        robotPosition: any; // Replace with a proper type
+        soundPitch: number;
+    }, configPath: string) {
         this.networkConfig = config.networkConfig;
         this.robotPosition = config.robotPosition;
         this.soundPitch = config.soundPitch;
 
-        /* Initialize KARERO brain/business logic. */
-        this.ZENITBrain = new Brain();
- 
-        /* Initial definition of the tracked person position to avoid NULL errors 
-        if no data is received. */
+        this.ZENITBrain = new Brain(configPath);
+
         this.tmpOSCPayload = {
-            "translatedBodies" : [
-                {
-                    "x": 0,
-                    "y": 0,
-                    "z": 0
-                }
-            ]
+            translatedBodies: [{ x: 0, y: 0, z: 0 }],
         };
 
-        /* Make sure Agent is not talking and listening at the same time. */
         this.talkingStart = 0;
         this.talkingEnd = 0;
 
-        /* Websocket Server declarations. */
         this.displayControlWSS = null;
         this.robotControlWSS = null;
         this.textToSpeechWSS = null;
         this.speechTranscriptionControlWSS = null;
 
-        /* Websockets. */
         this.displayControlWS = null;
         this.robotControlWS = null;
         this.textToSpeechWS = null;
         this.speechTranscriptionControlWS = null;
 
-        /* UDP sockets. */
-        this.osc = new pkg()
+        this.osc = new pkg();
         this.emotionDetectionSocket = dgram.createSocket('udp4');
         this.speechTranscriptionStreamSocket = dgram.createSocket('udp4');
     }
@@ -62,7 +77,7 @@ export class ZENITServer {
 
         /* On incoming OSC data from Azure Kinetic Space this data is processed for possible usage
         in the KARERO Brain/business logic. */
-        this.osc.on('/data', message => {
+        this.osc.on('/data', (message : any)  => {
 
             var data = JSON.parse(message.args)
             this.tmpOSCPayload = data
@@ -115,47 +130,47 @@ export class ZENITServer {
 
         /* Bind the websocket to stop STT translation while the agent is
         talking to prevent sound feedback loops. */
-        this.speechTranscriptionControlWSS = new WebSocketServer({host: this.networkConfig.STTNetwork.IpAddress, port: this.networkConfig.STTNetwork.Port}, ()=>{
+        this.speechTranscriptionControlWSS = new WebSocket.Server({host: this.networkConfig.STTNetwork.IpAddress, port: this.networkConfig.STTNetwork.Port}, ()=>{
             console.log("stt control server start");
         });
 
         /* On incoming connection of the KARERO STT in KARERO Brain. */
-        this.speechTranscriptionControlWSS.on('connection', (webSocket) =>{
+        this.speechTranscriptionControlWSS.on('connection', (webSocket : any) =>{
             console.log("Speech-To-Text control connection established");
             this.speechTranscriptionControlWS = webSocket;
             this.ZENITBrain.setSpeechTranscriptonControlWS(webSocket);
         });
 
         /* Handling for STT connection close. */
-        this.speechTranscriptionControlWSS.on('close', (webSocket) =>{
+        this.speechTranscriptionControlWSS.on('close', (webSocket : any) =>{
             console.log("connection disconnected");
             //this.textToSpeechWS = null;
         });
 
         /* Handling for STT connection error. */
-        this.speechTranscriptionControlWSS.on('error', (webSocket) =>{
+        this.speechTranscriptionControlWSS.on('error', (webSocket : any) =>{
             console.log("connection disonnected");
             //this.textToSpeechWS = null;
         });
         
         /* -------- Speech Synthesis -------- */
         /* Start the server to communicate with KARERO TTS application. */
-        this.textToSpeechWSS = new WebSocketServer({host: this.networkConfig.TTSNetwork.IpAddress, port: this.networkConfig.TTSNetwork.Port}, ()=>{
+        this.textToSpeechWSS = new WebSocket.Server({host: this.networkConfig.TTSNetwork.IpAddress, port: this.networkConfig.TTSNetwork.Port}, ()=>{
             console.log("tts control server start");
         });
 
         /* On incoming connection of the KARERO TTS in KARERO Brain. */
-        this.textToSpeechWSS.on('connection', (webSocket) =>{
+        this.textToSpeechWSS.on('connection', (webSocket : any) =>{
             console.log("Text-To-Speech control connection established");
             this.textToSpeechWS = webSocket;
             this.ZENITBrain.setSpeechSynthesisWS(webSocket);
 
-            this.textToSpeechWS.on('message', (data) =>{
+            this.textToSpeechWS.on('message', (data : any) =>{
                 //console.log(data.toString('utf8'))
                 var soundName = data.toString('utf8').split(';')[0];
                 var soundDuration = parseFloat(data.toString('utf8').split(';')[1]) * (1/this.soundPitch);
                 
-                this.ZENITBrain.speechProcessor.soundCreated(soundName, soundDuration);
+                this.ZENITBrain?.speechProcessor?.soundCreated(soundName, soundDuration);
 
                 var facePayload = {
                     "mode" : "setSound",
@@ -174,63 +189,63 @@ export class ZENITServer {
         });
 
         /* Handling for TTS connection close. */
-        this.textToSpeechWSS.on('close', (webSocket) =>{
+        this.textToSpeechWSS.on('close', (webSocket : any) =>{
             console.log("connection disconnected");
             this.textToSpeechWS = null;
         });
 
         /* Handling for TTS connection error. */
-        this.textToSpeechWSS.on('error', (webSocket) =>{
+        this.textToSpeechWSS.on('error', (webSocket : any) =>{
             console.log("connection disonnected");
             this.textToSpeechWS = null;
         });
 
         /* -------- Display/Face Communication -------- */
         /* Start the server to communicate with KARERO Face application. */
-        this.displayControlWSS = new WebSocketServer({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
+        this.displayControlWSS = new WebSocket.Server({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
             console.log("display control server start");
         });
 
         /* On incoming connection of the KARERO Face/Display, e.g. table or cell phone set
         the connection web socket in KARERO Brain. */
-        this.displayControlWSS.on('connection', (webSocket) =>{
+        this.displayControlWSS.on('connection', (webSocket : any) =>{
             console.log("display control connection established");
             this.displayControlWS = webSocket;
             this.ZENITBrain.setBrainRobotFaceTransmissionWS(webSocket);
 
-            this.displayControlWS.on('message', (data) =>{
+            this.displayControlWS.on('message', (data : any) =>{
                 this.ZENITBrain.processBrainRobotFaceInput(data.toString('utf8'));
             });
         });
 
         /* Handling for display control connection close. */
-        this.displayControlWSS.on('close', (webSocket) =>{
+        this.displayControlWSS.on('close', (webSocket : any) =>{
             console.log("connection disconnected");
             this.displayControlWS = null;
         });
 
         /* Handling for display control connection error. */
-        this.displayControlWSS.on('error', (webSocket) =>{
+        this.displayControlWSS.on('error', (webSocket : any) =>{
             console.log("connection disonnected");
             this.displayControlWS = null;
         });
 
         /* -------- MechArm Robot Communication -------- */
         /* Start the server to communicate with KARERO Body application. */
-        this.robotControlWSS = new WebSocketServer({host: this.networkConfig.RobotNetwork.IpAddress, port: this.networkConfig.RobotNetwork.Port}, ()=>{
+        this.robotControlWSS = new WebSocket.Server({host: this.networkConfig.RobotNetwork.IpAddress, port: this.networkConfig.RobotNetwork.Port}, ()=>{
             console.log("robot control server start");
         });
 
         /* On incoming connection of the KARERO body/MechArm set the connection web socket
         in KARERO Body. */
-        this.robotControlWSS.on('connection', (webSocket) =>{
+        this.robotControlWSS.on('connection', (webSocket : any) =>{
             console.log("robot control connection established");
             this.robotControlWS = webSocket;
             this.ZENITBrain.setBrainRobotBodyTransmissionWS(webSocket);
 
             /* When KARERO Body is in head follow mode it requests the position data of the first
             person tracked by the azure kinect array. Kinect data is the replied to the robot body. */
-            this.robotControlWS.on('message', (data) =>{              
+            this.robotControlWS.on('message', (data : any) =>{              
                 if(data == "getPersonCoordinates"){
                     /* Only target closest body */
                     var closestBody = null;
@@ -252,6 +267,15 @@ export class ZENITServer {
                             closestDistance = distance;
                         }
                     });
+
+                    if(closestBody == null){
+                        closestBody = {
+                            x :0,
+                            y :0,
+                            z: 0
+                        }
+                    }
+
                     var payload = {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
@@ -260,9 +284,9 @@ export class ZENITServer {
                             "baseY" : this.robotPosition.baseY,
                             "baseZ" : this.robotPosition.baseZ,
                             "baseRotation" : this.robotPosition.baseRotation,
-                            "personX" : Number(closestBody.x),
-                            "personY" : Number(closestBody.y),
-                            "personZ" : Number(closestBody.z)
+                            "personX" : Number(closestBody?.x),
+                            "personY" : Number(closestBody?.y),
+                            "personZ" : Number(closestBody?.z)
                         } 
                     }
 

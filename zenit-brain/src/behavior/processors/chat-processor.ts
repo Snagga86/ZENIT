@@ -2,20 +2,30 @@ import http from "http"
 import EventEmitter from 'events';
 import { Brain } from '../brain.js';
 
+interface LLMReply {
+    answer: string;
+    emotion: string;
+}
+
 export class ChatProcessor {
 
     static CHAT_EVENTS = {
-        LLM_ANSWER: 'LLM_ANSWER'
+        LLM_ANSWER: 'LLM_ANSWER',
+        RASA_ANSWER: 'RASA_ANSWER'
     }
+
+    defaultLLMReply: LLMReply;
+    chatEvents : EventEmitter;
 
     constructor() {
         this.chatEvents = new EventEmitter();
-        this.defaultLLMReply = new Object();
-        this.defaultLLMReply.answer = "Uups, da hat mein Sprachmodel eine invalide Antwort geliefert. Das kommt leider vor.";
-        this.defaultLLMReply.emotion = "sadness";
+        this.defaultLLMReply = {
+            answer: "Uups, da hat mein Sprachmodel eine invalide Antwort geliefert. Das kommt leider vor.",
+            emotion: "sadness"
+        };
     }
 
-    NLUSendMessage(text){
+    NLUSendMessage(text : String){
         var postData = JSON.stringify({
             "sender": "test_user",
             "message": text
@@ -39,7 +49,7 @@ export class ChatProcessor {
             console.log('statusCode:', res.statusCode);
             res.on('data', (d) => {
                 result = JSON.parse(d.toString());
-                this.chatEvents.emit(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, result);
+                this.chatEvents.emit(ChatProcessor.CHAT_EVENTS.RASA_ANSWER, result);
             });
         });
     
@@ -51,7 +61,7 @@ export class ChatProcessor {
         req.end();
     }
 
-    LLMSendMessage(text){
+    LLMSendMessage(text : String){
         const data = JSON.stringify({ prompt: text });
         const options = {
             hostname: '127.0.0.1',
@@ -72,12 +82,12 @@ export class ChatProcessor {
                 var utf8Content = Buffer.from(d, 'utf-8').toString('utf-8');
                 console.log(utf8Content)
                 try{
-                    res = JSON.parse(utf8Content);
+                    var res = JSON.parse(utf8Content);
                     res.emotion = this.repairLLMEmotion(res.emotion);
                     console.log(res);
                     result = res;
                 }catch (e) {
-                    result = this.xx;
+                    result = null;
                 }
                 
                 this.chatEvents.emit(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, result);
@@ -123,7 +133,7 @@ export class ChatProcessor {
         return jsonObject;
     }*/
 
-      repairLLMEmotion(guessedEmotion){
+      repairLLMEmotion(guessedEmotion : String){
         console.log("Guessed emotion:" + guessedEmotion);
         var emotion = "neutral";
 

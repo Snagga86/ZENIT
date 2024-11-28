@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true // Enable source maps
+  },
+  "include": ["src/**/*", /*"src/types/ws.d.ts",*/ "src/types/osc-js.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

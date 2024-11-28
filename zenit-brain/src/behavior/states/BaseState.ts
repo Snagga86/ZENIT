@@ -1,7 +1,16 @@
+import { EventEmitter } from 'stream';
 import { Brain } from '../brain.js';
+import { EmotionProcessor } from '../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
+import { SpeechProcessor } from '../processors/speech-processor.js';
 
 export class State{
-    constructor(stateName){
+
+    target : String;
+    actions : any;
+    transitions : any;
+
+    constructor(stateName : String){
         this.target = stateName;
         this.actions = new Actions();
         this.transitions = new Array();
@@ -9,6 +18,10 @@ export class State{
 }
 
 export class Actions{
+
+    onEnter : Function;
+    onExit : Function;
+
     constructor(){
         this.onEnter = function(){};
         this.onExit = function(){};
@@ -16,7 +29,12 @@ export class Actions{
 }
 
 export class Transition{
-    constructor(name, target, action){
+
+    name : any;
+    target : any;
+    action : any;
+
+    constructor(name : any, target : any, action : any){
         this.target = target;
         this.name = name;
         this.action = action;
@@ -24,7 +42,10 @@ export class Transition{
 }
 
 export class RoboticArm{
-    constructor(brainEvents){
+
+    brainEvents : any;
+
+    constructor(brainEvents : EventEmitter){
         this.brainEvents = brainEvents;
     }
 
@@ -104,7 +125,7 @@ export class RoboticArm{
         this.bodyAction("stretch");
     }
 
-    bodyAction(action){
+    bodyAction(action : String){
         var payload = {
             "mode" : "setMode",
             "activity" : action
@@ -115,7 +136,10 @@ export class RoboticArm{
 }
 
 export class Video{
-    constructor(brainEvents){
+
+    brainEvents : EventEmitter;
+
+    constructor(brainEvents : EventEmitter){
         this.brainEvents = brainEvents;
     }
 
@@ -135,11 +159,11 @@ export class Video{
         this.setVideo("stop");
     }
 
-    name(name){
+    name(name : String){
         this.setVideo("name", name);
     }
 
-    showAndPlay(name){
+    showAndPlay(name : String){
         this.setVideo("showAndPlay", name);
     }
 
@@ -147,19 +171,22 @@ export class Video{
         this.setVideo("stopAndHide");
     }
 
-    setVideo(data, extra = ""){
+    setVideo(data : any, extra : String = ""){
         var facePayload = {
             "mode" : "setVideo",
             "data" : data,
             "extra" : extra
         }
 
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
+        this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, facePayload);
     }
 }
 
 export class Emotion{
-    constructor(brainEvents){
+
+    brainEvents : EventEmitter;
+
+    constructor(brainEvents : EventEmitter){
         this.brainEvents = brainEvents;
     }
 
@@ -279,17 +306,20 @@ export class Emotion{
         this.setEmotion("sleepy");
     }
 
-    setEmotion(emotion){
+    setEmotion(emotion : String){
         var payloadEmotion = {
             "mode" : "setEmotion",
             "data" : emotion
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion)
+        this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadEmotion)
     }
 }
 
 export class Sound{
-    constructor(brainEvents){
+
+    brainEvents : EventEmitter;
+
+    constructor(brainEvents : EventEmitter){
         this.brainEvents = brainEvents;
     }
 
@@ -301,37 +331,40 @@ export class Sound{
         this.setSound("stop");
     }
 
-    name(name){
+    name(name : String){
         this.setSound("name", name);
     }
 
-    nameAndPlay(name){
+    nameAndPlay(name : String){
         this.setSound("nameAndPlay", name);
     }
 
-    setSound(data, extra = ""){
+    setSound(data : any, extra : String = ""){
         var payloadSound = {
             "mode" : "setSound",
             "data" : data,
             "extra" : extra
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadSound)
+        this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadSound)
     }
 
-    speak(text){
+    speak(text : String){
         var payloadTTS = { "mode" : "tts",
                            "text" : text
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
+        this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 }
 
 export class Text{
-    constructor(brainEvents){
+
+    brainEvents : EventEmitter;
+
+    constructor(brainEvents : EventEmitter){
         this.brainEvents = brainEvents;
     }
 
-    text(name){
+    text(name : String){
         this.setText("text", name);
     }
 
@@ -343,7 +376,7 @@ export class Text{
         this.setText("hide");
     }
 
-    setText(data, extra = ""){
+    setText(data : any, extra : String = ""){
         var payloadText = {
             "mode" : "setInfoText",
             "data" : data,
@@ -354,7 +387,14 @@ export class Text{
 }
 
 export class DisplayDevice{
-    constructor(brainEvents){
+
+    brainEvents : EventEmitter;
+    emotion : Emotion;
+    video : Video;
+    sound : Sound;
+    text : Text;
+
+    constructor(brainEvents : EventEmitter){
         this.brainEvents = brainEvents;
         this.emotion = new Emotion(this.brainEvents);
         this.video = new Video(this.brainEvents);
@@ -362,7 +402,7 @@ export class DisplayDevice{
         this.text = new Text(this.brainEvents);
     }
 
-    addSpeechVisual(length){
+    addSpeechVisual(length : Number){
         var payloadState = {
             "mode" : "setState",
             "data" : "speechVisual",
@@ -377,7 +417,7 @@ export class DisplayDevice{
             "mode" : "setState",
             "data" : "calculate"
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
+        this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
     }
 
     stopCalculate(){
@@ -385,12 +425,22 @@ export class DisplayDevice{
             "mode" : "setState",
             "data" : "stopCalculate"
         }
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
+        this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payloadState);
     }
 }
 
 export class StateWrap{
-    constructor(stateName, emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents){
+
+    stateChangeInitiated : Boolean;
+    emotionProcessor : EmotionProcessor;
+    bodyLanguageProcessor : BodyLanguageProcessor;
+    speechProcessor : SpeechProcessor;
+    brainEvents : EventEmitter;
+    state : State;
+    RoboticBody : RoboticArm;
+    ScreenFace : DisplayDevice;
+
+    constructor(stateName : String, emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
         this.stateChangeInitiated = false;
         this.emotionProcessor = emotionProcessor;
         this.bodyLanguageProcessor = bodyLanguageProcessor;
@@ -407,5 +457,5 @@ export class StateWrap{
         return this.state;
     }
 
-    GesturePostureDetection(rec){}
+    GesturePostureDetection(rec : any){}
 }

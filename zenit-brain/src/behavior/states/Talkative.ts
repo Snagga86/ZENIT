@@ -1,18 +1,23 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
-import readline from 'readline';
 import { ChatProcessor } from '../processors/chat-processor.js';
 import { SpeechProcessor } from '../processors/speech-processor.js';
 import { DisplayProcessor } from '../processors/display-processor.js';
 import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
-
-
+import { EmotionProcessor } from '../processors/emotion-processor.js';
+import { EventEmitter } from 'stream';
 
 /* Robot state class defining the robot behavior within this state */
 export class Talkative extends StateWrap{
-    constructor(chatProcessor, emotionProcessor, bodyLanguageProcessor, speechProcessor, displayProcessor, brainEvents){
+
+    chatProcessor : ChatProcessor;
+    displayProcessor : DisplayProcessor;
+    sleepWords : Array<String>;
+    chatEmotionTimeout : any | null;
+
+    lastLLMPayload : any | null;
+
+    constructor(chatProcessor : ChatProcessor, emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, displayProcessor :DisplayProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
         super("talkative", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
@@ -26,7 +31,6 @@ export class Talkative extends StateWrap{
 
         this.chatEmotionTimeout = null;
 
-        this.nextNonverbalSignals = null;
         this.lastLLMPayload = {
             answer : "",
             emotion : "neutral"
@@ -44,21 +48,17 @@ export class Talkative extends StateWrap{
         this.state.transitions.push(new Transition("nap", "nap", () => {
             console.log('transition action for "talkative" in "nap" state')
         }));
-        
-        this.feedbackTimer = null;
-        this.chatDuration = 0;
     }
 
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
-        this.nextNonverbalSignals = null;
         this.lastLLMPayload = {
             answer : "",
             emotion : "neutral"
         };
-        this.speechProcessor.speechEvent.on(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler.bind(this));
-        this.speechProcessor.speechEvent.on(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED, this.recognizedWordLengthHandler.bind(this));
-        this.speechProcessor.speechEvent.on(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler.bind(this))
+        this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler.bind(this));
+        this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED, this.recognizedWordLengthHandler.bind(this));
+        this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler.bind(this))
         this.chatProcessor.chatEvents.on(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, this.LLMAnswerHandler.bind(this));
         this.displayProcessor.displayEvents.on(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED, this.robotSpeechEndedHandler.bind(this));
         this.bodyLanguageProcessor.bodyLanguageEvent.on(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.bodiesLeftHandler.bind(this));
@@ -70,19 +70,19 @@ export class Talkative extends StateWrap{
     exitFunction(){
         /* Turn off event listener if state is exited. */
         clearTimeout(this.chatEmotionTimeout);
-        this.speechProcessor.speechEvent.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler);
-        this.speechProcessor.speechEvent.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED, this.recognizedWordLengthHandler);
-        this.speechProcessor.speechEvent.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler)
-        this.chatProcessor.chatEvents.removeAllListeners(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, this.LLMAnswerHandler);
-        this.displayProcessor.displayEvents.removeAllListeners(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED, this.robotSpeechEndedHandler);
-        this.bodyLanguageProcessor.bodyLanguageEvent.removeAllListeners(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.bodiesLeftHandler);
+        this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED);
+        this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED);
+        this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED)
+        this.chatProcessor.chatEvents.removeAllListeners(ChatProcessor.CHAT_EVENTS.LLM_ANSWER);
+        this.displayProcessor.displayEvents.removeAllListeners(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED);
+        this.bodyLanguageProcessor.bodyLanguageEvent.removeAllListeners(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE);
     }
 
-    recognizedWordLengthHandler(wordLength){
+    recognizedWordLengthHandler(wordLength : number){
         this.ScreenFace.addSpeechVisual(wordLength);
     }
 
-    finalResultHandler(result){
+    finalResultHandler(result : any){
         if(result.length > 1){
             if(this.isSleepWord(result)){
                 //this.ScreenFace.blink();
@@ -98,7 +98,7 @@ export class Talkative extends StateWrap{
         }
     }
 
-    LLMAnswerHandler(llmReply){
+    LLMAnswerHandler(llmReply : any){
         if (this.isValidJSON(llmReply)) {
             console.log("The content is valid JSON.");
             console.log(llmReply.answer);
@@ -107,11 +107,11 @@ export class Talkative extends StateWrap{
           }
     }
 
-    isValidJSON(payload) {
+    isValidJSON(payload : any) {
         return payload && typeof payload === 'object' && !Array.isArray(payload);
       }
 
-    isSleepWord(input) {
+    isSleepWord(input : string) {
         return this.sleepWords.some(word => word.toLowerCase() === input.toLowerCase());
     }
 
@@ -126,7 +126,7 @@ export class Talkative extends StateWrap{
         //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
     }
 
-    newSpeechSoundCreatedHandler(data){
+    newSpeechSoundCreatedHandler(data : any){
 
         var duration = data.soundDuration;
 

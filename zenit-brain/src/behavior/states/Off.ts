@@ -1,11 +1,13 @@
 import { State, Actions, Transition, StateWrap } from './BaseState.js';
 import { Brain } from '../brain.js';
-import logger from '../../tools/logger.js';
-import globalStore from '../../tools/globals.js';
 import readline from 'readline';
+import { EmotionProcessor } from '../processors/emotion-processor.js';
+import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
+import { SpeechProcessor } from '../processors/speech-processor.js';
 
 export class Off extends StateWrap{
-    constructor(emotionProcessor, gesturePostureProcessor, speechProcessor, stateChangeEvent){ 
+
+    constructor(emotionProcessor : EmotionProcessor, gesturePostureProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, stateChangeEvent : any){ 
         super("off", emotionProcessor, gesturePostureProcessor, speechProcessor, stateChangeEvent);
         
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -44,11 +46,11 @@ export class Off extends StateWrap{
         }
     }
 
-    keypressHandler(str, key) {
+    keypressHandler(str : any, key : any) {
         console.log("pressed");
         if (key.name === 's') {
             console.log("s pressed");
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "talkative");
+            this.brainEvents?.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "talkative");
         }
 
         // Exit on Ctrl+C or Ctrl+D
