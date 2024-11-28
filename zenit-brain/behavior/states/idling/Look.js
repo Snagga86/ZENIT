@@ -46,7 +46,7 @@ export class Look extends StateWrap{
         console.log("in look state");
         this.timeout = setTimeout(() => {
             clearTimeout(this.timeout);
-            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+            if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
             else{
@@ -74,7 +74,7 @@ export class Look extends StateWrap{
         this.RoboticBody.look1();
         this.timeout = setTimeout(() => {
             clearTimeout(this.timeout);
-            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+            if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
             else{
@@ -88,7 +88,7 @@ export class Look extends StateWrap{
         this.RoboticBody.look2();
         this.timeout = setTimeout(() => {
             clearTimeout(this.timeout);
-            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+            if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
             else{
@@ -102,7 +102,7 @@ export class Look extends StateWrap{
         this.RoboticBody.look3();
         this.timeout = setTimeout(() => {
             clearTimeout(this.timeout);
-            if(this.gesturePostureProcessor.bodyIsInInteractionZone == true){
+            if(this.bodyLanguageProcessor.bodyIsInInteractionZone == true){
                 this.progressToTalkative();
             }
             else{

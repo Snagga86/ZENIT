@@ -1,16 +1,20 @@
 import EventEmitter from 'events';
 import * as fs from 'fs';
 
+export class BodyLanguageProcessor {
 
-export class GesturePostureProcessor {
+    static BODY_LANGUAGE_EVENTS = {
+        ALL_BODIES_LEFT_INTERACTION_ZONE: 'ALL_BODIES_LEFT_INTERACTION_ZONE',
+        BODY_ENTERED_INTERACTION_ZONE: 'BODY_ENTERED_INTERACTION_ZONE',
+        GESTURE_OR_POSTURE_DETECTED: 'GESTURE_OR_POSTURE_DETECTED'
+    }
 
     constructor() {
         this.ONLY_SWEETSPOT_BODY = true;
-        this.gesturePostureEvent = new EventEmitter();
+        this.bodyLanguageEvent = new EventEmitter();
         this.currentGesture = "";
         this.closestBody;
         this.closestBodyDistance = 100000000;
-        this.INTERACTION_DISTANCE = 2.00;
         this.bodyIsInInteractionZone = false;
 
         this.rawdata = fs.readFileSync('./server-conf.json');
@@ -27,13 +31,14 @@ export class GesturePostureProcessor {
         }, 1000);
     }
 
+    /* Trigger and event if no bodies were found by the kinect in the previous second. */
     checkLastKinectData(){
         if(Date.now() - this.lastKinectUpdateTime >= 1000 && this.bodiesAbsent == false){
             this.closestBodyDistance = 100000000;
             console.log("All bodies left interaction zone.");
             this.bodiesAbsent = true;
             this.bodyIsInInteractionZone = false;
-            this.gesturePostureEvent.emit('BodiesLeftInteractionZone', this.closestBodyDistance);
+            this.bodyLanguageEvent.emit(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.closestBodyDistance);
         }
     }
 
@@ -45,19 +50,19 @@ export class GesturePostureProcessor {
             if(this.recentlyDetected == false && this.closestBody.trackedGesture != ""){
                 this.recentlyDetected = true;
                 this.timeDetected = Date.now();
-                this.gesturePostureEvent.emit('GesturePostureDetection', this.closestBody.trackedGesture);
+                this.bodyLanguageEvent.emit(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.GESTURE_OR_POSTURE_DETECTED, this.closestBody.trackedGesture);
             }
             this.debounceGesture();
             //console.log(this.closestBodyDistance);
             //console.log(kinectData.translatedBodies);
-            this.gesturePostureEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
-            if(this.closestBodyDistance < this.INTERACTION_DISTANCE && this.bodyIsInInteractionZone == false){
+            //this.bodyLanguageEvent.emit('ClosestBodyDistance', this.closestBodyDistance);
+            if(this.closestBodyDistance < this.serverConf.config.interactionRadius && this.bodyIsInInteractionZone == false){
                 this.bodyIsInInteractionZone = true;
-                this.gesturePostureEvent.emit('BodiesEnteredInteractionZone', this.closestBodyDistance);
+                this.bodyLanguageEvent.emit(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.BODY_ENTERED_INTERACTION_ZONE, this.closestBodyDistance);
             }
-            if(this.closestBodyDistance >= this.INTERACTION_DISTANCE && this.bodyIsInInteractionZone == true){
+            if(this.closestBodyDistance >= this.serverConf.config.interactionRadius && this.bodyIsInInteractionZone == true){
                 this.bodyIsInInteractionZone = false;
-                this.gesturePostureEvent.emit('BodiesLeftInteractionZone', this.closestBodyDistance);
+                this.bodyLanguageEvent.emit(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.closestBodyDistance);
             }
             //this.currentGesture = this.closestBody.trackedGesture;
         }
@@ -87,7 +92,6 @@ export class GesturePostureProcessor {
             if(distance < this.closestBodyDistance){
                 this.closestBody = body;
                 this.closestBodyDistance = distance;
-                //
             }
         });
     }

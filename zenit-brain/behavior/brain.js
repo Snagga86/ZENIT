@@ -1,7 +1,7 @@
 import { EmotionProcessor } from './processors/emotion-processor.js'
 import { SpeechProcessor } from './processors/speech-processor.js'
-import { GesturePostureProcessor } from './processors/gesture-posture-processor.js'
-import { RobotFaceProcessor } from './processors/robot-face-processor.js';
+import { BodyLanguageProcessor } from './processors/body-language-processor.js'
+import { DisplayProcessor } from './processors/display-processor.js';
 import EventEmitter from 'events';
 import { Off } from './states/Off.js'
 import { Follow } from './states/Follow.js'
@@ -46,15 +46,6 @@ from versatile recognition systems; 1. atm emotional status based on facial expr
 2. gestures/postures and Interactor location from Azure Kinetic Space. ZENIT Brain is implemented as
 a sort of extended state machine. */
 
-/* neutral => neutral */
-/* happy => dance, 6000 */
-/* sadness => mourn 9000 */
-/* anger => attack, 6500 */
-/* disgust => disgust, 5000 */
-/* fear => anxious, 5000 */
-/* contempt => contempt, 5000 */
-/* surprise => surprise, 6000 */
-
 export class Brain{
 
     /* Declate Events for chaning state machine mode, trigger robot movement and face actions. */
@@ -62,11 +53,15 @@ export class Brain{
         ROBOT_STATE_CHANGE: 'ROBOT_STATE_CHANGE',
         ROBOT_BODY_ACTION: 'ROBOT_BODY_ACTION',
         ROBOT_FACE_ACTION: 'ROBOT_FACE_ACTION',
-        RASA_ANSWER: 'RASA_ANSWER',
-        LLAMA_ANSWER: 'LLAMA_ANSWER',
         TEXT_TO_SPEECH_ACTION: 'TEXT_TO_SPEECH_ACTION',
         SPEECH_TO_TEXT_ACTION: 'SPEECH_TO_TEXT_ACTION',
-        NEW_CHAT_DURATION: 'NEW_CHAT_DURATION'
+    }
+
+    static payload_TEXT_TO_SPEECH(text){
+        return {
+            "mode" : "tts",
+            "text" : text
+        }
     }
 
     /* Estimated excecution times for robot emotional movements. */
@@ -83,18 +78,18 @@ export class Brain{
   
     constructor(){
 
+        /* Emitter for events within the brain component. */
+        this.brainEvents = new EventEmitter();
         /* Create emotion processor for emotion processing. */
         this.emotionProcessor = new EmotionProcessor();
         /* Create posture/gesture processor. */
-        this.gesturePostureProcessor = new GesturePostureProcessor();
+        this.bodyLanguageProcessor = new BodyLanguageProcessor();
         /* Create speech to text processor. */
-        this.speechProcessor = new SpeechProcessor();
+        this.speechProcessor = new SpeechProcessor(this.brainEvents);
         /* Crerate process for chatting with rasa bot. */
         this.chatProcessor = new ChatProcessor();
         /* Crerate process for messages from robotic face. */
-        this.robotFaceProcessor = new RobotFaceProcessor();
-        /* Emitter for events within the brain component. */
-        this.brainEvents = new EventEmitter();
+        this.displayProcessor = new DisplayProcessor();
 
         /* Websocket connections to send signals to KARERO display and body. */
         this.robotBodyWS = null;
@@ -104,48 +99,48 @@ export class Brain{
 
         /* Creating all state machine states for every behavior. The start state has to be declated
         seperately. */
-        this.start = new Off(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents)
+        this.start = new Off(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents)
         const off = this.start.getState();
-        const follow = new Follow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const joy = new Joy(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const anger = new Anger(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const follow = new Follow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const joy = new Joy(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const anger = new Anger(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
-        const appreciation = new Appreciation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const callToAction = new CallToAction(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const farewell = new Farewell(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const exerciseEntry = new ExerciseEntry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const intermediateAward = new IntermediateAward(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const talkative = new Talkative(this.chatProcessor, this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.robotFaceProcessor, this.brainEvents).getState();
+        const appreciation = new Appreciation(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const briefingForExercise = new BriefingForExercise(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const callToAction = new CallToAction(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const farewell = new Farewell(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const exerciseEntry = new ExerciseEntry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const intermediateAward = new IntermediateAward(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const performanceAnchor = new PerformanceAnchor(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const emotionCascade = new EmotionCascade(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const chatBase = new ChatBase(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const talkative = new Talkative(this.chatProcessor, this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.displayProcessor, this.brainEvents).getState();
         
-        const idleAnchor = new IdleAnchor( this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const jawn = new Jawn(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const look = new Look(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const nap = new Nap(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const napWake = new NapWake(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const relax = new Relax(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const stretch = new Stretch(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const idleAnchor = new IdleAnchor( this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const jawn = new Jawn(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const look = new Look(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const nap = new Nap(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const napWake = new NapWake(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const relax = new Relax(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const stretch = new Stretch(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
-        const contemptShow = new ContemptShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const angerShow = new AngerShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const disgustShow = new DisgustShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const sadnessShow = new SadnessShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const danceShow = new DanceShow(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const contemptShow = new ContemptShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const angerShow = new AngerShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const disgustShow = new DisgustShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const sadnessShow = new SadnessShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const danceShow = new DanceShow(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
         /* Heat Protection State declaration. */
-        const heatProtectionEntry = new HeatProtectionEntry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const subtleActivation = new SubtleActivation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const explicitActivation = new ExplicitActivation(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const informHelp = new InformHelp(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const videoCall = new VideoCall(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
-        const emergencyCall = new EmergencyCall(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const heatProtectionEntry = new HeatProtectionEntry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const subtleActivation = new SubtleActivation(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const explicitActivation = new ExplicitActivation(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const informHelp = new InformHelp(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const videoCall = new VideoCall(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const emergencyCall = new EmergencyCall(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
 
 
-        const facialMimicry = new FacialMimicry(this.emotionProcessor, this.gesturePostureProcessor, this.speechProcessor, this.brainEvents).getState();
+        const facialMimicry = new FacialMimicry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
         this.stateMachineDefinition = {
             initialState: "off", off, talkative, idleAnchor, jawn, look, nap, napWake, relax, stretch, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall
@@ -221,7 +216,7 @@ export class Brain{
 
     /* Process raw data of gestures/postures detection. */
     processKinectRecognition(data){
-        this.gesturePostureProcessor.digest(data);
+        this.bodyLanguageProcessor.digest(data);
     }
 
     /* Process raw data of facial emotion detection. */
@@ -230,16 +225,12 @@ export class Brain{
     }
 
     processBrainRobotFaceInput(data){
-        this.robotFaceProcessor.digest(data);
+        this.displayProcessor.digest(data);
     }
 
     /* Process raw data of speech detection. */
     processSpeechRecognition(data){
             this.speechProcessor.digest(data);
-    }
-
-    agentTalking(textDuration){
-        this.speechProcessor.agentStartTalking(textDuration);
     }
 
     getStateDefinition(state, stateMachineDefinition){

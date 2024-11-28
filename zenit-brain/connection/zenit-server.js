@@ -4,16 +4,16 @@ import http from "http";
 import { WebSocketServer } from 'ws';
 import { Brain } from '../behavior/brain.js';
 
-export class KAREROServer {
+export class ZENITServer {
 
-    constructor(networkConfig, robotPosition) {
-
+    constructor(config) {
         /* Store network configuration and stationary robot position. */
-        this.networkConfig = networkConfig;
-        this.robotPosition = robotPosition;
+        this.networkConfig = config.networkConfig;
+        this.robotPosition = config.robotPosition;
+        this.soundPitch = config.soundPitch;
 
         /* Initialize KARERO brain/business logic. */
-        this.KAREROBrain = new Brain();
+        this.ZENITBrain = new Brain();
  
         /* Initial definition of the tracked person position to avoid NULL errors 
         if no data is received. */
@@ -66,7 +66,7 @@ export class KAREROServer {
 
             var data = JSON.parse(message.args)
             this.tmpOSCPayload = data
-            this.KAREROBrain.processKinectRecognition(data);
+            this.ZENITBrain.processKinectRecognition(data);
         });
 
         /* -------- Emotion Recognition -------- */
@@ -76,7 +76,7 @@ export class KAREROServer {
 
         /* Incoming data from the emotion detection network is processed in the KARERO brain. */
         this.emotionDetectionSocket.on('message', (msg, rinfo) => {
-            this.KAREROBrain.processEmotionRecognition(msg.toString());
+            this.ZENITBrain.processEmotionRecognition(msg.toString());
         });
 
         /* Emotion detection error handling. */
@@ -98,7 +98,7 @@ export class KAREROServer {
 
         /* Incoming data from the TTS detection network is processed in the KARERO brain. */
         this.speechTranscriptionStreamSocket.on('message', (msg, rinfo) => {
-            this.KAREROBrain.processSpeechRecognition(msg.toString());
+            this.ZENITBrain.processSpeechRecognition(msg.toString());
         });
 
         /* TTS detection error handling. */
@@ -123,7 +123,7 @@ export class KAREROServer {
         this.speechTranscriptionControlWSS.on('connection', (webSocket) =>{
             console.log("Speech-To-Text control connection established");
             this.speechTranscriptionControlWS = webSocket;
-            this.KAREROBrain.setSpeechTranscriptonControlWS(webSocket);
+            this.ZENITBrain.setSpeechTranscriptonControlWS(webSocket);
         });
 
         /* Handling for STT connection close. */
@@ -148,28 +148,19 @@ export class KAREROServer {
         this.textToSpeechWSS.on('connection', (webSocket) =>{
             console.log("Text-To-Speech control connection established");
             this.textToSpeechWS = webSocket;
-            this.KAREROBrain.setSpeechSynthesisWS(webSocket);
+            this.ZENITBrain.setSpeechSynthesisWS(webSocket);
 
             this.textToSpeechWS.on('message', (data) =>{
                 //console.log(data.toString('utf8'))
-                var text = data.toString('utf8').split(';')[0];
-                var textDuration = data.toString('utf8').split(';')[1];
-
-                //console.log("emit brain event NEW_CHAT_DURATION");
-                this.KAREROBrain.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, textDuration);
-                var duration = parseFloat(textDuration) * (1/1.08);
-                var payload = {
-                    "mode" : "listen",
-                    "status" : "stop",
-                    "duration" : duration.toString()
-                }
-
-                //this.speechTranscriptionControlWS.send(JSON.stringify(payload));
+                var soundName = data.toString('utf8').split(';')[0];
+                var soundDuration = parseFloat(data.toString('utf8').split(';')[1]) * (1/this.soundPitch);
+                
+                this.ZENITBrain.speechProcessor.soundCreated(soundName, soundDuration);
 
                 var facePayload = {
                     "mode" : "setSound",
                     "data" : "speak",
-                    "extra" : text
+                    "extra" : soundName
                 }
 
                 try{
@@ -205,10 +196,10 @@ export class KAREROServer {
         this.displayControlWSS.on('connection', (webSocket) =>{
             console.log("display control connection established");
             this.displayControlWS = webSocket;
-            this.KAREROBrain.setBrainRobotFaceTransmissionWS(webSocket);
+            this.ZENITBrain.setBrainRobotFaceTransmissionWS(webSocket);
 
             this.displayControlWS.on('message', (data) =>{
-                this.KAREROBrain.processBrainRobotFaceInput(data.toString('utf8'));
+                this.ZENITBrain.processBrainRobotFaceInput(data.toString('utf8'));
             });
         });
 
@@ -235,7 +226,7 @@ export class KAREROServer {
         this.robotControlWSS.on('connection', (webSocket) =>{
             console.log("robot control connection established");
             this.robotControlWS = webSocket;
-            this.KAREROBrain.setBrainRobotBodyTransmissionWS(webSocket);
+            this.ZENITBrain.setBrainRobotBodyTransmissionWS(webSocket);
 
             /* When KARERO Body is in head follow mode it requests the position data of the first
             person tracked by the azure kinect array. Kinect data is the replied to the robot body. */

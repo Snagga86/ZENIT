@@ -19,7 +19,6 @@ export class EmotionProcessor {
         return this.currentEmotion;
     }
 
-
     /*keyValueInput(value){
         if(this.facialExpressionsInterpretation == true){
             var emotion = this.processValueAsFacialExpression(value);

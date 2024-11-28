@@ -42,8 +42,8 @@ export class PerformanceAnchor extends StateWrap{
     enterFunction(){
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
-        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureDetection.bind(this));
+        this.bodyLanguageProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        this.bodyLanguageProcessor.gesturePostureEvent.on('GesturePostureDetection', this.gesturePostureDetection.bind(this));
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         //this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
 
@@ -59,8 +59,8 @@ export class PerformanceAnchor extends StateWrap{
 
         this.squadCounter = 0;
         /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
+        this.bodyLanguageProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
+        this.bodyLanguageProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.gesturePostureDetection);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
         clearTimeout(this.timeoutAppreciation);
         clearTimeout(this.timeoutIntermediateMotivation);

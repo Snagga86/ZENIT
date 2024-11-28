@@ -42,7 +42,7 @@ export class ExerciseEntry extends StateWrap{
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
 
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        this.bodyLanguageProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
 
@@ -79,7 +79,7 @@ export class ExerciseEntry extends StateWrap{
 
         // Stop listening for input
         //process.stdin.pause();
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
+        this.bodyLanguageProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
         clearTimeout(this.timeout);

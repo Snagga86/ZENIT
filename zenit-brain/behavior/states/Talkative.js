@@ -3,22 +3,26 @@ import { Brain } from '../brain.js';
 import logger from '../../tools/logger.js';
 import globalStore from '../../tools/globals.js';
 import readline from 'readline';
+import { ChatProcessor } from '../processors/chat-processor.js';
+import { SpeechProcessor } from '../processors/speech-processor.js';
+import { DisplayProcessor } from '../processors/display-processor.js';
+import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
 
 
 
 /* Robot state class defining the robot behavior within this state */
 export class Talkative extends StateWrap{
-    constructor(chatProcessor, emotionProcessor, gesturePostureProcessor, speechProcessor, robotFaceProcessor, brainEvents){
+    constructor(chatProcessor, emotionProcessor, bodyLanguageProcessor, speechProcessor, displayProcessor, brainEvents){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("talkative", emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents);
+        super("talkative", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
-        console.log(robotFaceProcessor);
+        console.log(displayProcessor);
 
         this.sleepWords = ["geschlafen", "Geh schlafen", "Gute Nacht", "Zenit aus", "Zenith aus", "wir schlafen"];
 
         this.chatProcessor = chatProcessor;
-        this.robotFaceProcessor = robotFaceProcessor;
+        this.displayProcessor = displayProcessor;
 
         this.chatEmotionTimeout = null;
 
@@ -43,8 +47,6 @@ export class Talkative extends StateWrap{
         
         this.feedbackTimer = null;
         this.chatDuration = 0;
-
-        this.SOUND_PITCH = 1.08;
     }
 
     /* Enter function is executed whenever the state is activated. */
@@ -54,12 +56,12 @@ export class Talkative extends StateWrap{
             answer : "",
             emotion : "neutral"
         };
-        this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
-        this.speechProcessor.speechEvent.on('RecognizedWordLength', this.recognizedWordLengthHandler.bind(this));
-        this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler.bind(this));
-        this.robotFaceProcessor.robotFaceEvents.on("robotSpeechEnded", this.robotSpeechEndedHandler.bind(this));
-        this.brainEvents.on(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler.bind(this));
-        this.gesturePostureProcessor.gesturePostureEvent.on('BodiesLeftInteractionZone', this.bodiesLeftHandler.bind(this));
+        this.speechProcessor.speechEvent.on(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler.bind(this));
+        this.speechProcessor.speechEvent.on(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED, this.recognizedWordLengthHandler.bind(this));
+        this.speechProcessor.speechEvent.on(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler.bind(this))
+        this.chatProcessor.chatEvents.on(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, this.LLMAnswerHandler.bind(this));
+        this.displayProcessor.displayEvents.on(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED, this.robotSpeechEndedHandler.bind(this));
+        this.bodyLanguageProcessor.bodyLanguageEvent.on(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.bodiesLeftHandler.bind(this));
 
         this.RoboticBody.followHead();
     }
@@ -68,32 +70,12 @@ export class Talkative extends StateWrap{
     exitFunction(){
         /* Turn off event listener if state is exited. */
         clearTimeout(this.chatEmotionTimeout);
-        this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
-        this.speechProcessor.speechEvent.removeAllListeners('RecognizedWordLength', this.recognizedWordLengthHandler);
-        this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, this.LLMAnswerHandler);
-        this.brainEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.NEW_CHAT_DURATION, this.newChatDurationCalculatedHandler);
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('BodiesLeftInteractionZone', this.bodiesLeftHandler);
-        this.robotFaceProcessor.robotFaceEvents.removeAllListeners("robotSpeechEnded", this.robotSpeechEndedHandler);
-    }
-    
-    suspendSpeechTranscription(){
-        var payload = {
-            "mode" : "listen",
-            "status" : "stop",
-            "duration" : "0"
-        }
-        console.log("suspendSpeechTranscription");
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);
-    }
-
-    resumeSpeechTranscription(){
-        var payload = {
-            "mode" : "listen",
-            "status" : "resume",
-            "duration" : "0"
-        }
-        console.log("resumeSpeechTranscription");
-        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.SPEECH_TO_TEXT_ACTION, payload);
+        this.speechProcessor.speechEvent.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler);
+        this.speechProcessor.speechEvent.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED, this.recognizedWordLengthHandler);
+        this.speechProcessor.speechEvent.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler)
+        this.chatProcessor.chatEvents.removeAllListeners(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, this.LLMAnswerHandler);
+        this.displayProcessor.displayEvents.removeAllListeners(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED, this.robotSpeechEndedHandler);
+        this.bodyLanguageProcessor.bodyLanguageEvent.removeAllListeners(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.bodiesLeftHandler);
     }
 
     recognizedWordLengthHandler(wordLength){
@@ -111,7 +93,7 @@ export class Talkative extends StateWrap{
                 this.chatProcessor.LLMSendMessage(result);
                 this.ScreenFace.calculate();
                 this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
-                this.suspendSpeechTranscription();
+                this.speechProcessor.suspend();
             }
         }
     }
@@ -119,13 +101,9 @@ export class Talkative extends StateWrap{
     LLMAnswerHandler(llmReply){
         if (this.isValidJSON(llmReply)) {
             console.log("The content is valid JSON.");
-            var payloadTTS = {
-                "mode" : "tts",
-                "text" : llmReply.answer
-            }
             console.log(llmReply.answer);
             this.lastLLMPayload = llmReply;
-            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
+            this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, Brain.payload_TEXT_TO_SPEECH(llmReply.answer));
           }
     }
 
@@ -141,14 +119,17 @@ export class Talkative extends StateWrap{
         console.log("robot speech ended handler");
         this.ScreenFace.emotion.neutral();
         this.RoboticBody.followHead();
-        this.resumeSpeechTranscription();
+        this.speechProcessor.resume();
     }
 
     bodiesLeftHandler(){
         //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
     }
 
-    newChatDurationCalculatedHandler(duration){
+    newSpeechSoundCreatedHandler(data){
+
+        var duration = data.soundDuration;
+
         this.ScreenFace.stopCalculate();
         this.ScreenFace.emotion.setEmotion(this.lastLLMPayload.emotion);
 

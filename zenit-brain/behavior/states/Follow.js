@@ -40,7 +40,7 @@ export class Follow extends StateWrap{
 
         /* Add the event listener to listen on GesturePostureDetection events.
         Execute gesturePostureRecognition function on received detections. */
-        this.gesturePostureProcessor.gesturePostureEvent.on('GesturePostureDetection', this.GesturePostureDetection.bind(this));
+        this.bodyLanguageProcessor.gesturePostureEvent.on('GesturePostureDetection', this.GesturePostureDetection.bind(this));
         this.emotionProcessor.emotionEvent.on('EmotionDetection', this.emotionRecognition.bind(this));
     }
 
@@ -48,7 +48,7 @@ export class Follow extends StateWrap{
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.GesturePostureDetection);
+        this.bodyLanguageProcessor.gesturePostureEvent.removeAllListeners('GesturePostureDetection', this.GesturePostureDetection);
         this.emotionProcessor.emotionEvent.removeAllListeners('EmotionDetection', this.emotionRecognition);
     }
 

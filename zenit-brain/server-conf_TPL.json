@@ -2,47 +2,49 @@
     "config" : {
         "networkConfig" : {
             "RobotNetwork" : {
-                "IpAddress" : "192.168.123.182",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 3345
             },
             "DisplayNetwork" : {
-                "IpAddress" : "192.168.123.182",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 3344
             },
             "KinectNetwork" : {
-                "IpAddress" : "192.168.123.182",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 9123
             },
             "EmotionNetwork" : {
-                "IpAddress" : "192.168.123.182",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 1337
             },
             "SpeechNetwork" : {
-                "IpAddress" : "192.168.123.182",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 1338
             },
             "TTSNetwork" : {
-                "IpAddress" : "192.168.123.182",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 1339
             },
             "STTNetwork" : {
-                "IpAddress" : "192.168.123.182",
-                "Port" : 1341
+                "IpAddress" : "192.168.123.101",
+                "Port" : 1342
             },
             "RasaNetwork" : {
-                "IpAddress" : "192.168.0.101",
+                "IpAddress" : "192.168.123.101",
                 "Port" : 5005
+            },
+            "LLMNetwork" : {
+                "IpAddress" : "192.168.123.101",
+                "Port" : 12345
             }
         },
         "robotPosition" : {
-            "baseX" : 1.15,
-            "baseY" : 0.9,
-            "baseZ" : 0.01,
+            "baseX" : 1.7,
+            "baseY" : 1.15,
+            "baseZ" : 0.58,
             "baseRotation" : 0
         },
-        "interactionSweetSpot": {
-            "x" : 1.6,
-            "z" : 3
-        }
+        "interactionRadius": 2.0,
+        "soundPitch": 1.08
     }
 }

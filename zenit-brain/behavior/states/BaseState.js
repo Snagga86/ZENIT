@@ -322,8 +322,7 @@ export class Sound{
         var payloadTTS = { "mode" : "tts",
                            "text" : text
         }
-
-    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payloadTTS);
     }
 }
 
@@ -391,10 +390,10 @@ export class DisplayDevice{
 }
 
 export class StateWrap{
-    constructor(stateName, emotionProcessor, gesturePostureProcessor, speechProcessor, brainEvents){
+    constructor(stateName, emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents){
         this.stateChangeInitiated = false;
         this.emotionProcessor = emotionProcessor;
-        this.gesturePostureProcessor = gesturePostureProcessor;
+        this.bodyLanguageProcessor = bodyLanguageProcessor;
         this.speechProcessor = speechProcessor;
         this.brainEvents = brainEvents;
         this.state = new State(stateName);

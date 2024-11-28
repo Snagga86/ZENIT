@@ -4,6 +4,10 @@ import { Brain } from '../brain.js';
 
 export class ChatProcessor {
 
+    static CHAT_EVENTS = {
+        LLM_ANSWER: 'LLM_ANSWER'
+    }
+
     constructor() {
         this.chatEvents = new EventEmitter();
         this.defaultLLMReply = new Object();
@@ -48,15 +52,7 @@ export class ChatProcessor {
     }
 
     LLMSendMessage(text){
-        /*const data = JSON.stringify({
-            model: "ZENIT",
-            prompt: text,
-            stream: false
-          }); */
-
         const data = JSON.stringify({ prompt: text });
-          
-          // Options for the HTTP request
         const options = {
             hostname: '127.0.0.1',
             port: 12345,
@@ -84,7 +80,7 @@ export class ChatProcessor {
                     result = this.xx;
                 }
                 
-                this.chatEvents.emit(Brain.ROBOT_BRAIN_EVENTS.LLAMA_ANSWER, result);
+                this.chatEvents.emit(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, result);
             });
         });
     
@@ -96,7 +92,7 @@ export class ChatProcessor {
         req.end();
     }
 
-    repairLLMAnswerJSON(result){
+    /*repairLLMAnswerJSON(result){
         // Use a regular expression to extract the JSON object from the string
         const jsonMatch = result.match(/{.*}$/);
         if (!jsonMatch) {
@@ -125,7 +121,7 @@ export class ChatProcessor {
         jsonObject.emotion = this.repairLLMEmotion(jsonObject.emotion);
       
         return jsonObject;
-      }
+    }*/
 
       repairLLMEmotion(guessedEmotion){
         console.log("Guessed emotion:" + guessedEmotion);

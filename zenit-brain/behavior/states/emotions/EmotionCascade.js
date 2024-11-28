@@ -41,7 +41,7 @@ export class EmotionCascade extends StateWrap{
     /* Enter function is executed whenever the state is activated. */
     enterFunction(){
         this.currentEmotion = 0;
-        this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
+        this.bodyLanguageProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
         this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
         
         this.followHead();
@@ -51,7 +51,7 @@ export class EmotionCascade extends StateWrap{
     exitFunction(){
 
         /* Turn off event listener if state is exited. */
-        this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
+        this.bodyLanguageProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
         this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
         clearTimeout(this.waitForNextAnimationTimeout);
         clearTimeout(this.changeAnimationTimeout);
