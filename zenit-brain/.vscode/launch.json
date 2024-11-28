@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Program",
+        "skipFiles": ["<node_internals>/**"],
+        "program": "${workspaceFolder}/dist/server-start.js", // Path to the main compiled JS file
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"], // Match all JS files in the /dist folder
+        "preLaunchTask": "tsc: build - tsconfig.json", // Compile TypeScript before debugging
+        "sourceMaps": true,
+        "console": "integratedTerminal" // Ensure source maps are used for debugging
+      },
+      {
+        "type": "node",
+        "request": "attach",
+        "name": "Attach to Process",
+        "processId": "${command:PickProcess}",
+        "skipFiles": ["<node_internals>/**"]
+      }
+    ]
+  }
