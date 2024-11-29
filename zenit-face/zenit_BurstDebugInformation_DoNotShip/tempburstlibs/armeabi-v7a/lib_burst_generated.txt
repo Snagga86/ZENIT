@@ -107,6 +107,11 @@ Library: lib_burst_generated
 --compilation-defines=NET_STANDARD_2_1
 --compilation-defines=NETSTANDARD
 --compilation-defines=NETSTANDARD2_1
+--compilation-defines=DEVELOPMENT_BUILD
+--compilation-defines=ENABLE_PROFILER
+--compilation-defines=DEBUG
+--compilation-defines=TRACE
+--compilation-defines=UNITY_ASSERTIONS
 --compilation-defines=ENABLE_CUSTOM_RENDER_TEXTURE
 --compilation-defines=ENABLE_DIRECTOR
 --compilation-defines=ENABLE_LOCALIZATION
@@ -134,6 +139,7 @@ Library: lib_burst_generated
 --compilation-defines=USING_PHYSICS2D_MODULE
 --compilation-defines=TIMELINE_FRAMEACCURATE
 --generate-link-xml=Temp\burst.link.xml
+--debug=Full
 --output=C:\Workspace\DIS\Code\ZENIT\zenit-face\Temp\StagingArea\tempburstlibs\armeabi-v7a\lib_burst_generated
 --root-assembly=C:\Workspace\DIS\Code\ZENIT\zenit-face\Temp\StagingArea\Data\Managed\UnityEngine.UI.dll
 --root-assembly=C:\Workspace\DIS\Code\ZENIT\zenit-face\Temp\StagingArea\Data\Managed\Unity.RenderPipelines.Core.Runtime.dll
