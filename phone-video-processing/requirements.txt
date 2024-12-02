@@ -1,3 +1,6 @@
 opencv-python
 numpy
 deepface
+retinaface
+torch
+tf-keras

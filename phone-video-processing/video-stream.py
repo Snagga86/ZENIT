@@ -2,7 +2,18 @@ import socket
 import struct
 import cv2
 import numpy as np
-from deepface import DeepFace
+#from deepface import DeepFace
+import tensorflow as tf
+import torch
+
+print("TensorFlow version:", tf.__version__)
+print("Available GPUs:", tf.config.list_physical_devices('GPU'))
+
+
+print("PyTorch version:", torch.__version__)
+print("Is CUDA available:", torch.cuda.is_available())
+print("Device:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU")
+
 
 def start_server(host='0.0.0.0', port=6666):
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
