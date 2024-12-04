@@ -15,6 +15,8 @@ IP_ADDRESS = "192.168.123.101"
 TCP_PORT = 1342
 UDP_PORT = 1338
 
+print("Start Microphone Service...")
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
 
 sttQueue = queue.Queue()
@@ -23,14 +25,19 @@ controlSignalQueue = queue.Queue()
 partialResultBuffer = ["","","","","","","","","","","","","","","","","","","",""]
 
 samplerate = 44100
-
-model = Model(model_path="../models/src/de-de")
-
+print("Load model...")
+model = Model(model_path="models/src/de-de")
+print("Successfully loaded model...")
 device_info = sd.query_devices(0, "input")
+print("Device:")
+print(device_info)
+
 
 webservice_ip = 'ws://' + IP_ADDRESS + ':' + str(TCP_PORT)
-websocket.enableTrace(False)
 
+print("Service Connection: " + webservice_ip)
+websocket.enableTrace(False)
+print("trace enabled")
 recordTempPause = False
 recordTempPauseTimeStart = 0
 agentIsTalking = False

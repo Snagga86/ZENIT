@@ -1,6 +1,6 @@
 import { State, Actions, Transition, StateWrap } from '../BaseState.js';
 import { Brain } from '../../brain.js';
-import { EmotionProcessor } from '../../processors/emotion-processor.js';
+import { PhoneCamProcessor } from '../../processors/phone-cam-processor.js';
 import { BodyLanguageProcessor } from '../../processors/body-language-processor.js';
 import { SpeechProcessor } from '../../processors/speech-processor.js';
 import { EventEmitter } from 'stream';
@@ -14,7 +14,7 @@ export class IdleAnchor extends StateWrap{
     lastState : String;
     timeout : NodeJS.Timeout | null;
 
-    constructor(emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
+    constructor(emotionProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
         super("idleAnchor", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);

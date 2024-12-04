@@ -4,7 +4,7 @@ import { ChatProcessor } from '../processors/chat-processor.js';
 import { SpeechProcessor } from '../processors/speech-processor.js';
 import { DisplayProcessor } from '../processors/display-processor.js';
 import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
-import { EmotionProcessor } from '../processors/emotion-processor.js';
+import { PhoneCamProcessor } from '../processors/phone-cam-processor.js';
 import { EventEmitter } from 'stream';
 
 /* Robot state class defining the robot behavior within this state */
@@ -16,11 +16,12 @@ export class Talkative extends StateWrap{
     chatEmotionTimeout : any | null;
 
     lastLLMPayload : any | null;
+    lastEmotion : string | null;
 
-    constructor(chatProcessor : ChatProcessor, emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, displayProcessor :DisplayProcessor, brainEvents : EventEmitter){
+    constructor(chatProcessor : ChatProcessor, phoneCamProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, displayProcessor :DisplayProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
-        super("talkative", emotionProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
+        super("talkative", phoneCamProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
         console.log(displayProcessor);
 
@@ -35,6 +36,8 @@ export class Talkative extends StateWrap{
             answer : "",
             emotion : "neutral"
         };
+
+        this.lastEmotion = "";
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -58,7 +61,8 @@ export class Talkative extends StateWrap{
         };
         this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler.bind(this));
         this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED, this.recognizedWordLengthHandler.bind(this));
-        this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler.bind(this))
+        this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED, this.newSpeechSoundCreatedHandler.bind(this));
+        this.emotionProcessor.emotionEvent.on(PhoneCamProcessor.EMOTION_EVENTS.EMOTION_TRIGGERED, this.emotionTriggeredHandler.bind(this));
         this.chatProcessor.chatEvents.on(ChatProcessor.CHAT_EVENTS.LLM_ANSWER, this.LLMAnswerHandler.bind(this));
         this.displayProcessor.displayEvents.on(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED, this.robotSpeechEndedHandler.bind(this));
         this.bodyLanguageProcessor.bodyLanguageEvent.on(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE, this.bodiesLeftHandler.bind(this));
@@ -72,7 +76,8 @@ export class Talkative extends StateWrap{
         clearTimeout(this.chatEmotionTimeout);
         this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED);
         this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.TEMP_WORD_LENGTH_RECEIVED);
-        this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED)
+        this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.SOUND_CREATED);
+        this.emotionProcessor.emotionEvent.removeAllListeners(PhoneCamProcessor.EMOTION_EVENTS.EMOTION_TRIGGERED);
         this.chatProcessor.chatEvents.removeAllListeners(ChatProcessor.CHAT_EVENTS.LLM_ANSWER);
         this.displayProcessor.displayEvents.removeAllListeners(DisplayProcessor.DISPLAY_EVENTS.ROBOT_SPEECH_ENDED);
         this.bodyLanguageProcessor.bodyLanguageEvent.removeAllListeners(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE);
@@ -80,6 +85,10 @@ export class Talkative extends StateWrap{
 
     recognizedWordLengthHandler(wordLength : number){
         this.ScreenFace.addSpeechVisual(wordLength);
+    }
+
+    emotionTriggeredHandler(emotion : string){
+        this.lastEmotion = emotion;
     }
 
     finalResultHandler(result : any){
@@ -90,7 +99,7 @@ export class Talkative extends StateWrap{
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "nap");
             }
             else{
-                this.chatProcessor.LLMSendMessage(result);
+                this.chatProcessor.LLMSendMessage((result + "(your conversation partner shows a " + this.lastEmotion + " facial expression.)"));
                 this.ScreenFace.calculate();
                 this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
                 this.speechProcessor.suspend();

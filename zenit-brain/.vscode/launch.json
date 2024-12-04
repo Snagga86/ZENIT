@@ -6,7 +6,7 @@
         "request": "launch",
         "name": "Launch Program",
         "skipFiles": ["<node_internals>/**"],
-        "program": "${workspaceFolder}/dist/server-start.js", // Path to the main compiled JS file
+        "program": "${workspaceFolder}/src/server-start.ts", // Path to the main compiled JS file
         "outFiles": ["${workspaceFolder}/dist/**/*.js"], // Match all JS files in the /dist folder
         "preLaunchTask": "tsc: build - tsconfig.json", // Compile TypeScript before debugging
         "sourceMaps": true,

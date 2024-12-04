@@ -1,6 +1,6 @@
 import { EventEmitter } from 'stream';
 import { Brain } from '../brain.js';
-import { EmotionProcessor } from '../processors/emotion-processor.js';
+import { PhoneCamProcessor } from '../processors/phone-cam-processor.js';
 import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
 import { SpeechProcessor } from '../processors/speech-processor.js';
 
@@ -432,7 +432,7 @@ export class DisplayDevice{
 export class StateWrap{
 
     stateChangeInitiated : Boolean;
-    emotionProcessor : EmotionProcessor;
+    emotionProcessor : PhoneCamProcessor;
     bodyLanguageProcessor : BodyLanguageProcessor;
     speechProcessor : SpeechProcessor;
     brainEvents : EventEmitter;
@@ -440,7 +440,7 @@ export class StateWrap{
     RoboticBody : RoboticArm;
     ScreenFace : DisplayDevice;
 
-    constructor(stateName : String, emotionProcessor : EmotionProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
+    constructor(stateName : String, emotionProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
         this.stateChangeInitiated = false;
         this.emotionProcessor = emotionProcessor;
         this.bodyLanguageProcessor = bodyLanguageProcessor;

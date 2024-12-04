@@ -28,7 +28,7 @@ export class ZENITServer {
     speechTranscriptionControlWS: any | null;
 
     osc: any; // `osc-js` might not have proper type declarations
-    emotionDetectionSocket: dgram.Socket;
+    phoneCamDetectionSocket: dgram.Socket;
     speechTranscriptionStreamSocket: dgram.Socket;
 
     constructor(config: {
@@ -60,7 +60,7 @@ export class ZENITServer {
         this.speechTranscriptionControlWS = null;
 
         this.osc = new pkg();
-        this.emotionDetectionSocket = dgram.createSocket('udp4');
+        this.phoneCamDetectionSocket = dgram.createSocket('udp4');
         this.speechTranscriptionStreamSocket = dgram.createSocket('udp4');
     }
 
@@ -87,22 +87,22 @@ export class ZENITServer {
         /* -------- Emotion Recognition -------- */
         /* Bind the UDP socket to receive recognized basic emotions from the emotion detection
         network. */
-        this.emotionDetectionSocket.bind(this.networkConfig.EmotionNetwork.Port);
+        this.phoneCamDetectionSocket.bind(this.networkConfig.EmotionNetwork.Port);
 
         /* Incoming data from the emotion detection network is processed in the KARERO brain. */
-        this.emotionDetectionSocket.on('message', (msg, rinfo) => {
-            this.ZENITBrain.processEmotionRecognition(msg.toString());
+        this.phoneCamDetectionSocket.on('message', (msg, rinfo) => {
+            this.ZENITBrain.processPhoneCamRecognition(msg.toString());
         });
 
         /* Emotion detection error handling. */
-        this.emotionDetectionSocket.on('error', (err) => {
+        this.phoneCamDetectionSocket.on('error', (err) => {
             console.log(`server error:\n${err.stack}`);
-            this.emotionDetectionSocket.close();
+            this.phoneCamDetectionSocket.close();
         });
 
         /* ToDo: Handling */
-        this.emotionDetectionSocket.on('listening', () => {
-            const address = this.emotionDetectionSocket.address();
+        this.phoneCamDetectionSocket.on('listening', () => {
+            const address = this.phoneCamDetectionSocket.address();
             console.log(`python server listening ${address.address}:${address.port}`);
         });
 

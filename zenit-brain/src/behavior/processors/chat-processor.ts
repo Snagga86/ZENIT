@@ -9,13 +9,13 @@ interface LLMReply {
 
 export class ChatProcessor {
 
-    static CHAT_EVENTS = {
+    public static CHAT_EVENTS = {
         LLM_ANSWER: 'LLM_ANSWER',
         RASA_ANSWER: 'RASA_ANSWER'
     }
 
-    defaultLLMReply: LLMReply;
-    chatEvents : EventEmitter;
+    private defaultLLMReply: LLMReply;
+    public chatEvents : EventEmitter;
 
     constructor() {
         this.chatEvents = new EventEmitter();
@@ -79,10 +79,10 @@ export class ChatProcessor {
         var req = http.request(options, (res) => {
             //console.log('statusCode:', res.statusCode);
             res.on('data', (d) => {
-                var utf8Content = Buffer.from(d, 'utf-8').toString('utf-8');
+                var utf8Content : string = Buffer.from(d, 'utf-8').toString('utf-8');
                 console.log(utf8Content)
                 try{
-                    var res = JSON.parse(utf8Content);
+                    var res : any = JSON.parse(utf8Content);
                     res.emotion = this.repairLLMEmotion(res.emotion);
                     console.log(res);
                     result = res;
@@ -133,7 +133,7 @@ export class ChatProcessor {
         return jsonObject;
     }*/
 
-      repairLLMEmotion(guessedEmotion : String){
+      repairLLMEmotion(guessedEmotion : string){
         console.log("Guessed emotion:" + guessedEmotion);
         var emotion = "neutral";
 

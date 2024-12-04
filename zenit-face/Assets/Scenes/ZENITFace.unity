@@ -17368,6 +17368,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2045300468}
     - target: {fileID: 6304355968724499757, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6304355968724499757, guid: b4b26e1b4b99628428cbc2da55dde9bd, type: 3}
       propertyPath: speechFlow
       value: 
       objectReference: {fileID: 1974344540}

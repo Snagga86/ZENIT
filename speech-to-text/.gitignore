@@ -33,3 +33,6 @@ models/src
 python/vosk/*.so
 
 **/logs.txt
+
+#PyEnv
+speech-to-text

@@ -1,4 +1,4 @@
-import { EmotionProcessor } from './processors/emotion-processor.js'
+import { PhoneCamProcessor } from './processors/phone-cam-processor.js'
 import { SpeechProcessor } from './processors/speech-processor.js'
 import { BodyLanguageProcessor } from './processors/body-language-processor.js'
 import { DisplayProcessor } from './processors/display-processor.js';
@@ -80,7 +80,7 @@ export class Brain{
     }
 
     brainEvents : EventEmitter;
-    emotionProcessor : EmotionProcessor;
+    emotionProcessor : PhoneCamProcessor;
     bodyLanguageProcessor : BodyLanguageProcessor;
     speechProcessor : SpeechProcessor;
     chatProcessor : ChatProcessor;
@@ -101,7 +101,7 @@ export class Brain{
         /* Emitter for events within the brain component. */
         this.brainEvents = new EventEmitter();
         /* Create emotion processor for emotion processing. */
-        this.emotionProcessor = new EmotionProcessor();
+        this.emotionProcessor = new PhoneCamProcessor();
         /* Create posture/gesture processor. */
         this.bodyLanguageProcessor = new BodyLanguageProcessor(configPath);
         /* Create speech to text processor. */
@@ -240,7 +240,7 @@ export class Brain{
     }
 
     /* Process raw data of facial emotion detection. */
-    processEmotionRecognition(data : any){
+    processPhoneCamRecognition(data : string){
         this.emotionProcessor.digest(data);
     }
 

@@ -2,6 +2,9 @@ import { ZENITServer } from './connection/zenit-server.js';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { install } from 'source-map-support';
+install();
+
 
 // Resolve the directory of the current file
 const __filename = fileURLToPath(import.meta.url);

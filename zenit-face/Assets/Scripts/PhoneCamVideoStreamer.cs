@@ -9,84 +9,118 @@ public class PhoneCamVideoStreamer : MonoBehaviour
     public string serverIP = "192.168.123.101"; // Replace with your server's IP
     public int serverPort = 6666;
 
-
     private WebCamTexture webcam;
     private TcpClient client;
     private NetworkStream stream;
     private Texture2D frame;
 
-    private float frameInterval = 1f / 10f; // 5 FPS
+    private float frameInterval = 1f / 2f; // 5 FPS
     private float nextFrameTime = 0f;
+
+    private bool isConnecting = false;
 
     void Start()
     {
-        try
+        // Select the front-facing camera
+        WebCamDevice[] devices = WebCamTexture.devices;
+        if (devices.Length > 0)
         {
-            // Select the front-facing camera
-            WebCamDevice[] devices = WebCamTexture.devices;
-            if (devices.Length > 0)
+            for (int i = 0; i < devices.Length; i++)
             {
-                for (int i = 0; i < devices.Length; i++)
+                Debug.Log($"Device {i}: {devices[i].name} (Front: {devices[i].isFrontFacing})");
+                if (devices[i].isFrontFacing)
                 {
-                    Debug.Log($"Device {i}: {devices[i].name} (Front: {devices[i].isFrontFacing})");
-                    if (devices[i].isFrontFacing)
-                    {
-                        webcam = new WebCamTexture(devices[i].name, 1920, 1080); // Adjust resolution as needed
-                        break;
-                    }
+                    webcam = new WebCamTexture(devices[i].name); // Adjust resolution as needed
+                    break;
                 }
             }
+        }
 
-            if (webcam == null)
+        if (webcam == null)
+        {
+            Debug.LogError("No front-facing camera found.");
+            return;
+        }
+
+        webcam.Play();
+
+        // Reuse the same Texture2D
+        frame = new Texture2D(webcam.width, webcam.height, TextureFormat.RGB24, false);
+
+        // Start connection coroutine
+        StartCoroutine(ConnectToServer());
+    }
+
+    IEnumerator ConnectToServer()
+    {
+        while (true)
+        {
+            if (client == null || !client.Connected)
             {
-                Debug.LogError("No front-facing camera found.");
-                return;
+                Debug.Log("Attempting to connect to server...");
+                bool success = TryConnect();
+                if (success)
+                {
+                    Debug.Log("Successfully connected to server.");
+                }
+                else
+                {
+                    Debug.Log("Retrying in 5 seconds...");
+                    yield return new WaitForSeconds(5f); // Retry every 5 seconds
+                }
             }
+            else
+            {
+                yield return null; // If connected, pause the coroutine
+            }
+        }
+    }
 
-            webcam.Play();
-
-            // Reuse the same Texture2D
-            frame = new Texture2D(webcam.width, webcam.height, TextureFormat.RGB24, false);
-
-            // Connect to the server
-            client = new TcpClient(serverIP, serverPort);
+    bool TryConnect()
+    {
+        try
+        {
+            client = new TcpClient();
+            client.Connect(serverIP, serverPort);
             stream = client.GetStream();
-            Debug.Log("Connected to server.");
+            return true;
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"Error connecting to server: {ex.Message}");
+            Debug.LogError($"Connection attempt failed: {ex.Message}");
+            return false;
         }
     }
 
     void Update()
     {
-        if (stream == null || !stream.CanWrite) return;
+        if (client == null || !client.Connected || stream == null || !stream.CanWrite) return;
 
         if (Time.time >= nextFrameTime && webcam.didUpdateThisFrame)
         {
-            Debug.Log("frame send proc");
             nextFrameTime = Time.time + frameInterval;
 
             try
             {
-                Debug.Log("try");
                 // Update the existing Texture2D
                 frame.SetPixels(webcam.GetPixels());
                 frame.Apply();
 
                 // Convert to JPEG
-                byte[] imageData = frame.EncodeToJPG();
+                byte[] imageData = frame.GetRawTextureData();
                 byte[] sizeBytes = System.BitConverter.GetBytes(imageData.Length);
-                Debug.Log(frame);
-                Debug.Log(sizeBytes);
-                // Send the data
-                BinaryWriter writer = new BinaryWriter(stream);
-                Debug.Log("before write");
-                Debug.Log($"Sending frame size: {imageData.Length}");
-                writer.Write(sizeBytes);
-                writer.Write(imageData);
-                writer.Flush();
+
+                int width = webcam.width;
+                int height = webcam.height;
+                byte[] widthBytes = System.BitConverter.GetBytes(width);
+                byte[] heightBytes = System.BitConverter.GetBytes(height);
+
+                stream.Write(widthBytes, 0, 4);
+                stream.Write(heightBytes, 0, 4);
+                stream.Write(sizeBytes, 0, 4);
+                stream.Write(imageData, 0, imageData.Length);
+                stream.Flush();
+
             }
             catch (System.Exception ex)
             {
@@ -103,24 +137,4 @@ public class PhoneCamVideoStreamer : MonoBehaviour
         if (client != null) client.Close();
         Debug.Log("Connection closed.");
     }
-    byte[] GetTestImageBytes()
-    {
-        // Create a simple 2x2 texture with solid colors for testing
-        Texture2D testTexture = new Texture2D(2, 2, TextureFormat.RGB24, false);
-
-        // Set colors
-        testTexture.SetPixels(new Color[]
-        {
-        Color.red, Color.green,
-        Color.blue, Color.white
-        });
-        testTexture.Apply();
-
-        // Encode to JPEG
-        byte[] imageData = testTexture.EncodeToJPG();
-
-        Debug.Log("Generated test image byte array.");
-        return imageData;
-    }
-
 }

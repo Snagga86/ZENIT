@@ -7,7 +7,7 @@ const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
 
   if (parsedUrl.pathname === '/getAudio') {
-    const filename = "generatedSoundFiles/" + parsedUrl.query.filename;
+    const filename = "../generatedSoundFiles/" + parsedUrl.query.filename;
     const audioFilePath = path.join(__dirname, filename);
     console.log(audioFilePath);
     fs.access(audioFilePath, fs.constants.F_OK, (err) => {

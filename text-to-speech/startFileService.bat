@@ -1,1 +1,3 @@
-python text_to_speech.py
+cd sound-file-service
+node sound_file_service.js
+pause

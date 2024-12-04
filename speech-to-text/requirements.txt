@@ -2,6 +2,7 @@ librosa
 numpy
 scipy
 websocket
+websocket-client
 vosk
 sounddevice
 datetime
