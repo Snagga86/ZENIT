@@ -6,11 +6,11 @@ import { SpeechProcessor } from '../processors/speech-processor.js';
 
 export class State{
 
-    target : String;
+    target : string;
     actions : any;
     transitions : any;
 
-    constructor(stateName : String){
+    constructor(stateName : string){
         this.target = stateName;
         this.actions = new Actions();
         this.transitions = new Array();
@@ -306,7 +306,7 @@ export class Emotion{
         this.setEmotion("sleepy");
     }
 
-    setEmotion(emotion : String){
+    setEmotion(emotion : string){
         var payloadEmotion = {
             "mode" : "setEmotion",
             "data" : emotion
@@ -440,7 +440,7 @@ export class StateWrap{
     RoboticBody : RoboticArm;
     ScreenFace : DisplayDevice;
 
-    constructor(stateName : String, emotionProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
+    constructor(stateName : string, emotionProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, brainEvents : EventEmitter){
         this.stateChangeInitiated = false;
         this.emotionProcessor = emotionProcessor;
         this.bodyLanguageProcessor = bodyLanguageProcessor;

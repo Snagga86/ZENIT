@@ -37,7 +37,7 @@ export class PhoneCamProcessor {
 
         
         this.NUM_VALENCE_CLASSES = 3.333;
-        this.EMOTION_BUFFER_LEN = 10; // frames (5fps currently)
+        this.EMOTION_BUFFER_LEN = 5; // frames (5fps currently)
         this.BEmotion = {
 
             "anger" : ['annoyance','anger', 'rage']
@@ -82,7 +82,7 @@ export class PhoneCamProcessor {
         var emotion : string = "";
         if(this.facialExpressionsInterpretation == true){
             emotion = this.processValueAsFacialExpression(phoneCamRecognition.emotion.toLowerCase());
-            console.log("processed emotion: " + emotion);
+            //console.log("processed emotion: " + emotion);
         }
         if(this.bodyLanguageInterpretation == true){
             this.processValueAsBodyLanguage(phoneCamRecognition.emotion.toLowerCase());

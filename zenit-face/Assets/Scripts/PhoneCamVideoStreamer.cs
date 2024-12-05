@@ -1,13 +1,18 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 
 public class PhoneCamVideoStreamer : MonoBehaviour
 {
     public string serverIP = "192.168.123.101"; // Replace with your server's IP
     public int serverPort = 6666;
+
+    public GameObject confp;
 
     private WebCamTexture webcam;
     private TcpClient client;
@@ -17,7 +22,12 @@ public class PhoneCamVideoStreamer : MonoBehaviour
     private float frameInterval = 1f / 2f; // 5 FPS
     private float nextFrameTime = 0f;
 
-    private bool isConnecting = false;
+    private byte[] latestFrameData; // Atomic reference to the latest frame data
+    private int frameWidth;
+    private int frameHeight;
+    private bool isStreaming = true;
+
+    private readonly object frameLock = new object(); // Ensure thread-safe access
 
     void Start()
     {
@@ -30,7 +40,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
                 Debug.Log($"Device {i}: {devices[i].name} (Front: {devices[i].isFrontFacing})");
                 if (devices[i].isFrontFacing)
                 {
-                    webcam = new WebCamTexture(devices[i].name); // Adjust resolution as needed
+                    webcam = new WebCamTexture(devices[i].name, 1280, 720); // Adjust resolution as needed
                     break;
                 }
             }
@@ -44,11 +54,17 @@ public class PhoneCamVideoStreamer : MonoBehaviour
 
         webcam.Play();
 
-        // Reuse the same Texture2D
         frame = new Texture2D(webcam.width, webcam.height, TextureFormat.RGB24, false);
+
+        // Initialize frame dimensions
+        frameWidth = webcam.width;
+        frameHeight = webcam.height;
 
         // Start connection coroutine
         StartCoroutine(ConnectToServer());
+
+        // Start the processing thread
+        Task.Run(() => ProcessAndSendFrames());
     }
 
     IEnumerator ConnectToServer()
@@ -85,7 +101,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
             stream = client.GetStream();
             return true;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             Debug.LogError($"Connection attempt failed: {ex.Message}");
             return false;
@@ -94,44 +110,84 @@ public class PhoneCamVideoStreamer : MonoBehaviour
 
     void Update()
     {
-        if (client == null || !client.Connected || stream == null || !stream.CanWrite) return;
-
         if (Time.time >= nextFrameTime && webcam.didUpdateThisFrame)
         {
             nextFrameTime = Time.time + frameInterval;
 
+            // Capture the frame and process it on the main thread
+            frame.SetPixels(webcam.GetPixels());
+            frame.Apply();
+
+            // Get raw texture data
+            byte[] rawData = frame.GetRawTextureData();
+
+            // Store the latest frame data atomically
+            lock (frameLock)
+            {
+                latestFrameData = rawData;
+            }
+        }
+    }
+
+    void ProcessAndSendFrames()
+    {
+        while (isStreaming)
+        {
+            if (client == null || !client.Connected || stream == null || !stream.CanWrite)
+            {
+                Thread.Sleep(100); // Avoid busy waiting
+                continue;
+            }
+
+            byte[] rawDataToSend = null;
+            int width, height;
+
+            // Fetch the latest frame data atomically
+            lock (frameLock)
+            {
+                if (latestFrameData != null)
+                {
+                    rawDataToSend = latestFrameData;
+                    width = frameWidth;
+                    height = frameHeight;
+                }
+                else
+                {
+                    Thread.Sleep(10); // If no frame is available, wait briefly
+                    continue;
+                }
+            }
+
             try
             {
-                // Update the existing Texture2D
-                frame.SetPixels(webcam.GetPixels());
-                frame.Apply();
+                byte[] sizeBytes = BitConverter.GetBytes(rawDataToSend.Length);
+                byte[] widthBytes = BitConverter.GetBytes(width);
+                byte[] heightBytes = BitConverter.GetBytes(height);
 
-                // Convert to JPEG
-                byte[] imageData = frame.GetRawTextureData();
-                byte[] sizeBytes = System.BitConverter.GetBytes(imageData.Length);
-
-                int width = webcam.width;
-                int height = webcam.height;
-                byte[] widthBytes = System.BitConverter.GetBytes(width);
-                byte[] heightBytes = System.BitConverter.GetBytes(height);
-
-                stream.Write(widthBytes, 0, 4);
-                stream.Write(heightBytes, 0, 4);
-                stream.Write(sizeBytes, 0, 4);
-                stream.Write(imageData, 0, imageData.Length);
-                stream.Flush();
-
+                // Send data to the server
+                lock (stream) // Ensure thread-safe usage of the stream
+                {
+                    stream.Write(widthBytes, 0, 4);
+                    stream.Write(heightBytes, 0, 4);
+                    stream.Write(sizeBytes, 0, 4);
+                    stream.Write(rawDataToSend, 0, rawDataToSend.Length);
+                    stream.Flush();
+                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Debug.LogError($"Error during frame sending: {ex.Message}");
             }
+
+            // Respect frame interval
+            Thread.Sleep((int)(frameInterval * 1000));
         }
     }
 
     void OnApplicationQuit()
     {
         // Cleanup
+        isStreaming = false;
         webcam.Stop();
         if (stream != null) stream.Close();
         if (client != null) client.Close();

@@ -16,9 +16,10 @@ export class Talkative extends StateWrap{
     chatEmotionTimeout : any | null;
 
     lastLLMPayload : any | null;
-    lastEmotion : string | null;
+    lastEmotion : string;
+    freezedEmotion : Boolean;
 
-    constructor(chatProcessor : ChatProcessor, phoneCamProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, displayProcessor :DisplayProcessor, brainEvents : EventEmitter){
+    constructor(chatProcessor : ChatProcessor, phoneCamProcessor : PhoneCamProcessor, bodyLanguageProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, displayProcessor : DisplayProcessor, brainEvents : EventEmitter){
 
         /* Call the super constructor and set the identification name for the state class */
         super("talkative", phoneCamProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
@@ -38,6 +39,7 @@ export class Talkative extends StateWrap{
         };
 
         this.lastEmotion = "";
+        this.freezedEmotion = false;
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
@@ -54,7 +56,7 @@ export class Talkative extends StateWrap{
     }
 
     /* Enter function is executed whenever the state is activated. */
-    enterFunction(){
+    public enterFunction(){
         this.lastLLMPayload = {
             answer : "",
             emotion : "neutral"
@@ -71,7 +73,7 @@ export class Talkative extends StateWrap{
     }
     
     /* Exit function is executed whenever the state is left. */
-    exitFunction(){
+    public exitFunction(){
         /* Turn off event listener if state is exited. */
         clearTimeout(this.chatEmotionTimeout);
         this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED);
@@ -83,15 +85,30 @@ export class Talkative extends StateWrap{
         this.bodyLanguageProcessor.bodyLanguageEvent.removeAllListeners(BodyLanguageProcessor.BODY_LANGUAGE_EVENTS.ALL_BODIES_LEFT_INTERACTION_ZONE);
     }
 
-    recognizedWordLengthHandler(wordLength : number){
+    private freezeEmotion(){
+        this.freezedEmotion = true;
+    }
+
+    private unfreezeEmotion(){
+        this.freezedEmotion = false;
+    }
+    
+    private recognizedWordLengthHandler(wordLength : number){
         this.ScreenFace.addSpeechVisual(wordLength);
+        this.freezeEmotion();
+        this.ScreenFace.emotion.neutral();
     }
 
-    emotionTriggeredHandler(emotion : string){
-        this.lastEmotion = emotion;
+    private emotionTriggeredHandler(emotion : string){
+        if(!this.freezedEmotion){
+            this.lastEmotion = emotion;
+            this.ScreenFace.emotion.setEmotion(this.lastEmotion);
+        }
+        console.log("freezedEmotion: " + this.freezedEmotion);
+        console.log("lastEmotion: " + emotion);
     }
 
-    finalResultHandler(result : any){
+    private finalResultHandler(result : any){
         if(result.length > 1){
             if(this.isSleepWord(result)){
                 //this.ScreenFace.blink();
@@ -99,7 +116,7 @@ export class Talkative extends StateWrap{
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "nap");
             }
             else{
-                this.chatProcessor.LLMSendMessage((result + "(your conversation partner shows a " + this.lastEmotion + " facial expression.)"));
+                this.chatProcessor.LLMSendMessage((result + " (your human conversation partner shows a " + this.lastEmotion + " facial expression.)"));
                 this.ScreenFace.calculate();
                 this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
                 this.speechProcessor.suspend();
@@ -107,7 +124,7 @@ export class Talkative extends StateWrap{
         }
     }
 
-    LLMAnswerHandler(llmReply : any){
+    private LLMAnswerHandler(llmReply : any){
         if (this.isValidJSON(llmReply)) {
             console.log("The content is valid JSON.");
             console.log(llmReply.answer);
@@ -116,26 +133,27 @@ export class Talkative extends StateWrap{
           }
     }
 
-    isValidJSON(payload : any) {
+    private isValidJSON(payload : any) {
         return payload && typeof payload === 'object' && !Array.isArray(payload);
       }
 
-    isSleepWord(input : string) {
+      private isSleepWord(input : string) {
         return this.sleepWords.some(word => word.toLowerCase() === input.toLowerCase());
     }
 
-    robotSpeechEndedHandler(){
+    private robotSpeechEndedHandler(){
         console.log("robot speech ended handler");
         this.ScreenFace.emotion.neutral();
         this.RoboticBody.followHead();
         this.speechProcessor.resume();
+        this.unfreezeEmotion();
     }
 
-    bodiesLeftHandler(){
+    private bodiesLeftHandler(){
         //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
     }
 
-    newSpeechSoundCreatedHandler(data : any){
+    private newSpeechSoundCreatedHandler(data : any){
 
         var duration = data.soundDuration;
 
