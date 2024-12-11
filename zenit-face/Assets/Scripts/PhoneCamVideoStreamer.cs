@@ -19,7 +19,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
     private NetworkStream stream;
     private Texture2D frame;
 
-    private float frameInterval = 1f / 2f; // 5 FPS
+    private float frameInterval = 1f / 5f; // 5 FPS
     private float nextFrameTime = 0f;
 
     private byte[] latestFrameData; // Atomic reference to the latest frame data
@@ -40,7 +40,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
                 Debug.Log($"Device {i}: {devices[i].name} (Front: {devices[i].isFrontFacing})");
                 if (devices[i].isFrontFacing)
                 {
-                    webcam = new WebCamTexture(devices[i].name, 1280, 720); // Adjust resolution as needed
+                    webcam = new WebCamTexture(devices[i].name, 640, 320); // Adjust resolution as needed
                     break;
                 }
             }
@@ -54,7 +54,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
 
         webcam.Play();
 
-        frame = new Texture2D(webcam.width, webcam.height, TextureFormat.RGB24, false);
+        frame = new Texture2D(webcam.width, webcam.height, TextureFormat.RGB565, false);
 
         // Initialize frame dimensions
         frameWidth = webcam.width;
@@ -64,7 +64,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
         StartCoroutine(ConnectToServer());
 
         // Start the processing thread
-        Task.Run(() => ProcessAndSendFrames());
+        //Task.Run(() => ProcessAndSendFrames());
     }
 
     IEnumerator ConnectToServer()
@@ -121,11 +121,27 @@ public class PhoneCamVideoStreamer : MonoBehaviour
             // Get raw texture data
             byte[] rawData = frame.GetRawTextureData();
 
-            // Store the latest frame data atomically
-            lock (frameLock)
+            try
             {
-                latestFrameData = rawData;
+                byte[] sizeBytes = BitConverter.GetBytes(rawData.Length);
+                byte[] widthBytes = BitConverter.GetBytes(frameWidth);
+                byte[] heightBytes = BitConverter.GetBytes(frameHeight);
+
+                // Send data to the server
+                lock (stream) // Ensure thread-safe usage of the stream
+                {
+                    stream.Write(widthBytes, 0, 4);
+                    stream.Write(heightBytes, 0, 4);
+                    stream.Write(sizeBytes, 0, 4);
+                    stream.Write(rawData, 0, rawData.Length);
+                    stream.Flush();
+                }
             }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error during frame sending: {ex.Message}");
+            }
+
         }
     }
 
@@ -180,7 +196,7 @@ public class PhoneCamVideoStreamer : MonoBehaviour
             }
 
             // Respect frame interval
-            Thread.Sleep((int)(frameInterval * 1000));
+            //Thread.Sleep((int)(frameInterval * 1000));
         }
     }
 

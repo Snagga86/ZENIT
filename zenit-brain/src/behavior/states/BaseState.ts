@@ -53,6 +53,10 @@ export class RoboticArm{
         this.bodyAction("seekAttention");
     }
 
+    followHeadPercentages(){
+        this.bodyAction("followHeadPercentages");
+    }
+
     followHead(){
         this.bodyAction("followHead");
     }

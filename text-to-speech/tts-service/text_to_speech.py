@@ -27,8 +27,8 @@ model_name = "tts_models/de/thorsten/vits"
 file_name = ""
 
 # init TTS with the target model name
-tts = TTS(model_name=model_name, progress_bar=False, gpu=is_cuda_available)
-
+tts = TTS(model_name=model_name, progress_bar=False)
+tts.to("cuda")
 regex = re.compile('[^a-zA-Z]')
 
 webservice_ip = 'ws://' + IP_ADDRESS + ':' + str(PORT)
@@ -37,6 +37,16 @@ websocket.enableTrace(False)
 # Initialize a flag to track connection status
 IS_CONNECTED = False
 
+def split_at_first_delimiter(text):
+    # Use a regex to find the first delimiter that is a valid sentence end
+    match = re.search(r'([.!?])(?=\s|$)', text)
+    if match:
+        delimiter_index = match.start()
+        return [text[:delimiter_index + 1], text[delimiter_index + 1:]]
+    return [text + '.', '']  # Default to '.' if no delimiter exists
+
+
+    
 def on_message(ws, message):
     print("on message:", message)
     io = StringIO(message)

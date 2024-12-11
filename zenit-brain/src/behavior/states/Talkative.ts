@@ -104,8 +104,8 @@ export class Talkative extends StateWrap{
             this.lastEmotion = emotion;
             this.ScreenFace.emotion.setEmotion(this.lastEmotion);
         }
-        console.log("freezedEmotion: " + this.freezedEmotion);
-        console.log("lastEmotion: " + emotion);
+        //console.log("freezedEmotion: " + this.freezedEmotion);
+        //console.log("lastEmotion: " + emotion);
     }
 
     private finalResultHandler(result : any){

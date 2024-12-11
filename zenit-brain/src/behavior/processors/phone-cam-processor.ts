@@ -3,6 +3,7 @@ import EventEmitter from 'events';
 interface PhoneCamRecognition
 {
     emotion: string;
+    face : string;
     percent_x: number;
     percent_y: number;
 }
@@ -18,7 +19,7 @@ export class PhoneCamProcessor {
     bodyLanguageInterpretation : Boolean;
     facialEmotionInputBuffer : Array<string>;
     emotionCounter : Record<string, number>;
-    currentEmotion : String;
+    lastPhoneCamRecognition : PhoneCamRecognition;
     NUM_VALENCE_CLASSES : number;
     EMOTION_BUFFER_LEN : number;
     BEmotion: any;
@@ -33,11 +34,16 @@ export class PhoneCamProcessor {
 
         this.emotionEvent = new EventEmitter();
 
-        this.currentEmotion = "";
+        this.lastPhoneCamRecognition = {
+            "emotion": "0",
+            "face" : "False",
+            "percent_x": 0,
+            "percent_y": 0
+        } as PhoneCamRecognition;
 
         
         this.NUM_VALENCE_CLASSES = 3.333;
-        this.EMOTION_BUFFER_LEN = 5; // frames (5fps currently)
+        this.EMOTION_BUFFER_LEN = 10; // frames (5fps currently)
         this.BEmotion = {
 
             "anger" : ['annoyance','anger', 'rage']
@@ -61,7 +67,7 @@ export class PhoneCamProcessor {
     }
 
     getCurrentRecognition(){
-        return this.currentEmotion;
+        return this.lastPhoneCamRecognition;
     }
 
     /*keyValueInput(value){
@@ -89,7 +95,8 @@ export class PhoneCamProcessor {
         }
         //console.log(emotion);
         this.emotionEvent.emit(PhoneCamProcessor.EMOTION_EVENTS.EMOTION_TRIGGERED, emotion);
-        this.currentEmotion = emotion;
+        this.lastPhoneCamRecognition = phoneCamRecognition;
+        //console.log(this.lastPhoneCamRecognition);
     }
 
     processValueAsFacialExpression(value : string){

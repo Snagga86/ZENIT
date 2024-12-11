@@ -19,6 +19,9 @@ export class Off extends StateWrap{
         this.state.transitions.push(new Transition("talkative", "talkative", () => {
             console.log('transition action for "off" in "talkative" state')
         }));
+        this.state.transitions.push(new Transition("followHead", "followHead", () => {
+            console.log('transition action for "off" in "followHead" state')
+        }));
     }
 
     /* Enter function is executed whenever the state is activated. */

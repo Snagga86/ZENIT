@@ -245,8 +245,22 @@ export class ZENITServer {
 
             /* When KARERO Body is in head follow mode it requests the position data of the first
             person tracked by the azure kinect array. Kinect data is the replied to the robot body. */
-            this.robotControlWS.on('message', (data : any) =>{              
-                if(data == "getPersonCoordinates"){
+            this.robotControlWS.on('message', (data : any) =>{
+                //console.log("on message...")     
+                if(data == "getPersonViewPortPercentages"){
+                    var payload = {
+                        "mode" : "dataSupply",
+                        "activity" : "personViewPortPercentages",
+                        "data" : {
+                            "face" : this.ZENITBrain.phoneCamProcessor.lastPhoneCamRecognition.face,
+                            "percentX" : this.ZENITBrain.phoneCamProcessor.lastPhoneCamRecognition.percent_x,
+                            "percentY" : this.ZENITBrain.phoneCamProcessor.lastPhoneCamRecognition.percent_y
+                        } 
+                    }
+                    //console.log("send..." + JSON.stringify(payload))
+                    this.robotControlWS.send(JSON.stringify(payload));
+                }
+                else if(data == "getPersonCoordinates"){
                     /* Only target closest body */
                     var closestBody = null;
                     var closestDistance = 100000;
@@ -276,7 +290,7 @@ export class ZENITServer {
                         }
                     }
 
-                    var payload = {
+                    var payload_P = {
                         "mode" : "dataSupply",
                         "activity" : "personCoordinates",
                         "data" : {
@@ -290,7 +304,7 @@ export class ZENITServer {
                         } 
                     }
 
-                this.robotControlWS.send(JSON.stringify(payload));
+                this.robotControlWS.send(JSON.stringify(payload_P));
                 }
             });
         });

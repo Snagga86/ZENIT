@@ -56,12 +56,21 @@ def receive_frame(conn):
         # Receive frame data
         frame_data = recv_exact(conn, frame_size)
 
-        # Convert raw data to an image
-        raw_image = np.frombuffer(frame_data, dtype=np.uint8).reshape((height, width, 3))
-        frame = cv2.cvtColor(raw_image, cv2.COLOR_RGB2BGR)
-        frame = cv2.flip(frame, 0)
+        # Convert raw data (RGB565) to an image
+        raw_image = np.frombuffer(frame_data, dtype=np.uint16).reshape((height, width))
 
-        return frame
+        # Extract RGB channels from RGB565 format
+        r = ((raw_image >> 11) & 0x1F) * 255 // 31  # Red: 5 bits, scaled to 8-bit
+        g = ((raw_image >> 5) & 0x3F) * 255 // 63   # Green: 6 bits, scaled to 8-bit
+        b = (raw_image & 0x1F) * 255 // 31          # Blue: 5 bits, scaled to 8-bit
+
+        # Combine into a BGR image (OpenCV uses BGR by default)
+        bgr_image = np.stack((b, g, r), axis=-1).astype(np.uint8)
+
+        # Flip the image vertically if required
+        bgr_image = cv2.flip(bgr_image, 0)
+
+        return bgr_image
     except ConnectionError as e:
         print(f"Error: {e}")
         return None
@@ -71,7 +80,9 @@ def receive_frame(conn):
 
 # Detect Faces
 def detect_faces(frame, mtcnn):
+    
     faces, _ = mtcnn.detect(frame)
+    print(faces)
     if faces is None:
         return None
     return faces
@@ -95,7 +106,9 @@ def calculate_middle_point(face, frame_shape):
     x1, y1, x2, y2 = face
     middle_x = (x1 + x2) / 2
     middle_y = (y1 + y2) / 2
-    percent_x = (middle_x / frame_shape[1]) * 100
+    percent_x = (middle_x / frame_shape[1]) * 100 + 3
+    if percent_x < 0:
+        percent_x = 0
     percent_y = (middle_y / frame_shape[0]) * 100
     return percent_x, percent_y
 
@@ -142,12 +155,21 @@ def start_server(host='0.0.0.0', port=6666):
                         # Send data via UDP
                         data = {
                             "emotion": emotion,
+                            "face" : "True",
                             "percent_x": percent_x,
                             "percent_y": percent_y
                         }
                         json_data = json.dumps(data)
                         sock.sendto(bytes(json_data, "utf-8"), (UDP_IP, UDP_PORT))
-
+                else:
+                        data = {
+                            "emotion": "",
+                            "face" : "False",
+                            "percent_x": "",
+                            "percent_y": ""
+                        }
+                        json_data = json.dumps(data)
+                        sock.sendto(bytes(json_data, "utf-8"), (UDP_IP, UDP_PORT))
                 # Display the frame
                 cv2.imshow('Video Stream with Face and Emotion Detection', frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to quit
