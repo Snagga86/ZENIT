@@ -107,16 +107,41 @@ public class FaceActionController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(isPlaying);
+        Debug.Log(this.soundPlayer.GetComponent<AudioSource>().isPlaying);
+        if (!this.soundPlayer.GetComponent<AudioSource>().isPlaying)
+        {
+            Debug.Log("!isPlaying && !this.soundPlayer.GetComponent<AudioSource>().isPlaying");
+            if (this.networkController.primaryAudioClip != null)
+            {
+                Debug.Log("setAudioClip");
+                Debug.Log(this.networkController.primaryAudioClip);
+                this.setAudioClip(this.networkController.primaryAudioClip);
+                this.networkController.primaryAudioClip = null;
+                this.playSound();
+            }
+        }
+
+        if (!this.soundPlayer.GetComponent<AudioSource>().isPlaying)
+        {
+            if(this.networkController.secondaryAudioClip != null)
+            {
+                this.setAudioClip(this.networkController.secondaryAudioClip);
+                this.networkController.secondaryAudioClip = null;
+                this.playSound();
+            }
+        }
+
         if (isPlaying && !this.soundPlayer.GetComponent<AudioSource>().isPlaying)
         {
             isPlaying = false;
-            if(this.soundPlayer.GetComponent<AudioSource>().clip.name != "confirmSpeechInput")
+            if (this.soundPlayer.GetComponent<AudioSource>().clip.name != "confirmSpeechInput")
             {
                 OnAudioPlaybackComplete();
             }
         }
 
-        if (lastEmotion != displayEmotion)
+            if (lastEmotion != displayEmotion)
         {
             Debug.Log("change face: " + displayEmotion);
             this.startFace = this.getStartFace(eyeLeft, eyeRight);

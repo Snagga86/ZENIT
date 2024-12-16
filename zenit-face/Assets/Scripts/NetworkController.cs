@@ -32,6 +32,9 @@ public class NetworkController : MonoBehaviour
     private string nonverbalAction = "";
     private string verbalAction = "";
 
+    public string lastRequestPartial = "";
+    public AudioClip primaryAudioClip;
+    public AudioClip secondaryAudioClip;
 
     void Start()
     {
@@ -77,6 +80,9 @@ public class NetworkController : MonoBehaviour
     {
         //var payload = "{\"action\": \"screenTouch\" }";
         this.faceActionController.blinkDisgusted();
+        this.primaryAudioClip = null;
+        this.secondaryAudioClip = null;
+        this.lastRequestPartial = "";
         this.faceActionController.nameSound("breakSpeech");
         this.faceActionController.playSound();
     }
@@ -88,6 +94,9 @@ public class NetworkController : MonoBehaviour
     {
         //var payload = "{\"action\": \"screenTouch\" }";
         this.faceActionController.blinkDisgusted();
+        this.primaryAudioClip = null;
+        this.secondaryAudioClip = null;
+        this.lastRequestPartial = "";
         this.faceActionController.nameSound("breakSpeech");
         this.faceActionController.playSound();
     }
@@ -190,7 +199,7 @@ public class NetworkController : MonoBehaviour
                         break;
                     case "speak":
                         Debug.Log("speak");
-                        StartCoroutine(RequestAudio(jsonControlObject.extra));
+                        StartCoroutine(RequestAudio(jsonControlObject.extra, jsonControlObject.partial));
                         break;
                 }
             }
@@ -253,23 +262,41 @@ public class NetworkController : MonoBehaviour
         this.webSocket.Connect();
     }
 
-    private IEnumerator RequestAudio(string filename)
+    private IEnumerator RequestAudio(string filename, string partial)
     {
-        string audioUrl = $"{httpUrl}?filename={filename}";
-        Debug.Log(audioUrl);
-        using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
+        if(partial == "partial_2" && this.lastRequestPartial != "partial_1")
         {
-            yield return www.SendWebRequest();
+            Debug.Log("Prevent Request...");
+        }
+        else
+        {
+            this.lastRequestPartial = partial;
+            string audioUrl = $"{httpUrl}?filename={filename}";
+            Debug.Log(audioUrl);
+            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
+            {
+                yield return www.SendWebRequest();
 
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                AudioClip newAudioClip = DownloadHandlerAudioClip.GetContent(www);
-                this.faceActionController.setAudioClip(newAudioClip);
-                this.faceActionController.playSound();
-            }
-            else
-            {
-                Debug.LogError($"Failed to load audio: {www.error}");
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    AudioClip newAudioClip = DownloadHandlerAudioClip.GetContent(www);
+                    if (this.lastRequestPartial == "none")
+                    {
+                        this.primaryAudioClip = newAudioClip;
+                    }
+                    else if (this.lastRequestPartial == "partial_1")
+                    {
+                        this.primaryAudioClip = newAudioClip;
+                    }
+                    else if (this.lastRequestPartial == "partial_2")
+                    {
+                        this.secondaryAudioClip = newAudioClip;
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"Failed to load audio: {www.error}");
+                }
             }
         }
     }

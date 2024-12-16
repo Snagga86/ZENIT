@@ -8,6 +8,12 @@ interface OSCPayload {
     translatedBodies: { x: number; y: number; z: number }[];
 }
 
+interface SoundFilePayload {
+    name: string;      // Path to the generated sound file
+    duration: number;  // Duration of the sound file in seconds
+    partial: string; // Identifier for the partial file number
+}
+
 /**
  * ZENITServer Class
  * 
@@ -195,18 +201,16 @@ export class ZENITServer {
             this.ZENITBrain.setSpeechSynthesisWS(webSocket);
 
             this.textToSpeechWS.on('message', (data : any) =>{
-                //console.log(data.toString('utf8'))
-                var soundName = data.toString('utf8').split(';')[0];
-                var soundDuration = parseFloat(data.toString('utf8').split(';')[1]) * (1/this.soundPitch);
-                
-                this.ZENITBrain?.speechProcessor?.soundCreated(soundName, soundDuration);
+                var soundInformation: SoundFilePayload = JSON.parse(data.toString('utf8')) as SoundFilePayload;
+                this.ZENITBrain?.speechProcessor?.soundCreated(soundInformation.name, soundInformation.duration);
 
                 var facePayload = {
                     "mode" : "setSound",
                     "data" : "speak",
-                    "extra" : soundName
+                    "extra" : soundInformation.name,
+                    "partial" : soundInformation.partial
                 }
-
+                console.log(facePayload);
                 try{
                     console.log("Sending Text to speak to display device...")
                     this.displayControlWS.send(JSON.stringify(facePayload));

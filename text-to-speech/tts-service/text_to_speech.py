@@ -45,33 +45,58 @@ def split_at_first_delimiter(text):
         return [text[:delimiter_index + 1], text[delimiter_index + 1:]]
     return [text + '.', '']  # Default to '.' if no delimiter exists
 
-
-    
 def on_message(ws, message):
     print("on message:", message)
     io = StringIO(message)
     json_obj = json.load(io)
+    partial = ""
     if json_obj['mode'] == "tts":
-        text_to_generate = json_obj['text']
-        #file = text_to_generate.replace(' ', '').replace('.','').replace(',','').replace(';','')
-        #First parameter is the replacement, second parameter is your input string
-        file = regex.sub('', text_to_generate)
-        file = file[:100]
-        file = file + ".wav"
-        file_path = "./generatedSoundFiles/" + file
+        split_message = split_at_first_delimiter(json_obj['text'])
 
-        if os.path.exists(file_path):
-            duration = librosa.get_duration(filename=file_path)
-            print("File already exists, duration: " + str(duration))
+        print(split_message[0])
+        print(split_message[1])
+
+        if split_message[1] == "":
+            partial = "none"
+            file = get_file_name_for_text(split_message[0])
+            generate_sound_file(split_message[0], partial, file)
         else:
-            print("before file creation")
-            tts.tts_to_file(text=text_to_generate, file_path=file_path)
-            print("after file creation")
-            duration = librosa.get_duration(filename=file_path)
-            print("File successfully created, duration: " + str(duration))
-      
-        payload = file + ";" + str(duration)
-        backsend(payload)
+            partial1 = "partial_1"
+            file1 = get_file_name_for_text(split_message[0])
+            generate_sound_file(split_message[0], partial1, file1)
+            partial2 = "partial_2"
+            file2 = get_file_name_for_text(split_message[1])
+            generate_sound_file(split_message[1], partial2, file2)
+        
+
+def generate_sound_file(text, partial, file):
+
+    path = "./generatedSoundFiles/" + file
+
+    if os.path.exists(path):
+        duration = librosa.get_duration(filename=path)
+        print("File already exists, duration: " + str(duration))
+    else:
+        print("before file creation")
+        tts.tts_to_file(text=text, file_path=path)
+        print("after file creation")
+        duration = librosa.get_duration(filename=path)
+        print("File successfully created, duration: " + str(duration))
+    
+    payload = {
+        "name": file,
+        "duration": duration,
+        "partial": partial
+    }
+    
+    backsend(json.dumps(payload))
+
+def get_file_name_for_text(text):
+    file = regex.sub('', text)
+    file = file[:100]
+    file = file + ".wav"
+
+    return file
 
 def on_error(ws, error):
     print(error)
