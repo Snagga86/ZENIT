@@ -1,4 +1,4 @@
-import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { StateController, Actions, Transition, ZENITState } from '../zenit-state.js';
 import { Brain } from '../../brain.js';
 import { EventEmitter } from 'stream';
 import { PhoneCamProcessor } from '../../processors/phone-cam-processor.js';
@@ -6,7 +6,7 @@ import { BodyLanguageProcessor } from '../../processors/body-language-processor.
 import { SpeechProcessor } from '../../processors/speech-processor.js';
 
 /* Robot state class defining the robot behavior within this state */
-export class Look extends StateWrap{
+export class Look extends ZENITState{
 
     private LOOK1_ANTICIPATED_ANIMATION_DURATION : number;
     private LOOK2_ANTICIPATED_ANIMATION_DURATION : number;

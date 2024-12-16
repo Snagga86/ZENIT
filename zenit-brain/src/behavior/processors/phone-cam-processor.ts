@@ -1,30 +1,56 @@
+/**
+ * PhoneCamProcessor
+ * 
+ * A module for processing and interpreting data from a phone camera. This class
+ * handles facial emotion recognition, facial position and size, processes input data, and emits events 
+ * related to detected emotions.
+ * 
+ * Dependencies:
+ * - `EventEmitter` from the `events` module for event-driven programming.
+ * 
+ * Interfaces:
+ * - `PhoneCamRecognition`: Represents the structure of phone camera recognition data.
+ */
+
 import EventEmitter from 'events';
 
-interface PhoneCamRecognition
-{
-    emotion: string;
-    face : string;
-    percent_x: number;
-    percent_y: number;
+/**
+ * Interface defining the structure of recognition data.
+ */
+interface PhoneCamRecognition {
+    emotion: string; // Emotion detected
+    face: string; // Face detection status
+    percent_x: number; // X-coordinate percentage of face
+    percent_y: number; // Y-coordinate percentage of face
 }
 
+/**
+ * PhoneCamProcessor class to handle phone camera recognition data.
+ */
 export class PhoneCamProcessor {
 
+    /** Static events related to emotion processing */
     public static EMOTION_EVENTS = {
         EMOTION_TRIGGERED: 'EMOTION_TRIGGERED'
-    }
+    };
 
-    emotionEvent : EventEmitter;
-    facialExpressionsInterpretation : Boolean;
-    bodyLanguageInterpretation : Boolean;
-    facialEmotionInputBuffer : Array<string>;
-    emotionCounter : Record<string, number>;
-    lastPhoneCamRecognition : PhoneCamRecognition;
-    NUM_VALENCE_CLASSES : number;
-    EMOTION_BUFFER_LEN : number;
-    BEmotion: any;
+    emotionEvent: EventEmitter; // EventEmitter for emotion events
+    facialExpressionsInterpretation: boolean; // Flag for interpreting facial expressions
+    bodyLanguageInterpretation: boolean; // Flag for interpreting body language
+    facialEmotionInputBuffer: Array<string>; // Buffer for facial emotion inputs
+    emotionCounter: Record<string, number>; // Counter for emotion occurrences
+    lastPhoneCamRecognition: PhoneCamRecognition; // Last processed recognition data
+    NUM_AROUSAL_LEVELS: number; // Number of arousal levels for emotion classification
+    EMOTION_BUFFER_LEN: number; // Length of emotion buffer
+    BEmotion: Record<string, string[]>; // Emotion mapping for arousal lvel
 
-    constructor(facialExpressionsInterpretation=true, bodyLanguageInterpretation=false) {
+    /**
+     * Constructor to initialize PhoneCamProcessor.
+     * 
+     * @param {boolean} facialExpressionsInterpretation - Enables facial expression interpretation.
+     * @param {boolean} bodyLanguageInterpretation - Enables body language interpretation.
+     */
+    constructor(facialExpressionsInterpretation = true, bodyLanguageInterpretation = false) {
 
         this.facialExpressionsInterpretation = facialExpressionsInterpretation;
         this.bodyLanguageInterpretation = bodyLanguageInterpretation;
@@ -35,144 +61,142 @@ export class PhoneCamProcessor {
         this.emotionEvent = new EventEmitter();
 
         this.lastPhoneCamRecognition = {
-            "emotion": "0",
-            "face" : "False",
-            "percent_x": 0,
-            "percent_y": 0
-        } as PhoneCamRecognition;
+            emotion: "0",
+            face: "False",
+            percent_x: 0,
+            percent_y: 0
+        };
 
-        
-        this.NUM_VALENCE_CLASSES = 3.333;
+        this.NUM_AROUSAL_LEVELS = 3.333;
         this.EMOTION_BUFFER_LEN = 10; // frames (5fps currently)
         this.BEmotion = {
-
-            "anger" : ['annoyance','anger', 'rage']
-            ,
-            "anticipation" : ['interest','anticipation','vigilance']
-            ,
-            "happiness" :  ['serenity','joy','ecstasy']
-            ,
-            "trust" : ['acceptance', 'trust', 'admiration']
-            ,
-            "fear" : ['apprehension', 'fear', 'terror']
-            ,
-            "surprise" : ['distraction','surprise','amazement']
-            ,
-            "sadness" : ['pensiveness', 'sadness', 'grief']
-            ,
-            "disgust" : ['boredom', 'disgust','loathing']
-            ,
-            "contempt" : ['contempt', 'contempt','contempt']
-        }
+            anger: ['annoyance', 'anger', 'rage'],
+            anticipation: ['interest', 'anticipation', 'vigilance'],
+            happiness: ['serenity', 'joy', 'ecstasy'],
+            trust: ['acceptance', 'trust', 'admiration'],
+            fear: ['apprehension', 'fear', 'terror'],
+            surprise: ['distraction', 'surprise', 'amazement'],
+            sadness: ['pensiveness', 'sadness', 'grief'],
+            disgust: ['boredom', 'disgust', 'loathing'],
+            contempt: ['contempt', 'contempt', 'contempt']
+        };
     }
 
-    getCurrentRecognition(){
+    /**
+     * Retrieves the last phone camera recognition data.
+     * 
+     * @returns {PhoneCamRecognition} The last recognition data.
+     */
+    public getCurrentRecognition(): PhoneCamRecognition {
         return this.lastPhoneCamRecognition;
     }
 
-    /*keyValueInput(value){
-        if(this.facialExpressionsInterpretation == true){
-            var emotion = this.processValueAsFacialExpression(value);
-        }
-        if(this.bodyLanguageInterpretation == true){
-            this.processValueAsBodyLanguage(value);
-        }
-        this.currentEmotion = emotion;
-        return emotion;
-    }*/
+    /**
+     * Processes raw phone camera recognition data and emits an emotion event.
+     * 
+     * @param {string} rawPhoneCamRecognition - Raw recognition data in JSON string format.
+     */
+    public digest(rawPhoneCamRecognition: string): void {
+        const phoneCamRecognition: PhoneCamRecognition = JSON.parse(rawPhoneCamRecognition) as PhoneCamRecognition;
+        let emotion = "";
 
-    digest(rawPhoneCamRecognition : string) {
-        //console.log("rawPhoneCamRecognition");
-        //console.log(rawPhoneCamRecognition);
-        var phoneCamRecognition : PhoneCamRecognition = JSON.parse(rawPhoneCamRecognition) as PhoneCamRecognition;
-        var emotion : string = "";
-        if(this.facialExpressionsInterpretation == true){
+        if (this.facialExpressionsInterpretation) {
             emotion = this.processValueAsFacialExpression(phoneCamRecognition.emotion.toLowerCase());
-            //console.log("processed emotion: " + emotion);
         }
-        if(this.bodyLanguageInterpretation == true){
+
+        if (this.bodyLanguageInterpretation) {
             this.processValueAsBodyLanguage(phoneCamRecognition.emotion.toLowerCase());
         }
-        //console.log(emotion);
+
         this.emotionEvent.emit(PhoneCamProcessor.EMOTION_EVENTS.EMOTION_TRIGGERED, emotion);
         this.lastPhoneCamRecognition = phoneCamRecognition;
-        //console.log(this.lastPhoneCamRecognition);
     }
 
-    processValueAsFacialExpression(value : string){
+    /**
+     * Processes a facial expression value and determines the most likely emotion.
+     * 
+     * @param {string} value - The facial expression value.
+     * @returns {string} The classified emotion and arousal class.
+     */
+    private processValueAsFacialExpression(value: string): string {
         this.facialEmotionInputBuffer.push(value);
-        if(this.facialEmotionInputBuffer.length > this.EMOTION_BUFFER_LEN){
+
+        if (this.facialEmotionInputBuffer.length > this.EMOTION_BUFFER_LEN) {
             this.facialEmotionInputBuffer.shift();
         }
+
         this.facialEmotionInputBuffer.forEach(element => {
             this.emotionCounter[element] = (this.emotionCounter[element] || 0) + 1;
         });
 
-        var currentEmotion = this.maxKeyValue(this.emotionCounter);
-        //console.log("currentEmotion: " + currentEmotion[0]);
-        var emotionAndValenceClass = this.getEmotionAndValence(currentEmotion[0] as string, currentEmotion[1]);
+        const currentEmotion = this.maxKeyValue(this.emotionCounter);
+        const arousal = this.getArousal(currentEmotion[0], currentEmotion[1]);
         this.emotionCounter = {};
 
-        return emotionAndValenceClass;
+        return arousal;
     }
 
-    getEmotionAndValence(emotion : string, count : any){
-        var valence = ((count + 1) / this.EMOTION_BUFFER_LEN) * 10 / this.NUM_VALENCE_CLASSES;
-        var valenceClass = Math.floor(valence) - 1;
-        //var valenceClass = 1;
-        //if(valenceClass < 0)valenceClass = 0;
-        //console.log(emotion + ": " + valence);
-        //console.log(emotion + ": " + valenceClass);
-        switch(emotion){
+    /**
+     * Maps an emotion and count to a level of arousal.
+     * 
+     * @param {string} emotion - The emotion to classify.
+     * @param {number} count - The occurrence count of the emotion.
+     * @returns {string} The classified emotion with arousal level.
+     */
+    private getArousal(emotion: string, count: number): string {
+        const avgLevel = ((count + 1) / this.EMOTION_BUFFER_LEN) * 10 / this.NUM_AROUSAL_LEVELS;
+        const arousalLevel = Math.max(0, Math.floor(avgLevel) - 1);
+
+        switch (emotion) {
             case "anger":
-                emotion = this.BEmotion.anger[valenceClass];
-                break;
+                return this.BEmotion.anger[arousalLevel];
             case "anticipation":
-                emotion = this.BEmotion.anticipation[valenceClass];
-                break;
+                return this.BEmotion.anticipation[arousalLevel];
             case "happiness":
-                emotion = this.BEmotion.happiness[valenceClass];
-                break;
+                return this.BEmotion.happiness[arousalLevel];
             case "trust":
-                emotion = this.BEmotion.trust[valenceClass];
-                break;
+                return this.BEmotion.trust[arousalLevel];
             case "fear":
-                emotion = this.BEmotion.fear[valenceClass];
-                break;
+                return this.BEmotion.fear[arousalLevel];
             case "surprise":
-                emotion = this.BEmotion.surprise[valenceClass];
-                break;
+                return this.BEmotion.surprise[arousalLevel];
             case "sadness":
-                emotion = this.BEmotion.sadness[valenceClass];
-                break;
+                return this.BEmotion.sadness[arousalLevel];
             case "disgust":
-                emotion = this.BEmotion.disgust[valenceClass];
-                break;
+                return this.BEmotion.disgust[arousalLevel];
             case "contempt":
-                emotion = this.BEmotion.contempt[valenceClass];
-                break;
+                return this.BEmotion.contempt[arousalLevel];
             default:
-                emotion = "neutral";
+                return "neutral";
         }
-        //console.log("Emotion:" + emotion);
-        return emotion;
     }
 
-    maxKeyValue(data: Record<string, number>): [string, number] {
-        let lastValue: number = 0;
-        let lastKey: string = "";
-    
+    /**
+     * Retrieves the key-value pair with the highest value from a record.
+     * 
+     * @param {Record<string, number>} data - The data to evaluate.
+     * @returns {[string, number]} The key-value pair with the maximum value.
+     */
+    private maxKeyValue(data: Record<string, number>): [string, number] {
+        let lastValue = 0;
+        let lastKey = "";
+
         for (const [key, value] of Object.entries(data)) {
             if (value > lastValue) {
                 lastValue = value;
                 lastKey = key;
             }
         }
-    
+
         return [lastKey, lastValue];
     }
 
-    processValueAsBodyLanguage(value : any){
-
+    /**
+     * Processes body language values (placeholder for future implementation).
+     * 
+     * @param {string} value - The body language data.
+     */
+    private processValueAsBodyLanguage(value: string): void {
+        // Placeholder for future body language interpretation logic
     }
 }

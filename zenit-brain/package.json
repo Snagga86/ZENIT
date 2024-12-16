@@ -17,11 +17,25 @@
     "@types/source-map-support": "^0.5.10",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "typedoc": "^0.27.5",
     "typescript": "^5.7.2"
   },
   "scripts": {
     "start": "node dist/server-start.js",
     "prestart": "npm run build",
-    "build": "tsc"
+    "build": "tsc",
+    "typedoc": "typedoc"
+  },
+  "typedocOptions": {
+    "entryPoints": [
+      "src/server-start.ts"
+    ],
+    "out": "docs",
+    "includeVersion": true,
+    "highlightLanguages": [
+      "typescript",
+      "javascript",
+      "python"
+    ]
   }
 }

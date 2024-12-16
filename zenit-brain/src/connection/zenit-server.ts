@@ -4,6 +4,28 @@ import http from "http";
 import WebSocket from "ws";
 import { Brain } from '../behavior/brain.js';
 
+interface OSCPayload {
+    translatedBodies: { x: number; y: number; z: number }[];
+}
+
+/**
+ * ZENITServer Class
+ * 
+ * The `ZENITServer` class is responsible for managing various network services required for the ZENIT robotic system.
+ * It facilitates communication between different hardware components, software modules, and external systems such as
+ * Azure Kinect, emotion recognition, speech transcription, and robotic control.
+ * 
+ * Key Features:
+ * - Manages UDP sockets for Kinect and emotion detection data streams.
+ * - Establishes WebSocket connections for speech synthesis, robotic control, and display communication.
+ * - Processes incoming data and relays it to the appropriate components of the ZENIT Brain.
+ * 
+ * Dependencies:
+ * - `dgram` for UDP socket communication.
+ * - `osc-js` for OSC protocol support.
+ * - `ws` for WebSocket communication.
+ * - `Brain` for processing and business logic integration.
+ */
 export class ZENITServer {
 
     networkConfig: any; // Replace with the actual type if available
@@ -64,32 +86,31 @@ export class ZENITServer {
         this.speechTranscriptionStreamSocket = dgram.createSocket('udp4');
     }
 
-    /* Starts all network services for KARERO interaction. 
-    Azure Kinetic Space: The data is received via OSC protocol. Receive data only.
-    Emotion Recognition: The data is received by UDP stream. Receive data only.
-    Robot Arm: The data is sent and received via Websocket.
-    Robot Display: The data is sent via Websocket. Send data only. */
-    startAllNetworkServices(){
-
-        /* -------- Azure Kinetic Space -------- */
+    /**
+    * Sets up Azure Kinect services.
+    */
+    private setupAzureKinectService(): void {
         /* Open the OSC/UDP data receive connection to Azure Kinetic Space. */
-        this.osc.open({ host: this.networkConfig.KinectNetwork.IpAddress, port: this.networkConfig.KinectNetwork.Port })
+        this.osc.open({ host: this.networkConfig.KinectNetwork.IpAddress, port: this.networkConfig.KinectNetwork.Port });
 
         /* On incoming OSC data from Azure Kinetic Space this data is processed for possible usage
-        in the KARERO Brain/business logic. */
-        this.osc.on('/data', (message : any)  => {
-
-            var data = JSON.parse(message.args)
-            this.tmpOSCPayload = data
+        in the ZENIT Brain/business logic. */
+        this.osc.on('/data', (message: any) => {
+            const data: OSCPayload = JSON.parse(message.args);
+            this.tmpOSCPayload = data;
             this.ZENITBrain.processKinectRecognition(data);
         });
+    }
 
-        /* -------- Emotion Recognition -------- */
+    /**
+    * Sets up Phone Camera services.
+    */
+    private setupPhoneCameraService(): void {
         /* Bind the UDP socket to receive recognized basic emotions from the emotion detection
         network. */
         this.phoneCamDetectionSocket.bind(this.networkConfig.EmotionNetwork.Port);
 
-        /* Incoming data from the emotion detection network is processed in the KARERO brain. */
+        /* Incoming data from the emotion detection network is processed in the ZENIT brain. */
         this.phoneCamDetectionSocket.on('message', (msg, rinfo) => {
             this.ZENITBrain.processPhoneCamRecognition(msg.toString());
         });
@@ -105,13 +126,17 @@ export class ZENITServer {
             const address = this.phoneCamDetectionSocket.address();
             console.log(`python server listening ${address.address}:${address.port}`);
         });
+    }
 
-        /* -------- Speech Recognition -------- */
+    /**
+    * Sets up microphone and speech transcription service.
+    */
+    private setupMicrophoneService(): void {
         /* Bind the UDP socket to receive recognized basic emotions from the TTS detection
         network. */
         this.speechTranscriptionStreamSocket.bind(this.networkConfig.SpeechNetwork.Port);
 
-        /* Incoming data from the TTS detection network is processed in the KARERO brain. */
+        /* Incoming data from the TTS detection network is processed in the ZENIT brain. */
         this.speechTranscriptionStreamSocket.on('message', (msg, rinfo) => {
             this.ZENITBrain.processSpeechRecognition(msg.toString());
         });
@@ -134,7 +159,7 @@ export class ZENITServer {
             console.log("stt control server start");
         });
 
-        /* On incoming connection of the KARERO STT in KARERO Brain. */
+        /* On incoming connection of the ZENIT STT in ZENIT Brain. */
         this.speechTranscriptionControlWSS.on('connection', (webSocket : any) =>{
             console.log("Speech-To-Text control connection established");
             this.speechTranscriptionControlWS = webSocket;
@@ -152,14 +177,18 @@ export class ZENITServer {
             console.log("connection disonnected");
             //this.textToSpeechWS = null;
         });
-        
-        /* -------- Speech Synthesis -------- */
-        /* Start the server to communicate with KARERO TTS application. */
+    }
+
+    /**
+    * Sets up speech synthesis service.
+    */
+    private setupSpeechSynthesisService(): void {
+        /* Start the server to communicate with ZENIT TTS application. */
         this.textToSpeechWSS = new WebSocket.Server({host: this.networkConfig.TTSNetwork.IpAddress, port: this.networkConfig.TTSNetwork.Port}, ()=>{
             console.log("tts control server start");
         });
 
-        /* On incoming connection of the KARERO TTS in KARERO Brain. */
+        /* On incoming connection of the ZENIT TTS in ZENIT Brain. */
         this.textToSpeechWSS.on('connection', (webSocket : any) =>{
             console.log("Text-To-Speech control connection established");
             this.textToSpeechWS = webSocket;
@@ -199,15 +228,19 @@ export class ZENITServer {
             console.log("connection disonnected");
             this.textToSpeechWS = null;
         });
+    }
 
-        /* -------- Display/Face Communication -------- */
-        /* Start the server to communicate with KARERO Face application. */
+    /**
+    * Sets up service to controll the Unity app running on the mobile phone.
+    */
+    private setupPhoneAppControlService(): void {
+        /* Start the server to communicate with ZENIT Face application. */
         this.displayControlWSS = new WebSocket.Server({host: this.networkConfig.DisplayNetwork.IpAddress, port: this.networkConfig.DisplayNetwork.Port}, ()=>{
             console.log("display control server start");
         });
 
-        /* On incoming connection of the KARERO Face/Display, e.g. table or cell phone set
-        the connection web socket in KARERO Brain. */
+        /* On incoming connection of the ZENIT Face/Display, e.g. table or cell phone set
+        the connection web socket in ZENIT Brain. */
         this.displayControlWSS.on('connection', (webSocket : any) =>{
             console.log("display control connection established");
             this.displayControlWS = webSocket;
@@ -229,21 +262,25 @@ export class ZENITServer {
             console.log("connection disonnected");
             this.displayControlWS = null;
         });
+    }
 
-        /* -------- MechArm Robot Communication -------- */
-        /* Start the server to communicate with KARERO Body application. */
+    /**
+    * Sets up control service for the robotic arm.
+    */
+    private setupRobotControlService(): void {
+        /* Start the server to communicate with ZENIT Body application. */
         this.robotControlWSS = new WebSocket.Server({host: this.networkConfig.RobotNetwork.IpAddress, port: this.networkConfig.RobotNetwork.Port}, ()=>{
             console.log("robot control server start");
         });
 
-        /* On incoming connection of the KARERO body/MechArm set the connection web socket
-        in KARERO Body. */
+        /* On incoming connection of the ZENIT body/MechArm set the connection web socket
+        in ZENIT Body. */
         this.robotControlWSS.on('connection', (webSocket : any) =>{
             console.log("robot control connection established");
             this.robotControlWS = webSocket;
             this.ZENITBrain.setBrainRobotBodyTransmissionWS(webSocket);
 
-            /* When KARERO Body is in head follow mode it requests the position data of the first
+            /* When ZENIT Body is in head follow mode it requests the position data of the first
             person tracked by the azure kinect array. Kinect data is the replied to the robot body. */
             this.robotControlWS.on('message', (data : any) =>{
                 //console.log("on message...")     
@@ -308,5 +345,17 @@ export class ZENITServer {
                 }
             });
         });
+    }
+
+    /**
+    * Sets up all network services required to run ZENIT.
+    */
+    public startAllNetworkServices(){
+        this.setupAzureKinectService();
+        this.setupMicrophoneService();
+        this.setupPhoneAppControlService();
+        this.setupPhoneCameraService();
+        this.setupSpeechSynthesisService();
+        this.setupRobotControlService();
     }
 }

@@ -34,16 +34,16 @@ import { EmergencyCall } from './states/heatprotection/EmergencyCall.js';
 
 import { FacialMimicry } from './states/facialmimicry/FacialMimicry.js'; */
 
-import { Off } from './states/Off.js'
-import { IdleAnchor } from './states/idling/IdleAnchor.js';
-import { Jawn } from './states/idling/Jawn.js';
-import { Look } from './states/idling/Look.js';
-import { Nap } from './states/idling/Nap.js';
-import { NapWake } from './states/idling/NapWake.js';
+import { Off } from './states/off.js'
+import { IdleAnchor } from './states/idling/idle-anchor.js';
+import { Jawn } from './states/idling/jawn.js';
+import { Look } from './states/idling/look.js';
+import { Nap } from './states/idling/nap.js';
+import { NapWake } from './states/idling/nap-wake.js';
 //import { Relax } from './states/idling/Relax.js';
 //import { Stretch } from './states/idling/Stretch.js';
-import { Talkative } from './states/Talkative.js';
-import { FollowHead } from './states/FollowHead.js';
+import { Talkative } from './states/talkative.js';
+import { FollowHead } from './states/follow-head.js';
 
 /* ZENIT Brain is the busieness logic for the ZENIT robot interaction. It receives data
 from versatile recognition systems; 1. atm emotional status based on facial expression emotion detection,
@@ -212,7 +212,7 @@ export class Brain{
     }
 
     /* Set the transmission websocket for robot arm action connection. */
-    setBrainRobotBodyTransmissionWS(ws : any){
+    public setBrainRobotBodyTransmissionWS(ws : any){
         this.robotBodyWS = ws;
          
         /* Fire enter on off state when robot arm is connected. */
@@ -223,45 +223,45 @@ export class Brain{
     }
 
     /* Set the transmission websocket for robot face action connection. */
-    setBrainRobotFaceTransmissionWS(ws : any){
+    public setBrainRobotFaceTransmissionWS(ws : any){
         this.robotFaceWS = ws;
     }
 
     /* Set the transmission websocket for text to speech action connection. */
-    setSpeechSynthesisWS(ws : any){
+    public setSpeechSynthesisWS(ws : any){
         this.speechSynthesisWS = ws;
     }
 
     /* Set the transmission websocket for speech to text action connection. */
-    setSpeechTranscriptonControlWS(ws : any){
+    public setSpeechTranscriptonControlWS(ws : any){
         this.speechTranscriptionWS = ws;
     }
 
     /* Process raw data of gestures/postures detection. */
-    processKinectRecognition(data : any){
+    public processKinectRecognition(data : any){
         this.bodyLanguageProcessor.digest(data);
     }
 
     /* Process raw data of facial emotion detection. */
-    processPhoneCamRecognition(data : string){
+    public processPhoneCamRecognition(data : string){
         this.phoneCamProcessor.digest(data);
     }
 
-    processBrainRobotFaceInput(data : any){
+    public processBrainRobotFaceInput(data : any){
         this.displayProcessor.digest(data);
     }
 
     /* Process raw data of speech detection. */
-    processSpeechRecognition(data : any){
+    public processSpeechRecognition(data : any){
             this.speechProcessor.digest(data);
     }
 
-    getStateDefinition(state : any, stateMachineDefinition : any){
+    private getStateDefinition(state : any, stateMachineDefinition : any){
         return stateMachineDefinition[state];
     };
 
     /* Create the base state machine. */
-    createMachine(stateMachineDefinition : any) {
+    private createMachine(stateMachineDefinition : any) {
         const machine = {
             value: stateMachineDefinition.initialState, /* Initial State [String] */
 

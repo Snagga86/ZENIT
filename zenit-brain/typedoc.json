@@ -1,0 +1,9 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "name": "ZENIT",
+    "entryPoints": ["./src"],
+    "entryPointStrategy": "expand",
+    "out": "documentation",
+    "includeVersion": true
+}
+  

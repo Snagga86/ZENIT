@@ -1,4 +1,4 @@
-import { State, Actions, Transition, StateWrap } from '../BaseState.js';
+import { StateController, Actions, Transition, ZENITState } from '../zenit-state.js';
 import { Brain } from '../../brain.js';
 import { EventEmitter } from 'stream';
 import { PhoneCamProcessor } from '../../processors/phone-cam-processor.js';
@@ -7,7 +7,7 @@ import { SpeechProcessor } from '../../processors/speech-processor.js';
 
 
 /* Robot state class defining the robot behavior within this state */
-export class Relax extends StateWrap{
+export class Relax extends ZENITState{
 
     ANTICIPATED_ANIMATION_DURATION : number;
     timeout : NodeJS.Timeout | null;
@@ -44,7 +44,7 @@ export class Relax extends StateWrap{
         mode: setMode | DataSupply
         activity: The strategy interpreted and executed by the connected robot device */
 
-        this.ScreenFace.emotion.rage();
+        this.ScreenFace.emotion.anger();
         this.RoboticBody.anger();
 
         /* Go back to follow state after the anticipated execution time of attack. */

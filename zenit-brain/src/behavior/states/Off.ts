@@ -1,11 +1,11 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
+import { StateController, Actions, Transition, ZENITState } from './zenit-state.js';
 import { Brain } from '../brain.js';
 import readline from 'readline';
 import { PhoneCamProcessor } from '../processors/phone-cam-processor.js';
 import { BodyLanguageProcessor } from '../processors/body-language-processor.js';
 import { SpeechProcessor } from '../processors/speech-processor.js';
 
-export class Off extends StateWrap{
+export class Off extends ZENITState{
 
     constructor(emotionProcessor : PhoneCamProcessor, gesturePostureProcessor : BodyLanguageProcessor, speechProcessor : SpeechProcessor, stateChangeEvent : any){ 
         super("off", emotionProcessor, gesturePostureProcessor, speechProcessor, stateChangeEvent);

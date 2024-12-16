@@ -1,4 +1,4 @@
-import { State, Actions, Transition, StateWrap } from './BaseState.js';
+import { StateController, Actions, Transition, ZENITState } from './zenit-state.js';
 import { Brain } from '../brain.js';
 import { ChatProcessor } from '../processors/chat-processor.js';
 import { SpeechProcessor } from '../processors/speech-processor.js';
@@ -8,7 +8,7 @@ import { PhoneCamProcessor } from '../processors/phone-cam-processor.js';
 import { EventEmitter } from 'stream';
 
 /* Robot state class defining the robot behavior within this state */
-export class FollowHead extends StateWrap{
+export class FollowHead extends ZENITState{
 
     chatProcessor : ChatProcessor;
     displayProcessor : DisplayProcessor;
