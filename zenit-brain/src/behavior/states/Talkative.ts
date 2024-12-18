@@ -24,8 +24,6 @@ export class Talkative extends ZENITState{
         /* Call the super constructor and set the identification name for the state class */
         super("talkative", phoneCamProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
-        console.log(displayProcessor);
-
         this.sleepWords = ["geschlafen", "Geh schlafen", "Gute Nacht", "Zenit aus", "Zenith aus", "wir schlafen"];
 
         this.chatProcessor = chatProcessor;
@@ -104,8 +102,6 @@ export class Talkative extends ZENITState{
             this.lastEmotion = emotion;
             this.ScreenFace.emotion.setEmotion(this.lastEmotion);
         }
-        //console.log("freezedEmotion: " + this.freezedEmotion);
-        //console.log("lastEmotion: " + emotion);
     }
 
     private finalResultHandler(result : any){

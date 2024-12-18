@@ -68,7 +68,7 @@ export class PhoneCamProcessor {
         };
 
         this.NUM_AROUSAL_LEVELS = 3.333;
-        this.EMOTION_BUFFER_LEN = 10; // frames (5fps currently)
+        this.EMOTION_BUFFER_LEN = 12; // frames (5fps currently)
         this.BEmotion = {
             anger: ['annoyance', 'anger', 'rage'],
             anticipation: ['interest', 'anticipation', 'vigilance'],
