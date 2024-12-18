@@ -33,7 +33,7 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
 ## Hardware Requirements
 - **Robotic Arm:** Elephant Robotics MechArm 270-Pi or similar (1).
 - **Display Device:** Samsung Galaxy A41 or similar smartphone/tablet (5).
-- **Depth Camera:** Microsoft Azure Kinect (6).
+- **(Optional) Depth Camera:** Microsoft Azure Kinect (6).
 - **Additional Components:**
   - Power Supply (2)
   - Table Clamp (3)
@@ -58,7 +58,7 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
   - Python (ZENIT Brain: v. 3.9; ZENIT Body: v. 3.7)
 - **Kinetic Space:**
    Kinetic Space is a self-developed tool to enable training, analysis, and recognition of individual gestures with a depth camera like Microsoft’s Kinect family.
-   To run the Project you will require this tool. There is not repsitory available at current times so please don't hesitate to contact us directly ([christian.felix.purps@h-ka.de](mailto:christian.felix.purps@h-ka.de))
+   To run the Project you will not require this tool, its possible to use user focussation by phone camera (however results of focus will have a lower performance and accuracy). There is not repsitory available at current times so please don't hesitate to contact us directly ([christian.felix.purps@h-ka.de](mailto:christian.felix.purps@h-ka.de))
    so we can provide you the software.
 
 
@@ -68,13 +68,13 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    git clone https://github.com/Snagga86/ZENIT.git
    ```
 2. **Install Dependencies:**
-   - Follow the instructions in the `requirements.txt` file for Python dependencies for `/zenit-body` (on the robot), `/speech-to-text` and `/text-to-speech`. You run use setup.py for `/face-emotion-recognition` in python-package folder.
+   - Follow the instructions in the `requirements.txt` file for Python dependencies for `/zenit-body` (on the robot), `/speech-to-text` and `/text-to-speech` as well as `/phone-video-processing` and `/large-language-model`. You can use the respective .bat files to setup the virtual python environments.
    - Download the VOSK speech model to use and put it into the `/speech-to-text/models/src` folder. (e.g. https://alphacephei.com/vosk/models/vosk-model-de-0.21.zip for german language support).
-   - Install RASA in the chat-system by `pip install rasa`. Then use `rasa train` to prepare the RASA NLU.
+   - (Optional) Install RASA in the chat-system by `pip install rasa`. Then use `rasa train` to prepare the RASA NLU.
+   - Install OLLAMA 3.2 (https://ollama.com/).
    - Install Node.js and required packages using `npm install` in `/zenit-brain` folder.
    - Set up Unity and import necessary assets for the robot face application.
    - Install the App AudioRelay on your smartphone and on your computer if you want to process audio data.
-   - Install the App IPCamera on your smartphone if you want to process facial expressions.
 
 3. **Hardware Setup:**
    - Assemble the robotic arm and attach the smartphone using the car holder.
@@ -86,7 +86,6 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    - Power on the robotic arm, smartphone, computer and depth camera.
    - Start AudioRelay on your computer to receive audio data from the smartphone.
    - Start AudioRelay on your smartphone to stream audio data to your main computation unit.
-   - Start IPCamera on your smartphone if you want to use emotion recognition.
    - Run the main control script to initialize the distributed system `start-zenit-brain.bat`.
    - Start Kinetic Space Application.
    - Start the Robot control script `KARERO_control.py`.
