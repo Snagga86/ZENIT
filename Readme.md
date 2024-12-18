@@ -225,25 +225,19 @@ In the following section we describe the main components to give ZENIT custom be
 
 ## Citation Requirement
 
-If you use this open-source system in your research, projects, or any published work, you must cite the accompanying paper:
-
-```
-[Author(s)], "[Title of the Paper]," [Journal/Conference Name], vol. [Volume], no. [Number], pp. [Page numbers], [Year]. DOI: [DOI link]
-```
-
-Please include the following BibTeX entry in your publications:
+If you use this open-source system in your research, projects, or any published work, you must cite the accompanying paper. Please include the following BibTeX entry in your publications:
 
 ```bibtex
-@article{Author2024,
-  author = {Author(s)},
-  title = {Title of the Paper},
-  journal = {Journal/Conference Name},
-  volume = {Volume},
-  number = {Number},
-  pages = {Page numbers},
-  year = {Year},
-  doi = {DOI link}
-}
+@INPROCEEDINGS{10731255,
+  author={Purps, Christian Felix and Wölfel, Matthias},
+  booktitle={2024 33rd IEEE International Conference on Robot and Human Interactive Communication (ROMAN)}, 
+  title={Fusing Components for an Attentive and Emotionally Expressive Companion Robot: Meet ZENIT}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={2339-2346},
+  keywords={Surveys;Robot vision systems;Human-robot interaction;Manipulators;Hardware;Software reliability;Time factors;Robots;Open source software;Testing},
+  doi={10.1109/RO-MAN60168.2024.10731255}}
 ```
 
 ## License
