@@ -40,10 +40,8 @@ public class ObjectMover : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log("update");
         if (isMoving)
         {
-            //Debug.Log("move");
             // Calculate the distance covered (how far we've moved since the start time)
             float distanceCovered = (Time.time - startTime) * speed;
 

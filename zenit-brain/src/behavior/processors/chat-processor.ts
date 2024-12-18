@@ -222,6 +222,27 @@ export class ChatProcessor {
             case "arrogance":
                 emotion = "contempt";
                 break;
+            case "arrogance":
+                emotion = "contempt";
+                break;
+            case "wut":
+                emotion = "anger";
+                break;
+            case "freude":
+                emotion = "joy";
+                break;
+            case "verachtung":
+                emotion = "contempt";
+                break;
+            case "überraschung":
+                emotion = "surprise";
+                break;
+            case "ekel":
+                emotion = "disgust";
+                break;
+            case "angst":
+                emotion = "fear";
+                break;
             default:
                 emotion = "neutral";
         }

@@ -78,7 +78,6 @@ public class NetworkController : MonoBehaviour
     /// <param name="touchPosition">The position of the touch.</param>
     private void HandleTouch(Vector2 touchPosition)
     {
-        //var payload = "{\"action\": \"screenTouch\" }";
         this.faceActionController.blinkDisgusted();
         this.primaryAudioClip = null;
         this.secondaryAudioClip = null;
@@ -123,7 +122,6 @@ public class NetworkController : MonoBehaviour
 
         this.webSocket.OnMessage += (data) =>
         {
-            //Debug.Log("onMessage");
             var message = System.Text.Encoding.UTF8.GetString(data);
             FaceControlDescription jsonControlObject = JsonConvert.DeserializeObject<FaceControlDescription>(message);
 
@@ -133,14 +131,12 @@ public class NetworkController : MonoBehaviour
             }
             if (jsonControlObject.mode == "setSound")
             {
-                //Debug.Log("VERBAL ACTION TRACE");
                 this.verbalAction = "Mode: " + jsonControlObject.mode + "\nData: " + jsonControlObject.data + "\nExtra: " + jsonControlObject.extra;
             }
             this.DebugTrace.GetComponent<TextMeshProUGUI>().text = this.verbalAction + this.nonverbalAction;
 
             if (jsonControlObject.mode == "setEmotion")
             {
-                //Debug.Log(jsonControlObject.data);
                 this.faceActionController.setEmotion(jsonControlObject.data);
             }
 
@@ -272,7 +268,6 @@ public class NetworkController : MonoBehaviour
         {
             this.lastRequestPartial = partial;
             string audioUrl = $"{httpUrl}?filename={filename}";
-            Debug.Log(audioUrl);
             using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(audioUrl, AudioType.WAV))
             {
                 yield return www.SendWebRequest();

@@ -62,9 +62,6 @@ public class PhoneCamVideoStreamer : MonoBehaviour
 
         // Start connection coroutine
         StartCoroutine(ConnectToServer());
-
-        // Start the processing thread
-        //Task.Run(() => ProcessAndSendFrames());
     }
 
     IEnumerator ConnectToServer()
@@ -194,9 +191,6 @@ public class PhoneCamVideoStreamer : MonoBehaviour
             {
                 Debug.LogError($"Error during frame sending: {ex.Message}");
             }
-
-            // Respect frame interval
-            //Thread.Sleep((int)(frameInterval * 1000));
         }
     }
 

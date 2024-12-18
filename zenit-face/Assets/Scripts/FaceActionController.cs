@@ -283,15 +283,6 @@ public class FaceActionController : MonoBehaviour
         };
 
         speechFlow.Emit(emitParams, 1);
-
-        // Scale only the X-axis of the particle
-        /*var particles = new ParticleSystem.Particle[1];
-        int numParticles = speechFlow.GetParticles(particles);
-        if (numParticles > 0)
-        {
-            particles[0].startSize3D = new Vector3((1/(11-length)), particles[0].startSize3D.y, particles[0].startSize3D.z);
-            speechFlow.SetParticles(particles, numParticles);
-        }*/
     }
 
     internal void showRotatingGears()
