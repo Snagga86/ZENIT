@@ -86,9 +86,7 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    - Power on the robotic arm, smartphone, computer and depth camera.
    - Start AudioRelay on your computer to receive audio data from the smartphone.
    - Start AudioRelay on your smartphone to stream audio data to your main computation unit.
-   - Run the main control script to initialize the distributed system `start-zenit-brain.bat`.
-   - Start Kinetic Space Application.
-   - Start the Robot control script `KARERO_control.py`.
+   - (Optional) Start Kinetic Space Application.
    - Run all required services using `start-services.bat`.
    - Launch the Unity application on the smartphone to display the robot face.
 
@@ -117,9 +115,9 @@ We welcome contributions to ZENIT! If you would like to contribute:
 ## Architecture and Editing
 In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `/zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `/chat-system` folder following instructions from https://rasa.com/docs/.
 1. **States**
-   - Basic behavior of ZENIT is provided by a JavaScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
+   - Basic behavior of ZENIT is provided by a TypeScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
      
-    ```js
+    ```ts
     import { State, Actions, Transition, StateWrap } from './BaseState.js';
     import { Brain } from '../brain.js';
   
@@ -148,24 +146,24 @@ In the following section we describe the main components to give ZENIT custom be
         exitFunction(){}
     }
     ```
-    - Once the state has been defined it must be added to the `brain.js` file.
-     ```js
+    - Once the state has been defined it must be added to the `brain.ts` file.
+     ```ts
      const follow = new StateOne(this.ProcessorA, this.ProcessorB, ..., this.brainEvents).getState();
      ```
     - Additionally, the declared state must be added to the state machine definition.
-    ```js
+    ```ts
     this.stateMachineDefinition = {initialState: "off", off, ..., stateOne};
     ```
 2. **Events**
    - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
      
     - To change the state machine state you can use:
-    ```js
+    ```ts
     this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "stateOne");
     ```
     
     - To trigger a robotic arm movement you can use the following event (this is usually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
-    ```js
+    ```ts
     var payload = {
       "mode" : "setMode",
       "activity" : actionString
@@ -175,7 +173,7 @@ In the following section we describe the main components to give ZENIT custom be
     ```
     
     - To trigger a screen face action you can use the following event (this is usually not necessary because there exists a facade for screen face actions in `BaseState.js` that lets you trigger the action easily.):
-    ```js
+    ```ts
     var payload = {
       "mode" : theMode,
       "data" : data,
@@ -185,7 +183,7 @@ In the following section we describe the main components to give ZENIT custom be
     ```
     
     - For letting the robot speak any text you can use the follwing event:
-    ```js
+    ```ts
     var payload = {
       "mode" : "tts",
       "text" : "Test to speak."
@@ -195,7 +193,7 @@ In the following section we describe the main components to give ZENIT custom be
     
     - To deal with answers from RASA you can use the following event. As RASA is a little detached from the rest of the state machine consider checking `ChatBase.js` class:
     
-    ```js
+    ```ts
     this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
     
     RASAAnswerHandler(rasaAnswer){
@@ -206,14 +204,14 @@ In the following section we describe the main components to give ZENIT custom be
 
 3. **Processors**
    - Processors are made to collect a number of redundant functionalities that are required often and thus injected to the respective state that uses it. At the moment these include the `chat-processor`, `emotion-processor`, `gesture-posture-processor`, and `speech-processor`. These processors are designed to emit specific events that can be listened to, such as e.g.:
-   ```js
+   ```ts
     this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
     this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
     this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
    ```
    - Make sure to remove the respective listeners after usage:
 
-    ```js
+    ```ts
     this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
     this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
     this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler);
@@ -235,7 +233,6 @@ If you use this open-source system in your research, projects, or any published 
   volume={},
   number={},
   pages={2339-2346},
-  keywords={Surveys;Robot vision systems;Human-robot interaction;Manipulators;Hardware;Software reliability;Time factors;Robots;Open source software;Testing},
   doi={10.1109/RO-MAN60168.2024.10731255}}
 ```
 
