@@ -2,7 +2,7 @@
 
 This guide provides detailed steps to set up the ZENIT zenit-brain for connecting to the robotic body. Additional documentation will be included in the future, covering different networks that zenit-brain will connect to. 
 
-The code documentation can be found in `/documentation` subfolder.
+**The code documentation can be found in `/documentation` subfolder.**
 
 ## Steps to Connect Zenit-Brain to the Robotic Body
 
