@@ -1,6 +1,6 @@
-# Video Stream Server with Face and Emotion Detection
+# ZENIT Video Stream Server with Face and Emotion Detection
 
-This repository contains scripts to set up a video streaming server with integrated face detection and emotion recognition using PyTorch and OpenCV.
+This component contains scripts to set up a video streaming server with integrated face detection and emotion recognition using PyTorch and OpenCV to be processed by zenit-brain.
 
 ## Setup Instructions
 
