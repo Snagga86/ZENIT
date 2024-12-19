@@ -1,5 +1,3 @@
-import asyncio
-import _thread
 import time
 import rel
 import json
@@ -9,6 +7,7 @@ import websocket
 from io import StringIO
 from pymycobot.genre import Angle
 import json
+import asyncio
 import numpy
 
 
@@ -33,17 +32,24 @@ class ZENITBot:
 
         self.look_direction = 0;
 
-        zenit_api.power_on();
-        time.sleep(2);
+        #x = zenit_api.is_power_on()
+        print(zenit_api.is_power_on())
+        zenit_api.power_on()
+        time.sleep(2)
         zenit_api.set_fresh_mode(1)
-        time.sleep(0.5);
-        print("get_robot_version: ", zenit_api.get_robot_version())
-        time.sleep(0.5);
+        time.sleep(0.5)
+        print("get_robot_version: ", zenit_api.get_system_version())
+        time.sleep(0.5)
         print("Power on: ", zenit_api.is_power_on())
-        time.sleep(0.5);
+        time.sleep(0.5)
         # zenit_api.send_angles([0, -20, -30, 0, 0, 0], 50)
-        zenit_api.send_angles([0, -20, 10, 0, 10, 0], 50)
+        zenit_api.send_angles([-45, -5, -15, 0, 10, 0], 50)
         time.sleep(4)
+
+        angles = zenit_api.get_angles()
+        print(angles)
+        self.servo1rota = angles[0]
+        self.servo3rota = angles[3]
 
         self.zenit_network.start(self)
 
@@ -106,11 +112,74 @@ class ZENITBot:
 
         return [-1 * angle_v, -1 * angle_h]
 
+    def estimatedAngle(self, percentage):
+        return (percentage - 50) * 0.7
+
+    def rotateBaseToTarget_P(self, servo0rota, servo3rota, facePercentageX, facePercentageY, faceDetected):
+        print("servo0rota: " + str(servo0rota))
+        print("servo3rota: " + str(servo3rota))
+        print("facePercentageX: " + str(facePercentageX))
+        print("facePercentageY: " + str(facePercentageY))
+        print("__________________________")
+
+        '''if facePercentageX < 35:
+            self.servo1rota = self.servo1rota + (100 - facePercentageX)*0.05
+        elif facePercentageX >= 65:
+            self.servo1rota = self.servo1rota - (facePercentageX)*0.05
+        elif facePercentageX < 45:
+            self.servo1rota = self.servo1rota + (100 - facePercentageX)*0.01
+        elif facePercentageX >= 55:
+            self.servo1rota = self.servo1rota - (facePercentageX)*0.01
+        elif facePercentageX < 48:
+            self.servo1rota = self.servo1rota + (100 - facePercentageX)*0.005
+        elif facePercentageX >= 52:
+            self.servo1rota = self.servo1rota - (facePercentageX)*0.005'''
+        
+        if faceDetected == "True":
+
+            self.servo1rota = self.servo1rota - self.estimatedAngle(facePercentageX) * 0.5
+
+            if self.servo1rota > 160:
+                self.servo1rota = 160
+            elif self.servo1rota < -160:
+                self.servo1rota = -160
+
+            '''if facePercentageY < 45:
+                #Move arm upwards to focus face
+                self.servo3rota = self.servo3rota - (100 - facePercentageY)*0.1
+            elif facePercentageY >= 55:
+                self.servo3rota = self.servo3rota + (facePercentageY)*0.1
+
+            self.servo3rota = -15
+            '''
+            self.servo3rota = self.servo3rota + self.estimatedAngle(facePercentageY) * 0.5
+            if self.servo3rota > 45:
+                self.servo3rota = 45
+            if self.servo3rota < -180:
+                self.servo3rota = -180
+
+        if faceDetected == "False":
+            print("no face")
+
+        print("rotationX: " + str(self.servo1rota))
+        print("rotationX: " + str(self.servo3rota))
+        return [self.servo1rota, self.servo3rota]
+
+    def follow_head_percentages(self, payload):
+        servo1rota = self.servo1rota
+        servo3rota = self.servo3rota
+        print("before")
+        r1, r2 = self.rotateBaseToTarget_P(servo1rota, servo3rota, payload["data"]["percentX"], payload["data"]["percentY"], payload["data"]["face"])
+        #print(angle_v, angle_h)
+        self.zenit_api.send_angles([r1, -15, r2 - 5 , 0, 30, 0], 15)
+
+        self.last_action_timestamp = time.time()
+
     def follow_head(self, payload):
         angle_v, angle_h = self.rotateBaseToTarget(payload["data"]["baseX"], payload["data"]["baseY"], payload["data"]["baseZ"], payload["data"]["baseRotation"], payload["data"]["personX"], payload["data"]["personY"], payload["data"]["personZ"])
         print("action: follow head")
         #print(angle_v, angle_h)
-        self.zenit_api.send_angles([angle_v, -15, angle_h - 5 , 0, 30, 0], 15)
+        self.zenit_api.send_angles([angle_v, -5, angle_h - 5 , 0, 30, 0], 15)
         self.personFocusAngleHorizontal = angle_v
         self.personFocusAngleVertical = angle_h
         print("Vangle:" + str(self.personFocusAngleHorizontal))
@@ -218,7 +287,7 @@ class ZENITBot:
     async def nap(self, zenit_api):
         look_direction = random.randint(-35, 35)
         movement_description = [
-            [120, -55, 45, -85, 75, 65],
+            [self.personFocusAngleHorizontal, -55, 45, -85, 75, 65],
         ]
 
         zenit_api.send_angles(movement_description[0], 20)
@@ -320,6 +389,7 @@ class ZENITBot:
         time.sleep(3.5)
         zenit_api.send_angles(movement_description[1], 0)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def surprise(self, zenit_api):
         print("Original Angle:" + str(self.personFocusAngleVertical))
@@ -352,6 +422,7 @@ class ZENITBot:
         time.sleep(3.5)
         zenit_api.send_angles(movement_description[1], 0)
         time.sleep(1.5)
+        self.activity_ended()
 
     async def contempt(self, zenit_api):
         movement_description = [
@@ -450,7 +521,7 @@ class ZENITBot:
                  bP_LegsOpenCrossed, 
                  bP_LegsStretched]
 
-        '''
+
         print("bP_LeanForwardBackward:", bP_LeanForwardBackward)
         print("bP_LeanSideward:", bP_LeanSideward)
         print("bP_HeadForwardBackward:", bP_HeadForwardBackward)
@@ -459,7 +530,7 @@ class ZENITBot:
         print("bP_ArmsOnHip:", bP_ArmsOnHip)
         print("bP_LegsOpenCrossed:", bP_LegsOpenCrossed)
         print("bP_LegsStretched:", bP_LegsStretched)
-        '''
+     
 
         weights = [6.5, 5.5, 2, 2, 1, 0.5, 1, 0]
         joint_angles = self.choose_current_pose(poses=poses, weights=weights)
@@ -700,10 +771,14 @@ class ZENITBot:
         if(self.activity != payload['activity']):
             self.activity = payload['activity']
             print("set activity ", self.activity)
+            if(payload['activity'] == 'followHeadPercentages'):
+                print("followHeadPercentages")
+                self.zenit_network.backsend("getPersonViewPortPercentages")
+
             if(payload['activity'] == 'followHead' ):
                 self.zenit_network.backsend("getPersonCoordinates")
 
-            if(payload['activity'] == 'followHeadVertical' ):
+            if(payload['activity'] == 'followHeadVertical'):
                 self.zenit_network.backsend("getPersonCoordinates")
 				
             if(payload['activity'] == 'performMimicry' ):
@@ -782,13 +857,21 @@ class ZENITBot:
 
         if(self.activity == 'look3'):
             asyncio.run(self.look3(self.zenit_api, payload))
+
+        if(self.activity == 'followHeadPercentages'):
+            if(self.ready_for_command() == False):
+                time.sleep(0.5)
+                self.zenit_network.backsend("getPersonViewPortPercentages")
+                return False
+            self.follow_head_percentages(payload)
+            time.sleep(0.5)
+            self.zenit_network.backsend("getPersonViewPortPercentages")
         
         if(self.activity == 'followHead'):
             if(self.ready_for_command() == False):
                 time.sleep(0.1)
                 self.zenit_network.backsend("getPersonCoordinates")
                 return False
-            #print(self.ready_for_command())
             self.follow_head(payload)
             time.sleep(0.1)
             self.zenit_network.backsend("getPersonCoordinates")
@@ -818,4 +901,3 @@ class ZENITBot:
         if time.time() - self.last_action_timestamp > self.DIGEST_THRESHOLD:
             return True
         return False
-        
