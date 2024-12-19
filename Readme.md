@@ -15,7 +15,6 @@ This repository contains the code and documentation for the ZENIT robot, a mecha
 6. [Usage](#usage)
 7. [Components](#components)
 8. [Contributing](#contributing)
-9. [Architecture and Editing](#architecture-and-editing)
 10. [Citation Requirement](#citation-requirement)
 11. [License](#license)
 12. [Contact](#contact)
