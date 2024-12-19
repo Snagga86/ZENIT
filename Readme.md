@@ -72,9 +72,10 @@ ZENIT (ZENIT Enabling Natural Interaction Technology) is designed to enable easy
    - Download the VOSK speech model to use and put it into the `/speech-to-text/models/src` folder. (e.g. https://alphacephei.com/vosk/models/vosk-model-de-0.21.zip for german language support).
    - (Optional) Install RASA in the chat-system by `pip install rasa`. Then use `rasa train` to prepare the RASA NLU.
    - Install OLLAMA 3.2 (https://ollama.com/).
-   - Install Node.js and required packages using `npm install` in `/zenit-brain` folder.
-   - Set up Unity and import necessary assets for the robot face application.
-   - Install the App AudioRelay on your smartphone and on your computer if you want to process audio data.
+   - Install Node.js (20.9.0) and required packages using `npm install` in `/zenit-brain` folder.
+   - Set up Unity (2021.3.8) and import necessary assets for the robot face application.
+   - Install the App AudioRelay (https://audiorelay.net/) on your smartphone and on your computer if you want to process audio data.
+   - **Check component subfolders for more detailed information**.
 
 3. **Hardware Setup:**
    - Assemble the robotic arm and attach the smartphone using the car holder.
@@ -111,114 +112,6 @@ We welcome contributions to ZENIT! If you would like to contribute:
 1. Fork the repository.
 2. Create a new branch for your feature or bugfix.
 3. Submit a pull request with a detailed description of your changes.
-
-## Architecture and Editing
-In the following section we describe the main components to give ZENIT custom behavior using the supported input modalities (speech, gestures/postures, emotions, and localization) and output modalities (facial expressions, bodily movements, and speech). Behavior is mainly defined in `/zenit-brain`, except for RASA based NLU content. Adjustments in RASA can be found in the respective files in `/chat-system` folder following instructions from https://rasa.com/docs/.
-1. **States**
-   - Basic behavior of ZENIT is provided by a TypeScript based program section using the classic state machine pattern. The state machine itself is defined in `brain.js`. Each state for the state machine must be defined in a seperate file, located in `/states` folder. A basic state would look sth. like the following:
-     
-    ```ts
-    import { State, Actions, Transition, StateWrap } from './BaseState.js';
-    import { Brain } from '../brain.js';
-  
-    /* Robot state class defining the robot behavior within this state. */
-    export class StateOne extends StateWrap{
-        /* Construct object of class and provide the required processors that are required for the respective following code.
-        Processors are made to handle operations of speech, gesture, or chat inputs and maybe extended for further application.*/
-        constructor(ProcessorA, ProcessorB, ..., brainEvents){
-            /* Call the super constructor and set the identification name for the state class and basic functionalities,
-            such as auto cleanup state and facades to easily trigger actions. */
-            super("stateOne", ProcessorA, ProcessorB, ..., brainEvents);
-  
-            /* Bind concrete implementation functions for enter and exit of the current state. */
-            this.state.actions.onEnter = this.enterFunction.bind(this);
-            this.state.actions.onExit = this.exitFunction.bind(this);
-  
-            /* Set up connections between related states of the state machine. */
-            this.state.transitions.push(new Transition("stateTwo", "stateTwo", () => {}));   
-            this.state.transitions.push(new Transition("stateThree", "stateThree", () => {}));  
-        }
-  
-        /* Concrete implementation for the state enter function.*/
-        enterFunction(){}
-  
-        /* Concrete implementation for the state exit function.*/
-        exitFunction(){}
-    }
-    ```
-    - Once the state has been defined it must be added to the `brain.ts` file.
-     ```ts
-     const follow = new StateOne(this.ProcessorA, this.ProcessorB, ..., this.brainEvents).getState();
-     ```
-    - Additionally, the declared state must be added to the state machine definition.
-    ```ts
-    this.stateMachineDefinition = {initialState: "off", off, ..., stateOne};
-    ```
-2. **Events**
-   - The mostly asychnronous behavior of the robot's perceptive and expressive components are triggered via a bunch of different events.
-     
-    - To change the state machine state you can use:
-    ```ts
-    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "stateOne");
-    ```
-    
-    - To trigger a robotic arm movement you can use the following event (this is usually not necessary because there exists a facade for body actions in `BaseState.js` that lets you trigger the action easily.):
-    ```ts
-    var payload = {
-      "mode" : "setMode",
-      "activity" : actionString
-    }
-    
-    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_BODY_ACTION, payload);
-    ```
-    
-    - To trigger a screen face action you can use the following event (this is usually not necessary because there exists a facade for screen face actions in `BaseState.js` that lets you trigger the action easily.):
-    ```ts
-    var payload = {
-      "mode" : theMode,
-      "data" : data,
-      "extra" : extra
-    }
-    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_FACE_ACTION, payload)
-    ```
-    
-    - For letting the robot speak any text you can use the follwing event:
-    ```ts
-    var payload = {
-      "mode" : "tts",
-      "text" : "Test to speak."
-    }
-    this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.TEXT_TO_SPEECH_ACTION, payload);
-    ```
-    
-    - To deal with answers from RASA you can use the following event. As RASA is a little detached from the rest of the state machine consider checking `ChatBase.js` class:
-    
-    ```ts
-    this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
-    
-    RASAAnswerHandler(rasaAnswer){
-      console.log("Answer:" + rasaAnswer);
-    }
-    ```
-    - Whenever you setup an event listener in a state always make sure to remove it properly in the states `exitFunction()` function.
-
-3. **Processors**
-   - Processors are made to collect a number of redundant functionalities that are required often and thus injected to the respective state that uses it. At the moment these include the `chat-processor`, `emotion-processor`, `gesture-posture-processor`, and `speech-processor`. These processors are designed to emit specific events that can be listened to, such as e.g.:
-   ```ts
-    this.gesturePostureProcessor.gesturePostureEvent.on('ClosestBodyDistance', this.closestBodyRecognition.bind(this));
-    this.speechProcessor.speechEvent.on('FinalResult', this.finalResultHandler.bind(this));
-    this.chatProcessor.chatEvents.on(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler.bind(this));
-   ```
-   - Make sure to remove the respective listeners after usage:
-
-    ```ts
-    this.gesturePostureProcessor.gesturePostureEvent.removeAllListeners('ClosestBodyDistance', this.closestBodyRecognition);
-    this.speechProcessor.speechEvent.removeAllListeners('FinalResult', this.finalResultHandler);
-    this.chatProcessor.chatEvents.removeAllListeners(Brain.ROBOT_BRAIN_EVENTS.RASA_ANSWER, this.RASAAnswerHandler);
-
-    Here's a suggested text for your Git repository README file, specifying that users must cite the accompanying paper when using the open-source system:
-
----
 
 ## Citation Requirement
 
