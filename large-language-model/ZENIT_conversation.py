@@ -15,7 +15,7 @@ conversation_history = InMemoryChatMessageHistory()
 # Initialize the Ollama model
 ollama_model = ChatOllama(model="ZENIT", keep_alive = -1)  # Replace "base" with "3.2" if needed
 
-def build_conversation_prompt(history, max_messages=5):
+def build_conversation_prompt(history, max_messages=3):
     """
     Build a conversation prompt using the last `max_messages` from the history.
     """

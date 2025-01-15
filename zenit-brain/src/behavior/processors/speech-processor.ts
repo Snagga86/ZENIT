@@ -97,6 +97,7 @@ export class SpeechProcessor {
         if (splitText[0].includes("text") || splitText[0].includes("partial")) {
             const contentString = splitText[1].substring(1, splitText[1].length - 3);
             console.log("Transcribed Text Input: ", contentString);
+            console.log("emit speeech final result event");
             this.speechEvents.emit(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, contentString);
         }
 

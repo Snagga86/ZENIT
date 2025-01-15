@@ -59,8 +59,6 @@ export class IdleAnchor extends ZENITState{
         console.log("Randomly chosen state:" + this.idlingStyles[action].toString());
         var state = this.idlingStyles[action].toString();
 
-        
-        console.log("jawn");
         if(this.lastState == "jawn"){
             while(state == "jawn"){
                 var action = this.getRandomInt(0, this.idlingStyles.length - 1);

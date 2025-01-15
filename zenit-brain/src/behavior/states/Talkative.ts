@@ -146,7 +146,8 @@ export class Talkative extends ZENITState{
     }
 
     private bodiesLeftHandler(){
-        //this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
+        console.log("bodies left");
+        this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "idleAnchor");
     }
 
     private newSpeechSoundCreatedHandler(data : any){

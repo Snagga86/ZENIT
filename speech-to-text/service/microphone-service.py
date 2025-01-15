@@ -131,6 +131,8 @@ try:
                 if(message["mode"] == "listen" and message["status"] == "resume"):
                     print("resume listening...")
                     agentIsTalking = False
+                    partialResultBuffer = ["","","","","","","","","","","","","","","","","","","",""]
+                    rec.Reset()
                 
                 if(message["mode"] == "listen" and message["status"] == "stop"):
                     #agentStartTalkTime = int(time.time())

@@ -24,7 +24,7 @@ export class Nap extends ZENITState{
         Thus, we anticipate that the animation of the robot arm has been successfully
         executed after a specified time. If this is not the case the animation will
         be overridden by the following. */
-        this.ANTICIPATED_ANIMATION_DURATION = 4000000; /* Time duration in milliseconds. */
+        this.ANTICIPATED_ANIMATION_DURATION = 60000; /* Time duration in milliseconds. */
 
         this.timeout = null;
 
@@ -52,8 +52,10 @@ export class Nap extends ZENITState{
         //this.ScreenFace.emotion.rage();
         this.RoboticBody.nap();
         this.ScreenFace.emotion.sleepy();
+        this.ANTICIPATED_ANIMATION_DURATION = Math.random() * (60000) + 60000;
 
-        this.speechProcessor.speechEvents.on('FinalResult', this.finalResultHandler.bind(this));
+        console.log(this.ANTICIPATED_ANIMATION_DURATION);
+        this.speechProcessor.speechEvents.on(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED, this.finalResultHandler.bind(this));
 
         /* Go back to follow state after the anticipated execution time of attack. */
         this.timeout = setTimeout(() => {
@@ -65,10 +67,11 @@ export class Nap extends ZENITState{
 
     exitFunction(){
         clearTimeout(this.timeout as NodeJS.Timeout);
-        this.speechProcessor.speechEvents.removeAllListeners('FinalResult');
+        this.speechProcessor.speechEvents.removeAllListeners(SpeechProcessor.SPEECH_EVENTS.FINAL_RESULT_RECEIVED);
     }
 
     finalResultHandler(result : any){
+        console.log("FR handler");
         if(this.containsWords(result, this.breakWords)){
             this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "napWake");     
         }
