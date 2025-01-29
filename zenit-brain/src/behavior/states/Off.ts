@@ -42,7 +42,7 @@ export class Off extends ZENITState{
     exitFunction() {
         // Turn off event listener if state is exited.
         process.stdin.removeListener('keypress', this.keypressHandler);
-
+                this.speechProcessor.resume();
         // Optionally, reset raw mode if needed
         if (process.stdin.isTTY) {
             process.stdin.setRawMode(false);

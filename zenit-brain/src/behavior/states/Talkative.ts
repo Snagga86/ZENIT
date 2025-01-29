@@ -13,6 +13,7 @@ export class Talkative extends ZENITState{
     chatProcessor : ChatProcessor;
     displayProcessor : DisplayProcessor;
     sleepWords : Array<String>;
+    heatProtectionWords : Array<String>;
     chatEmotionTimeout : any | null;
 
     lastLLMPayload : any | null;
@@ -25,6 +26,7 @@ export class Talkative extends ZENITState{
         super("talkative", phoneCamProcessor, bodyLanguageProcessor, speechProcessor, brainEvents);
 
         this.sleepWords = ["geschlafen", "Geh schlafen", "Gute Nacht", "Zenit aus", "Zenith aus", "wir schlafen"];
+        this.heatProtectionWords = ["Hitzeschutz", "Hitze Schutz", "Hitzeschutz Modus", "Hitzeschutzmodus"];
 
         this.chatProcessor = chatProcessor;
         this.displayProcessor = displayProcessor;
@@ -50,6 +52,9 @@ export class Talkative extends ZENITState{
         }));
         this.state.transitions.push(new Transition("nap", "nap", () => {
             console.log('transition action for "talkative" in "nap" state')
+        }));
+        this.state.transitions.push(new Transition("subtleActivation", "subtleActivation", () => {
+            console.log('transition action for "talkative" in "subtleActivation" state')
         }));
     }
 
@@ -111,6 +116,10 @@ export class Talkative extends ZENITState{
                 this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
                 this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "nap");
             }
+            else if(this.isHeatProtectionWord(result)){
+                this.ScreenFace.sound.nameAndPlay("confirmSpeechInput");
+                this.brainEvents.emit(Brain.ROBOT_BRAIN_EVENTS.ROBOT_STATE_CHANGE, "subtleActivation");
+            }
             else{
                 this.chatProcessor.LLMSendMessage((result + " (your human conversation partner shows a " + this.lastEmotion + " facial expression.)"));
                 this.ScreenFace.calculate();
@@ -133,8 +142,12 @@ export class Talkative extends ZENITState{
         return payload && typeof payload === 'object' && !Array.isArray(payload);
       }
 
-      private isSleepWord(input : string) {
+    private isSleepWord(input : string) {
         return this.sleepWords.some(word => word.toLowerCase() === input.toLowerCase());
+    }
+
+    private isHeatProtectionWord(input : string) {
+        return this.heatProtectionWords.some(word => word.toLowerCase() === input.toLowerCase());
     }
 
     private robotSpeechEndedHandler(){

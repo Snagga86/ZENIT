@@ -25,10 +25,10 @@ import { ContemptShow } from './states/ContemptShow.js'
 import { DanceShow } from './states/DanceShow.js'
 import { SadnessShow } from './states/SadnessShow.js'
 import { AngerShow } from './states/AngerShow.js';
-import { HeatProtectionEntry } from './states/heatprotection/HeatProtectionEntry.js';
+import { HeatProtectionEntry } from './states/heatprotection/HeatProtectionEntry.js'; */
 import { SubtleActivation } from './states/heatprotection/SubtleActivation.js';
 import { ExplicitActivation } from './states/heatprotection/ExplicitActivation.js';
-import { InformHelp } from './states/heatprotection/InformHelp.js';
+import { InformHelp } from './states/heatprotection/InformHelp.js'; /*
 import { VideoCall } from './states/heatprotection/VideoCall.js';
 import { EmergencyCall } from './states/heatprotection/EmergencyCall.js';
 
@@ -144,6 +144,10 @@ export class Brain{
         const look = new Look(this.phoneCamProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const nap = new Nap(this.phoneCamProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const napWake = new NapWake(this.phoneCamProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
+        const subtleActivation = new SubtleActivation(this.chatProcessor, this.phoneCamProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.displayProcessor, this.brainEvents).getState();
+        const explicitActivation = new ExplicitActivation(this.chatProcessor, this.phoneCamProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.displayProcessor, this.brainEvents).getState();
+        const informHelp = new InformHelp(this.chatProcessor, this.phoneCamProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.displayProcessor, this.brainEvents).getState();
+
         /*const relax = new Relax(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
         const stretch = new Stretch(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();
 
@@ -166,7 +170,7 @@ export class Brain{
         const facialMimicry = new FacialMimicry(this.emotionProcessor, this.bodyLanguageProcessor, this.speechProcessor, this.brainEvents).getState();*/
 
         this.stateMachineDefinition = {
-            initialState: "off", off, followHead, talkative, idleAnchor, jawn, look, nap, napWake /*, relax, stretch, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall */
+            initialState: "off", off, followHead, talkative, idleAnchor, jawn, look, nap, napWake, subtleActivation, explicitActivation, informHelp /*, relax, stretch, facialMimicry, emotionCascade, joy, anger, appreciation, briefingForExercise, callToAction, farewell, exerciseEntry, intermediateAward, performanceAnchor, chatBase, angerShow, disgustShow, sadnessShow, danceShow, contemptShow, follow, heatProtectionEntry, subtleActivation, explicitActivation, informHelp, videoCall, emergencyCall */
         };
         
         /* Create the state machine with states required. */

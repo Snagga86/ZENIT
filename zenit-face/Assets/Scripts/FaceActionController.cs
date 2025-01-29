@@ -312,12 +312,23 @@ public class FaceActionController : MonoBehaviour
     internal void showVideo()
     {
         //this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.CameraNearPlane;
-        this.videoObj.SetActive(true);
+        Debug.Log("Set video object: true");
+
+        if (this.videoObj == null)
+        {
+            Debug.LogError("videoObj is not assigned!");
+        }
+        else
+        {
+            Debug.Log("videoObj is assigned: " + this.videoObj.name);
+            this.videoObj.SetActive(true);
+        }
     }
 
     internal void hideVideo()
     {
         //this.videoPlayer.GetComponent<VideoPlayer>().renderMode = VideoRenderMode.APIOnly;
+        Debug.Log("hide video");
         this.videoObj.SetActive(false);
     }
 

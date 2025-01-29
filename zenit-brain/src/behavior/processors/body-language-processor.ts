@@ -138,6 +138,10 @@ export class BodyLanguageProcessor {
             const xDistance = this.serverConf.config.robotPosition.baseX - body.x;
             const yDistance = this.serverConf.config.robotPosition.baseY - body.y;
             const zDistance = this.serverConf.config.robotPosition.baseZ - body.z;
+            
+            //console.log("xrob: " + this.serverConf.config.robotPosition.baseX + ", yrob: " + this.serverConf.config.robotPosition.baseY + ", zrob: " + this.serverConf.config.robotPosition.baseZ + "\n");
+            //console.log("x: " + body.x + ", y: " + body.y + ", z: " + body.z + "\n");
+            //console.log("xDistance: " + xDistance + ", :yDistance " + yDistance + ", zDistance: " + zDistance + "\n");
 
             distance = Math.sqrt(
                 Math.pow(xDistance, 2) +
@@ -148,6 +152,7 @@ export class BodyLanguageProcessor {
             if (distance < this.closestBodyDistance) {
                 this.closestBody = body;
                 this.closestBodyDistance = distance;
+                console.log(distance);
             }
         });
     }

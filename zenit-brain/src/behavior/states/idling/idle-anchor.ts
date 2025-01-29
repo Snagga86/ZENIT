@@ -33,6 +33,7 @@ export class IdleAnchor extends ZENITState{
 
         /* Bind concrete implementation functions for enter and exit of the current state. */
         this.state.actions.onEnter = this.enterFunction.bind(this);
+        this.state.actions.onExit = this.exitFunction.bind(this);
 
         /* Add transitions to the other states to build the graph.
         The transition is called after the state was left but before the new state is entered. */
